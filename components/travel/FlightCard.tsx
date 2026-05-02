@@ -39,6 +39,13 @@ function AirlineDot({ airline }: { airline: string }) {
   );
 }
 
+function buildSkyscannerUrl(flight: FlightResult): string {
+  const date = flight.departureTime.slice(0, 10).replace(/-/g, "").slice(2); // YYMMDD
+  const origin = flight.originAirport.toLowerCase();
+  const dest = flight.destinationAirport.toLowerCase();
+  return `https://www.skyscanner.es/transporte/vuelos/${origin}/${dest}/${date}/`;
+}
+
 interface FlightCardProps {
   flight: FlightResult;
   rank: number;
@@ -168,10 +175,17 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
 
         {/* CTA */}
         <div className="mt-4 flex gap-2">
-          <Button size="sm" className="flex-1">
-            <ExternalLink className="h-3.5 w-3.5" />
-            Ver oferta
-          </Button>
+          <a
+            href={flight.bookingUrl ?? buildSkyscannerUrl(flight)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1"
+          >
+            <Button size="sm" className="w-full">
+              <ExternalLink className="h-3.5 w-3.5" />
+              Ver oferta
+            </Button>
+          </a>
           <Button variant="outline" size="sm" className="border-gray-200">
             <Bookmark className="h-3.5 w-3.5" />
           </Button>
