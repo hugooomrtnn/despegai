@@ -3,19 +3,26 @@ import { mockFlightProvider } from "./mockFlightProvider";
 import { realFlightProvider } from "./realFlightProvider";
 
 function createFlightProvider(): FlightProvider {
-  const providerName = process.env.FLIGHT_API_PROVIDER || "mock";
+  const hasAmadeus = !!(process.env.AMADEUS_CLIENT_ID && process.env.AMADEUS_CLIENT_SECRET);
+  const explicitMock = process.env.FLIGHT_API_PROVIDER === "mock";
 
-  if (providerName === "mock") {
+  // Usar mock si se fuerza explícitamente o si no hay credenciales reales
+  if (explicitMock || !hasAmadeus) {
     return mockFlightProvider;
   }
 
-  // For real providers, try to use them but fall back to mock on error
+  // Con Amadeus configurado: intentar real y caer en mock si falla o si el destino es flexible
   return {
     async searchFlights(request) {
+      // Sin destino concreto no podemos llamar a Amadeus → mock para recomendaciones
+      if (!request.destinationAirportCode) {
+        return mockFlightProvider.searchFlights(request);
+      }
+
       try {
         return await realFlightProvider.searchFlights(request);
       } catch (error) {
-        console.warn(`[FlightProvider] Real provider (${providerName}) failed, falling back to mock:`, error);
+        console.warn("[FlightProvider] Amadeus failed, falling back to mock:", error);
         return mockFlightProvider.searchFlights(request);
       }
     },
