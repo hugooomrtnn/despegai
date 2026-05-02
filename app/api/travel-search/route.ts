@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
 
     // 1. Parse the natural language prompt
     const parsedRequest = await parseTravelPrompt(prompt.trim());
-    console.log("[DEBUG] parsed:", JSON.stringify({ dest: parsedRequest.destination, flex: parsedRequest.flexibleDestination, origin: parsedRequest.origin }));
 
     // 2. Get destination recommendations if destination is flexible
     const destinationRecommendations = parsedRequest.flexibleDestination

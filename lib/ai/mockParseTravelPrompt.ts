@@ -1,9 +1,5 @@
 import type { ParsedTravelRequest, TripType } from "@/types/travel";
 
-// ─── Diccionario de ciudades y regiones ────────────────────────────────────────
-// Incluye ciudades españolas, regiones, comunidades y destinos internacionales.
-// La clave es el texto que puede aparecer en el prompt (en minúsculas, sin tildes opcionales).
-
 const PLACE_DICT: Record<string, { name: string; code: string }> = {
   // España – principales aeropuertos
   madrid: { name: "Madrid", code: "MAD" },
@@ -11,7 +7,6 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   valencia: { name: "Valencia", code: "VLC" },
   sevilla: { name: "Sevilla", code: "SVQ" },
   malaga: { name: "Málaga", code: "AGP" },
-  málaga: { name: "Málaga", code: "AGP" },
   bilbao: { name: "Bilbao", code: "BIO" },
   alicante: { name: "Alicante", code: "ALC" },
   zaragoza: { name: "Zaragoza", code: "ZAZ" },
@@ -19,7 +14,6 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   valladolid: { name: "Valladolid", code: "VLL" },
   murcia: { name: "Murcia", code: "RMU" },
   almeria: { name: "Almería", code: "LEI" },
-  almería: { name: "Almería", code: "LEI" },
   pamplona: { name: "Pamplona", code: "PNA" },
   navarra: { name: "Pamplona", code: "PNA" },
   santander: { name: "Santander", code: "SDR" },
@@ -29,22 +23,18 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   oviedo: { name: "Oviedo (Asturias)", code: "OVD" },
   asturias: { name: "Oviedo (Asturias)", code: "OVD" },
   gijon: { name: "Oviedo (Asturias)", code: "OVD" },
-  gijón: { name: "Oviedo (Asturias)", code: "OVD" },
-  norte: { name: "Oviedo (Asturias)", code: "OVD" }, // "norte" → Asturias por defecto
+  norte: { name: "Oviedo (Asturias)", code: "OVD" },
 
   // País Vasco
   "san sebastian": { name: "San Sebastián", code: "EAS" },
-  "san sebastián": { name: "San Sebastián", code: "EAS" },
   donostia: { name: "San Sebastián", code: "EAS" },
   "pais vasco": { name: "Bilbao", code: "BIO" },
-  "país vasco": { name: "Bilbao", code: "BIO" },
   euskadi: { name: "Bilbao", code: "BIO" },
-  "vitoria": { name: "Vitoria", code: "VIT" },
+  vitoria: { name: "Vitoria", code: "VIT" },
 
   // Galicia
   "a coruna": { name: "A Coruña", code: "LCG" },
-  "a coruña": { name: "A Coruña", code: "LCG" },
-  coruña: { name: "A Coruña", code: "LCG" },
+  coruna: { name: "A Coruña", code: "LCG" },
   galicia: { name: "Santiago de Compostela", code: "SCQ" },
   santiago: { name: "Santiago de Compostela", code: "SCQ" },
   "santiago de compostela": { name: "Santiago de Compostela", code: "SCQ" },
@@ -53,7 +43,6 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   // Islas Baleares
   palma: { name: "Palma de Mallorca", code: "PMI" },
   mallorca: { name: "Palma de Mallorca", code: "PMI" },
-  "palma de mallorca": { name: "Palma de Mallorca", code: "PMI" },
   ibiza: { name: "Ibiza", code: "IBZ" },
   menorca: { name: "Menorca", code: "MAH" },
   baleares: { name: "Palma de Mallorca", code: "PMI" },
@@ -65,7 +54,6 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   lanzarote: { name: "Lanzarote", code: "ACE" },
   fuerteventura: { name: "Fuerteventura", code: "FUE" },
   "la palma": { name: "La Palma", code: "SPC" },
-  "la gomera": { name: "La Gomera", code: "GMZ" },
   canarias: { name: "Tenerife", code: "TFS" },
   "islas canarias": { name: "Tenerife", code: "TFS" },
 
@@ -79,23 +67,19 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
 
   // Francia
   paris: { name: "París", code: "CDG" },
-  "parís": { name: "París", code: "CDG" },
-  france: { name: "París", code: "CDG" },
   niza: { name: "Niza", code: "NCE" },
   lyon: { name: "Lyon", code: "LYS" },
   marsella: { name: "Marsella", code: "MRS" },
+  francia: { name: "París", code: "CDG" },
 
   // Italia
   roma: { name: "Roma", code: "FCO" },
   rome: { name: "Roma", code: "FCO" },
   milan: { name: "Milán", code: "MXP" },
-  "milán": { name: "Milán", code: "MXP" },
   venecia: { name: "Venecia", code: "VCE" },
   florencia: { name: "Florencia", code: "FLR" },
   napoles: { name: "Nápoles", code: "NAP" },
-  "nápoles": { name: "Nápoles", code: "NAP" },
   cagliari: { name: "Cagliari", code: "CAG" },
-  "cerdeña": { name: "Cagliari", code: "CAG" },
   cerdena: { name: "Cagliari", code: "CAG" },
   sicilia: { name: "Palermo", code: "PMO" },
   palermo: { name: "Palermo", code: "PMO" },
@@ -110,32 +94,27 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
 
   // Alemania
   berlin: { name: "Berlín", code: "BER" },
-  "berlín": { name: "Berlín", code: "BER" },
   munich: { name: "Múnich", code: "MUC" },
-  "múnich": { name: "Múnich", code: "MUC" },
   frankfurt: { name: "Frankfurt", code: "FRA" },
   alemania: { name: "Berlín", code: "BER" },
   hamburgo: { name: "Hamburgo", code: "HAM" },
 
   // Países Bajos
   amsterdam: { name: "Ámsterdam", code: "AMS" },
-  "ámsterdam": { name: "Ámsterdam", code: "AMS" },
   holanda: { name: "Ámsterdam", code: "AMS" },
 
   // Bélgica
   bruselas: { name: "Bruselas", code: "BRU" },
   belgica: { name: "Bruselas", code: "BRU" },
-  "bélgica": { name: "Bruselas", code: "BRU" },
 
   // Europa del Este
   budapest: { name: "Budapest", code: "BUD" },
   hungria: { name: "Budapest", code: "BUD" },
-  "hungría": { name: "Budapest", code: "BUD" },
   praga: { name: "Praga", code: "PRG" },
-  "república checa": { name: "Praga", code: "PRG" },
+  "republica checa": { name: "Praga", code: "PRG" },
   varsovia: { name: "Varsovia", code: "WAW" },
   cracovia: { name: "Cracovia", code: "KRK" },
-  "polonia": { name: "Cracovia", code: "KRK" },
+  polonia: { name: "Cracovia", code: "KRK" },
   viena: { name: "Viena", code: "VIE" },
   austria: { name: "Viena", code: "VIE" },
   bucarest: { name: "Bucarest", code: "OTP" },
@@ -145,7 +124,6 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   atenas: { name: "Atenas", code: "ATH" },
   athens: { name: "Atenas", code: "ATH" },
   grecia: { name: "Atenas", code: "ATH" },
-  thessaloniki: { name: "Tesalónica", code: "SKG" },
   tesalonica: { name: "Tesalónica", code: "SKG" },
   santorini: { name: "Santorini", code: "JTR" },
   mykonos: { name: "Mykonos", code: "JMK" },
@@ -173,29 +151,25 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
 
   // Irlanda
   dublin: { name: "Dublín", code: "DUB" },
-  "dublín": { name: "Dublín", code: "DUB" },
   irlanda: { name: "Dublín", code: "DUB" },
 
-  // Marruecos / Norte de África
+  // Marruecos
   marrakech: { name: "Marrakech", code: "RAK" },
   marrakesh: { name: "Marrakech", code: "RAK" },
   casablanca: { name: "Casablanca", code: "CMN" },
   marruecos: { name: "Marrakech", code: "RAK" },
-  "marroc": { name: "Marrakech", code: "RAK" },
   fez: { name: "Fez", code: "FEZ" },
 
   // Turquía
   estambul: { name: "Estambul", code: "IST" },
   istanbul: { name: "Estambul", code: "IST" },
   turquia: { name: "Estambul", code: "IST" },
-  "turquía": { name: "Estambul", code: "IST" },
   antalya: { name: "Antalya", code: "AYT" },
 
   // Asia
   tokio: { name: "Tokio", code: "NRT" },
   tokyo: { name: "Tokio", code: "NRT" },
   japon: { name: "Tokio", code: "NRT" },
-  "japón": { name: "Tokio", code: "NRT" },
   osaka: { name: "Osaka", code: "KIX" },
   bangkok: { name: "Bangkok", code: "BKK" },
   tailandia: { name: "Bangkok", code: "BKK" },
@@ -204,7 +178,6 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   singapur: { name: "Singapur", code: "SIN" },
   singapore: { name: "Singapur", code: "SIN" },
   dubai: { name: "Dubái", code: "DXB" },
-  "dubái": { name: "Dubái", code: "DXB" },
   maldivas: { name: "Maldivas", code: "MLE" },
   vietnam: { name: "Hanói", code: "HAN" },
   hanoi: { name: "Hanói", code: "HAN" },
@@ -217,16 +190,12 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   "new york": { name: "Nueva York", code: "JFK" },
   miami: { name: "Miami", code: "MIA" },
   "los angeles": { name: "Los Ángeles", code: "LAX" },
-  "los ángeles": { name: "Los Ángeles", code: "LAX" },
   chicago: { name: "Chicago", code: "ORD" },
   cancun: { name: "Cancún", code: "CUN" },
-  "cancún": { name: "Cancún", code: "CUN" },
   mexico: { name: "Ciudad de México", code: "MEX" },
-  "méxico": { name: "Ciudad de México", code: "MEX" },
   "ciudad de mexico": { name: "Ciudad de México", code: "MEX" },
   colombia: { name: "Bogotá", code: "BOG" },
   bogota: { name: "Bogotá", code: "BOG" },
-  "bogotá": { name: "Bogotá", code: "BOG" },
   "buenos aires": { name: "Buenos Aires", code: "EZE" },
   argentina: { name: "Buenos Aires", code: "EZE" },
   brasil: { name: "São Paulo", code: "GRU" },
@@ -240,7 +209,7 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   "cape town": { name: "Ciudad del Cabo", code: "CPT" },
   nairobi: { name: "Nairobi", code: "NBO" },
   kenia: { name: "Nairobi", code: "NBO" },
-  "kenya": { name: "Nairobi", code: "NBO" },
+  kenya: { name: "Nairobi", code: "NBO" },
 };
 
 const MONTH_MAP: Record<string, number> = {
@@ -250,68 +219,88 @@ const MONTH_MAP: Record<string, number> = {
   july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
 };
 
-// Palabras que indican destino flexible (no hay destino concreto)
 const FLEXIBLE_KEYWORDS = [
-  "me da igual", "da igual", "cualquier", "cualquier destino",
-  "sorprendeme", "sorpréndeme", "donde sea", "donde quiera",
-  "algún sitio", "algun sitio", "no importa el destino",
-  "no importa donde", "abierto a", "flexible",
+  "me da igual", "da igual", "cualquier", "sorprendeme", "donde sea",
+  "donde quiera", "algun sitio", "no importa el destino", "no importa donde",
+  "abierto a", "flexible",
 ];
 
-// Palabras de ruido que NO son ciudades aunque aparezcan en el diccionario
-const NOISE_WORDS = new Set([
-  "norte", // solo es destino si hay contexto claro
-]);
+// "norte" solo es destino con contexto explícito, no en scan libre
+const CONTEXT_ONLY_WORDS = new Set(["norte"]);
 
-// ─── Normalizar texto: quitar tildes, pasar a minúsculas ─────────────────────
+// ─── Normalizar: quitar tildes y pasar a minúsculas ──────────────────────────
 function normalize(text: string): string {
   return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// ─── Extraer ORIGEN ──────────────────────────────────────────────────────────
-// Solo considera origen si hay un patrón explícito tipo "desde [ciudad]".
-// Si no hay patrón → null (el caller defaultea a Madrid).
-function extractOrigin(text: string): { name: string; code: string } | null {
-  const norm = normalize(text);
-
-  const originPatterns = [
-    // "desde Madrid", "volando desde Barcelona", "salida desde Sevilla"
-    /(?:desde|volando\s+desde|salida\s+desde|saliendo\s+de(?:sde)?|vuelo\s+desde|sale\s+de|part(?:o|iendo)\s+de(?:sde)?)\s+([\w\s]+?)(?:\s+(?:a|para|hacia|en|el|la|los|las|durante|por|,)|$)/i,
-    // "origen: Madrid"
-    /origen\s*[:=]\s*([\w\s]+?)(?:\s|,|$)/i,
-  ];
-
-  for (const pattern of originPatterns) {
-    const m = norm.match(pattern);
-    if (m) {
-      const candidate = m[1].trim();
-      for (const len of [3, 2, 1]) {
-        const words = candidate.split(/\s+/).slice(0, len).join(" ");
-        const found = lookupPlace(words);
-        if (found) return found;
-      }
-    }
-  }
-
-  return null;
-}
-
-// Construye un mapa de búsqueda normalizado: normKey → {name, code}
-// Se ejecuta una sola vez y permite búsqueda exacta sin tildes.
+// ─── Mapa de búsqueda normalizado (construido una vez al cargar el módulo) ───
 const NORMALIZED_DICT: Map<string, { name: string; code: string }> = new Map(
   Object.entries(PLACE_DICT).map(([k, v]) => [normalize(k), v])
 );
 
-// Busca una palabra/frase en el diccionario ignorando tildes.
-function lookupPlace(word: string): { name: string; code: string } | null {
-  const norm = normalize(word.trim());
-  // Exacto
-  const exact = NORMALIZED_DICT.get(norm);
-  if (exact) return exact;
-  // El texto de entrada contiene una clave conocida (ej: "ir a san sebastian")
-  for (const [normKey, val] of Array.from(NORMALIZED_DICT.entries())) {
-    if (normKey.length >= 5 && norm.includes(normKey)) return val;
+// Lista de claves ordenadas de mayor a menor longitud (para preferir matches específicos)
+const SORTED_KEYS: string[] = Array.from(NORMALIZED_DICT.keys()).sort(
+  (a, b) => b.length - a.length
+);
+
+// ─── Busca una frase en el diccionario, ignorando tildes ─────────────────────
+function lookupPlace(phrase: string): { name: string; code: string } | null {
+  const norm = normalize(phrase.trim());
+  return NORMALIZED_DICT.get(norm) ?? null;
+}
+
+// ─── Busca todos los lugares presentes en el texto normalizado ────────────────
+// Recorre las claves de mayor a menor longitud para preferir matches más específicos.
+// Respeta límites de palabra para evitar falsos positivos.
+function findPlacesInText(
+  norm: string,
+  excludeName: string | null
+): Array<{ name: string; code: string; key: string; pos: number }> {
+  const found: Array<{ name: string; code: string; key: string; pos: number }> = [];
+  const covered = new Set<number>(); // posiciones ya cubiertas por un match más largo
+
+  for (const key of SORTED_KEYS) {
+    let idx = norm.indexOf(key);
+    while (idx !== -1) {
+      const end = idx + key.length;
+      const beforeOk = idx === 0 || /\W/.test(norm[idx - 1]);
+      const afterOk = end >= norm.length || /\W/.test(norm[end]);
+
+      if (beforeOk && afterOk && !covered.has(idx)) {
+        const val = NORMALIZED_DICT.get(key)!;
+        if (val.name !== excludeName) {
+          found.push({ ...val, key, pos: idx });
+          // Marcar posiciones cubiertas
+          for (let p = idx; p < end; p++) covered.add(p);
+        }
+      }
+      idx = norm.indexOf(key, idx + 1);
+    }
   }
+
+  return found;
+}
+
+// ─── Extraer ORIGEN ──────────────────────────────────────────────────────────
+function extractOrigin(text: string): { name: string; code: string } | null {
+  const norm = normalize(text);
+
+  const patterns = [
+    /(?:desde|volando\s+desde|salida\s+desde|saliendo\s+de|vuelo\s+desde|sale\s+de|parto\s+de|partiendo\s+de)\s+([a-z\s]{2,30}?)(?:\s+(?:a|para|hacia|en|el|la|los|las|durante|por)|,|$)/i,
+    /origen\s*[:=]\s*([a-z\s]{2,20}?)(?:\s|,|$)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const m = norm.match(pattern);
+    if (!m) continue;
+    const candidate = m[1].trim();
+    for (const len of [3, 2, 1]) {
+      const words = candidate.split(/\s+/).slice(0, len).join(" ");
+      const found = lookupPlace(words);
+      if (found) return found;
+    }
+  }
+
   return null;
 }
 
@@ -320,25 +309,23 @@ function extractDestination(
   text: string,
   originName: string | null
 ): { name: string; code: string } | null {
-  const lower = text.toLowerCase();
-  // Trabajar con texto normalizado (sin tildes) para evitar problemas de encoding en regex
   const norm = normalize(text);
 
-  // Si hay palabras de destino flexible → sin destino concreto
-  if (FLEXIBLE_KEYWORDS.some((k) => lower.includes(normalize(k)))) return null;
+  // Si el usuario pide destino flexible → sin destino concreto
+  if (FLEXIBLE_KEYWORDS.some((k) => norm.includes(normalize(k)))) return null;
 
-  // Patrones explícitos (todos sobre texto normalizado para evitar problemas de charset)
+  // ── Método 1: buscar después de indicadores de destino explícitos ──────────
   const destPatterns = [
-    // "quiero ir a asturias", "me voy a lisboa", "viajar al norte"
-    /(?:quiero\s+(?:ir|viajar|volar)|me\s+(?:voy|quiero\s+ir)|voy|viajar|volar|ir)\s+al?\s+([\w\s]{2,40}?)(?=\s+\d|\s+durante|\s+en\s|\s+por|\s+,|$)/i,
-    // "sacame vuelos a roma", "busca vuelos para berlin"
-    /(?:s[ae]came?|busca|encuentra|dame|mostrame?|muestrame?)\s+(?:vuelos?|billetes?|pasajes?)\s+(?:al?|para|hacia)\s+([\w\s]{2,40}?)(?=\s+\d|\s+en\s|\s+,|$)/i,
-    // "vuelos a japon", "vuelos para tokio"
-    /vuelos?\s+(?:al?|para|hacia)\s+([\w\s]{2,40}?)(?=\s+\d|\s+en\s|\s+desde|\s+,|$)/i,
-    // "destino: barcelona"
-    /destino\s*[:=]\s*([\w\s]{2,30}?)(?:\s|,|$)/i,
-    // "a roma", "al norte"
-    /\bal?\s+([\w\s]{3,30}?)(?=\s+\d|\s+durante|\s+en\s+|\s+para|\s*,|$)/i,
+    // "quiero ir a X", "me voy a X", "viajar a X"
+    /(?:quiero\s+(?:ir|viajar|volar)|me\s+(?:voy|quiero\s+ir)|voy|viajar|volar|ir)\s+al?\s+([a-z\s]{2,40}?)(?=\s+\d|\s+durante|\s+en\s|\s+por|\s*,|$)/i,
+    // "sacame vuelos a X", "busca vuelos para X"
+    /(?:sacame?|busca|encuentra|dame|mostrame?|muestrame?)\s+(?:vuelos?|billetes?|pasajes?)\s+(?:al?|para|hacia)\s+([a-z\s]{2,40}?)(?=\s+\d|\s+en\s|\s*,|$)/i,
+    // "vuelos a X", "vuelos para X"
+    /vuelos?\s+(?:al?|para|hacia)\s+([a-z\s]{2,40}?)(?=\s+\d|\s+en\s|\s+desde|\s*,|$)/i,
+    // "destino: X"
+    /destino\s*[:=]\s*([a-z\s]{2,30}?)(?:\s|,|$)/i,
+    // "al norte", "a roma", "a japon"
+    /\bal?\s+([a-z\s]{3,30}?)(?=\s+\d|\s+durante|\s+en\s+|\s+para|\s*,|$)/i,
   ];
 
   for (const pattern of destPatterns) {
@@ -346,8 +333,6 @@ function extractDestination(
     if (!m) continue;
 
     const candidate = m[1].trim();
-
-    // Prueba con hasta 4 palabras del candidato
     for (const len of [4, 3, 2, 1]) {
       const words = candidate.split(/\s+/).slice(0, len).join(" ");
       if (!words || words.length < 2) continue;
@@ -356,17 +341,18 @@ function extractDestination(
     }
   }
 
-  // Fallback: escanea el texto normalizado buscando nombres conocidos
-  const normWords = norm.split(/\s+/);
-  for (const len of [4, 3, 2, 1]) {
-    for (let i = 0; i <= normWords.length - len; i++) {
-      const chunk = normWords.slice(i, i + len).join(" ");
-      if (chunk.length < 3) continue;
-      const found = NORMALIZED_DICT.get(chunk);
-      if (found && found.name !== originName && !NOISE_WORDS.has(chunk)) {
-        return found;
-      }
-    }
+  // ── Método 2: scan completo del texto normalizado ─────────────────────────
+  // Encuentra todos los lugares mencionados y devuelve el primero que no sea el origen
+  const allPlaces = findPlacesInText(norm, originName);
+  for (const place of allPlaces) {
+    if (!CONTEXT_ONLY_WORDS.has(place.key)) return place;
+  }
+
+  // "norte" solo se acepta si hay contexto geográfico claro en el texto
+  const hasNorteContext = /(?:ir al|voy al|vuelos? al|a(?:l)?\s+norte|norte\s+de\s+espa)/i.test(norm);
+  if (hasNorteContext) {
+    const norte = NORMALIZED_DICT.get("norte");
+    if (norte && norte.name !== originName) return norte;
   }
 
   return null;
@@ -380,7 +366,7 @@ function extractBudget(text: string): number | null {
     /hasta\s+(?:unos?|los?)?\s*(\d{2,5})/i,
     /menos\s+de\s+(\d{2,5})/i,
     /m[aá]ximo\s+(\d{2,5})/i,
-    /no\s+(?:más\s+de|mas\s+de|gastar\s+más\s+de)\s+(\d{2,5})/i,
+    /no\s+(?:m[aá]s\s+de|gastar\s+m[aá]s\s+de)\s+(\d{2,5})/i,
     /(\d{2,5})\s*(?:de\s+)?presupuesto/i,
   ];
   for (const p of patterns) {
@@ -394,23 +380,18 @@ function extractBudget(text: string): number | null {
 function extractDuration(text: string): number | null {
   const lower = text.toLowerCase();
 
-  // "fin de semana" / "finde" = 3 días
   if (/fin\s+de\s+semana|finde(?:\s+semana)?|weekend/.test(lower)) return 3;
 
-  // "X o Y días" → tomar el primero
   const rangeMatch = lower.match(/(\d+)\s*(?:o|a|-)\s*\d+\s*d[íi]as?/i);
   if (rangeMatch) return parseInt(rangeMatch[1]);
 
-  // "X días" / "X noches"
   const daysMatch = lower.match(/(\d+)\s*d[íi]as?/i);
   if (daysMatch) return parseInt(daysMatch[1]);
 
   const nightsMatch = lower.match(/(\d+)\s*noches?/i);
   if (nightsMatch) return parseInt(nightsMatch[1]) + 1;
 
-  // "una semana" = 7
   if (/una\s+semana/.test(lower)) return 7;
-  // "dos semanas" = 14
   if (/dos\s+semanas/.test(lower)) return 14;
 
   return null;
@@ -420,7 +401,6 @@ function extractDuration(text: string): number | null {
 function extractDepartureDate(text: string): string | null {
   const lower = text.toLowerCase();
 
-  // Buscar mes conocido
   for (const [monthName, monthNum] of Object.entries(MONTH_MAP)) {
     if (lower.includes(monthName)) {
       const now = new Date();
@@ -430,7 +410,6 @@ function extractDepartureDate(text: string): string | null {
     }
   }
 
-  // "próximas X semanas"
   const weeksMatch = lower.match(/pr[oó]ximas?\s+(\d+)\s+semanas?/i);
   if (weeksMatch) {
     const d = new Date();
@@ -438,7 +417,6 @@ function extractDepartureDate(text: string): string | null {
     return d.toISOString().split("T")[0];
   }
 
-  // "próximos X meses"
   const monthsMatch = lower.match(/pr[oó]ximos?\s+(\d+)\s+meses?/i);
   if (monthsMatch) {
     const d = new Date();
@@ -446,20 +424,14 @@ function extractDepartureDate(text: string): string | null {
     return d.toISOString().split("T")[0];
   }
 
-  // "este verano"
   if (/(?:este|el)\s+verano/.test(lower)) {
-    const now = new Date();
-    return new Date(now.getFullYear(), 6, 15).toISOString().split("T")[0]; // julio
+    return new Date(new Date().getFullYear(), 6, 15).toISOString().split("T")[0];
   }
-  // "estas navidades" / "navidad"
-  if (/navidad|navidades|diciembre/.test(lower)) {
-    const now = new Date();
-    return new Date(now.getFullYear(), 11, 22).toISOString().split("T")[0];
+  if (/navidad|navidades/.test(lower)) {
+    return new Date(new Date().getFullYear(), 11, 22).toISOString().split("T")[0];
   }
-  // "semana santa"
   if (/semana\s+santa/.test(lower)) {
-    const now = new Date();
-    return new Date(now.getFullYear(), 3, 10).toISOString().split("T")[0]; // abril
+    return new Date(new Date().getFullYear(), 3, 10).toISOString().split("T")[0];
   }
 
   return null;
@@ -470,14 +442,14 @@ function detectTripType(text: string): TripType {
   const lower = text.toLowerCase();
 
   const checks: Array<[string[], TripType]> = [
-    [["playa", "beach", "mar ", "costa ", "arena", "isla", "mediterráneo", "caribe", "bañarme", "sol y"], "beach"],
-    [["romántic", "pareja", "luna de miel", "honeymoon", "aniversario", "romanc"], "romantic"],
-    [["aventura", "adventure", "senderismo", "trekking", "montaña", "naturaleza", "activo", "senderista"], "adventure"],
-    [["fiesta", "party", "nightlife", "clubbing", "discoteca", "marcha nocturna", "de fiesta"], "party"],
-    [["cultura", "museo", "historia", "arte ", "patrimonio", "monumento", "turismo cultural"], "culture"],
+    [["playa", "beach", "mar ", "costa ", "arena", "isla", "caribe", "mediterr"], "beach"],
+    [["romantic", "pareja", "luna de miel", "honeymoon", "aniversario"], "romantic"],
+    [["aventura", "senderismo", "trekking", "montana", "naturaleza"], "adventure"],
+    [["fiesta", "party", "discoteca", "marcha nocturna"], "party"],
+    [["cultura", "museo", "historia", "arte ", "patrimonio", "monumento"], "culture"],
     [["relax", "descanso", "tranquil", "spa", "descansar", "desconectar", "relajar"], "relax"],
-    [["ciudad", "city break", "urbano", "capital", "europeo", "europea", "visitar la ciudad"], "city"],
-    [["norte", "asturias", "cantabria", "galicia", "país vasco"], "relax"],
+    [["ciudad", "city break", "urbano", "capital", "europeo", "europea"], "city"],
+    [["norte", "asturias", "cantabria", "galicia"], "relax"],
   ];
 
   for (const [keywords, type] of checks) {
@@ -493,12 +465,12 @@ function extractPreferences(text: string): string[] {
   const prefs: string[] = [];
 
   if (/directo|sin escalas|vuelo directo/.test(lower)) prefs.push("vuelo directo");
-  if (/barat[ao]|econ[oó]mic[ao]|precio bajo|barato|low[ -]cost|chollo/.test(lower)) prefs.push("precio bajo");
-  if (/buen clima|buen tiempo|sol y calor|hace calor/.test(lower)) prefs.push("buen clima");
-  if (/gastronom[ií]a|buena comida|comer bien|cocina/.test(lower)) prefs.push("gastronomía");
-  if (/no\s+(?:muy\s+)?tur[íi]stic|poco tur[íi]stic|no masificad|tranquilo/.test(lower)) prefs.push("poco turístico");
+  if (/barat[ao]|econ[oó]mic[ao]|precio bajo|low[ -]cost|chollo/.test(lower)) prefs.push("precio bajo");
+  if (/buen clima|buen tiempo|sol y calor/.test(lower)) prefs.push("buen clima");
+  if (/gastronom[ií]a|buena comida|comer bien/.test(lower)) prefs.push("gastronomía");
+  if (/poco tur[íi]stic|no masificad|tranquilo/.test(lower)) prefs.push("poco turístico");
   if (/familiar|ni[ñn]os|familia/.test(lower)) prefs.push("apto para familias");
-  if (/solo|solero|solo\/a|viaje solo/.test(lower)) prefs.push("viaje en solitario");
+  if (/\bsolo\b|viaje solo/.test(lower)) prefs.push("viaje en solitario");
 
   return prefs;
 }
@@ -506,24 +478,23 @@ function extractPreferences(text: string): string[] {
 // ─── Función principal ───────────────────────────────────────────────────────
 export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
   const text = rawPrompt.trim();
+  const norm = normalize(text);
 
   const origin = extractOrigin(text);
   const destination = extractDestination(text, origin?.name ?? null);
-  console.log("[MOCK_PARSE] origin:", origin?.name, "destination:", destination?.name, "for:", text.slice(0, 50));
   const budget = extractBudget(text);
   const durationDays = extractDuration(text);
   const departureDate = extractDepartureDate(text);
   const tripType = detectTripType(text);
   const preferences = extractPreferences(text);
 
-  const lower = text.toLowerCase();
   const isFlexibleDestination =
     !destination ||
-    FLEXIBLE_KEYWORDS.some((k) => lower.includes(normalize(k)));
+    FLEXIBLE_KEYWORDS.some((k) => norm.includes(normalize(k)));
 
   const isFlexibleDates =
     !departureDate ||
-    /flexible|cualquier fecha|cuando sea|cuando quiera/.test(lower);
+    /flexible|cualquier fecha|cuando sea|cuando quiera/.test(norm);
 
   return {
     origin: origin?.name ?? "Madrid",
