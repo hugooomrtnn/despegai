@@ -3,6 +3,8 @@ import { parseTravelPrompt } from "@/lib/ai/parseTravelPrompt";
 import { flightProvider } from "@/lib/flights/flightProvider";
 import { getDestinationRecommendations } from "@/lib/flights/mockFlightProvider";
 import { scoreFlights } from "@/lib/flights/scoreFlight";
+import { getHotels } from "@/lib/hotels/mockHotelProvider";
+import { buildTripPlan } from "@/lib/planning/tripPlanner";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type { TravelSearchResponse } from "@/types/travel";
 
@@ -39,7 +41,13 @@ export async function POST(request: NextRequest) {
     // 4. Score and rank flights
     const flights = scoreFlights(rawFlights, parsedRequest);
 
-    // 5. Optionally save to Supabase
+    // 5. Get hotels
+    const hotels = getHotels(parsedRequest);
+
+    // 6. Build trip plan
+    const tripPlan = buildTripPlan(parsedRequest);
+
+    // 7. Optionally save to Supabase
     let searchId: string | undefined;
     if (isSupabaseConfigured()) {
       try {
@@ -63,6 +71,8 @@ export async function POST(request: NextRequest) {
       parsedRequest,
       destinationRecommendations,
       flights,
+      hotels,
+      tripPlan,
       searchId,
     };
 

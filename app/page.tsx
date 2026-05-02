@@ -3,12 +3,14 @@
 import { useState } from "react";
 import {
   Plane, Brain, FileText, Sparkles, Globe, Zap,
-  Star, ChevronDown, Clock,
+  ChevronDown, Clock, Hotel, Map,
 } from "lucide-react";
 import { AITravelSearch } from "@/components/travel/AITravelSearch";
 import { ParsedRequestSummary } from "@/components/travel/ParsedRequestSummary";
 import { DestinationRecommendations } from "@/components/travel/DestinationRecommendations";
 import { FlightResultsList } from "@/components/travel/FlightResultsList";
+import { HotelResultsList } from "@/components/travel/HotelResultsList";
+import { TripPlanPanel } from "@/components/travel/TripPlanPanel";
 import { ProposalPanel } from "@/components/travel/ProposalPanel";
 import { LoadingState } from "@/components/travel/LoadingState";
 import { ErrorState } from "@/components/travel/ErrorState";
@@ -46,14 +48,18 @@ const STATS = [
   { value: "1 clic", label: "Para copiar propuesta" },
 ];
 
+type ResultTab = "flights" | "hotels" | "plan";
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<TravelSearchResponse | null>(null);
+  const [activeTab, setActiveTab] = useState<ResultTab>("flights");
 
   function handleResults(data: TravelSearchResponse) {
     setResults(data);
     setError(null);
+    setActiveTab("flights");
     setTimeout(() => {
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -168,14 +174,67 @@ export default function HomePage() {
                   />
                 )}
 
-                {/* Flights */}
+                {/* Tab navigation */}
                 {hasResults && (
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <Plane className="h-5 w-5 text-violet-500" />
-                      Opciones de vuelo
-                    </h2>
-                    <FlightResultsList flights={results.flights} />
+                    <div className="flex gap-1 bg-white border border-gray-100 rounded-xl p-1 shadow-sm mb-5">
+                      <button
+                        onClick={() => setActiveTab("flights")}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-lg transition-all ${
+                          activeTab === "flights"
+                            ? "bg-violet-600 text-white shadow-sm"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <Plane className="h-4 w-4" />
+                        Vuelos
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("hotels")}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-lg transition-all ${
+                          activeTab === "hotels"
+                            ? "bg-violet-600 text-white shadow-sm"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <Hotel className="h-4 w-4" />
+                        Hoteles
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("plan")}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-sm font-medium py-2 rounded-lg transition-all ${
+                          activeTab === "plan"
+                            ? "bg-violet-600 text-white shadow-sm"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <Map className="h-4 w-4" />
+                        Plan de viaje
+                      </button>
+                    </div>
+
+                    {activeTab === "flights" && (
+                      <FlightResultsList flights={results.flights} />
+                    )}
+
+                    {activeTab === "hotels" && (
+                      results.hotels && results.hotels.length > 0 ? (
+                        <HotelResultsList
+                          hotels={results.hotels}
+                          nights={results.parsedRequest.durationDays ?? 3}
+                        />
+                      ) : (
+                        <p className="text-center text-gray-400 py-10 text-sm">No hay hoteles disponibles para este destino.</p>
+                      )
+                    )}
+
+                    {activeTab === "plan" && (
+                      results.tripPlan ? (
+                        <TripPlanPanel plan={results.tripPlan} />
+                      ) : (
+                        <p className="text-center text-gray-400 py-10 text-sm">No hay plan disponible. Indica un destino concreto.</p>
+                      )
+                    )}
                   </div>
                 )}
 

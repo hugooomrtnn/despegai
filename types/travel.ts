@@ -69,10 +69,63 @@ export type FlightBadge =
 
 export type FlightSortOption = "price" | "stops" | "duration" | "score";
 
+// ─── Hoteles ─────────────────────────────────────────────────────────────────
+
+export type HotelResult = {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+  stars: number;
+  pricePerNight: number;
+  totalPrice: number;
+  currency: string;
+  rating: number;   // 7.0 – 10.0
+  reviewCount: number;
+  amenities: string[];
+  zone: string;
+  bookingUrl: string;
+  score: number;
+  badges: HotelBadge[];
+  recommendationReason: string;
+};
+
+export type HotelBadge =
+  | "cheapest"
+  | "top_rated"
+  | "best_value"
+  | "recommended"
+  | "central";
+
+// ─── Planning ────────────────────────────────────────────────────────────────
+
+export type TripDay = {
+  day: number;
+  title: string;
+  morning: string;
+  afternoon: string;
+  evening: string;
+  tip: string;
+};
+
+export type TripPlan = {
+  destination: string;
+  durationDays: number;
+  tripType: TripType;
+  days: TripDay[];
+  generalTips: string[];
+  bestTimeToVisit: string;
+  estimatedDailyBudget: string;
+};
+
+// ─── Respuesta completa ───────────────────────────────────────────────────────
+
 export type TravelSearchResponse = {
   parsedRequest: ParsedTravelRequest;
   destinationRecommendations: DestinationRecommendation[];
   flights: FlightResult[];
+  hotels: HotelResult[];
+  tripPlan: TripPlan | null;
   searchId?: string;
 };
 
