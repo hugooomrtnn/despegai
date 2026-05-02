@@ -278,6 +278,10 @@ function findPlacesInText(
     }
   }
 
+  // Ordenar por posición descendente: el lugar mencionado más tarde es el más específico
+  // Ej: "vuelos japon osaka" → osaka gana sobre japon
+  found.sort((a, b) => b.pos - a.pos);
+
   return found;
 }
 
