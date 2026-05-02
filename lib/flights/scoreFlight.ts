@@ -68,24 +68,30 @@ export function buildRecommendationReason(
   allFlights: FlightResult[]
 ): string {
   const minPrice = Math.min(...allFlights.map((f) => f.price));
+  const maxPrice = Math.max(...allFlights.map((f) => f.price));
+  const minDuration = Math.min(...allFlights.map((f) => f.durationMinutes));
+  const savingVsMax = maxPrice - flight.price;
 
-  if (flight.price === minPrice) {
-    return "Es la opción más barata encontrada para tus fechas.";
+  if (flight.price === minPrice && flight.stops === 0) {
+    return "Mejor precio y vuelo directo. Opción ideal para proponer al cliente.";
   }
-  if (flight.stops === 0 && flight.price < minPrice * 1.2) {
-    return "Vuelo directo con excelente relación precio/comodidad.";
+  if (flight.price === minPrice) {
+    return `Opción más económica disponible. Ahorra hasta ${savingVsMax}€ respecto a otras alternativas.`;
+  }
+  if (flight.stops === 0 && flight.price <= minPrice * 1.15) {
+    return "Vuelo directo con precio muy competitivo. Recomendado para clientes que valoran comodidad.";
   }
   if (flight.stops === 0) {
-    return "Vuelo directo sin escalas, ideal para viajes cómodos.";
+    return "Vuelo directo sin escalas. Mayor comodidad para el cliente aunque con precio algo superior.";
   }
   if (request.budget && flight.price <= request.budget * 0.8) {
-    return `Encaja perfectamente con tu presupuesto de ${request.budget} ${request.currency}.`;
+    return `Encaja bien con el presupuesto del cliente (${request.budget} ${request.currency}). Deja margen para otros gastos.`;
   }
-  if (flight.durationMinutes < 120) {
-    return "Vuelo corto y rápido, ideal para escapadas de fin de semana.";
+  if (flight.durationMinutes === minDuration) {
+    return "Vuelo más rápido disponible. Ideal para clientes con poco tiempo o viajes de empresa.";
   }
-  if (flight.score >= 75) {
-    return "Destino recomendado por IA: buen precio, vuelo conveniente y gran experiencia.";
+  if (flight.score >= 80) {
+    return "Buen equilibrio entre precio, duración y escalas. Opción sólida para proponer.";
   }
-  return "Buena relación precio/duración para este destino.";
+  return "Alternativa válida con buena relación precio/duración para este destino.";
 }

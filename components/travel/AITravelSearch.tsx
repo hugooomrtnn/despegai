@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import type { TravelSearchResponse } from "@/types/travel";
 
 const PROMPT_EXAMPLES = [
-  "Quiero volar barato desde Madrid un fin de semana de mayo, me da igual el destino",
-  "Tengo 300 euros y quiero ir a una ciudad europea bonita durante 4 días",
-  "Quiero ir a Japón en septiembre lo más barato posible",
-  "Quiero playa barata desde Barcelona en julio",
-  "Busca vuelos baratos desde Madrid para cualquier destino europeo en los próximos 2 meses",
-  "Quiero una escapada romántica de fin de semana desde Madrid",
+  "Cliente quiere Japón en septiembre lo más barato posible desde Madrid",
+  "Familia de 4 busca escapada a Roma en octubre, presupuesto ajustado",
+  "Empresa necesita Madrid-Londres ida y vuelta la semana que viene",
+  "Pareja quiere 5 días en París, vuelos cómodos sin escalas",
+  "Escapada de fin de semana desde Madrid por menos de 150€, destino flexible",
+  "Viaje de empresa Sevilla-Berlín para 2 personas en junio",
 ];
 
 interface AITravelSearchProps {
