@@ -75,7 +75,7 @@ export function AITravelSearch({ onResults, onError, isLoading, setIsLoading }: 
           />
           <div className="flex items-center justify-between px-4 pb-3">
             <div className="flex items-center gap-2 text-xs text-white/30">
-              <Sparkles className="h-3.5 w-3.5 text-amber-400/70" />
+              <Sparkles className="h-3.5 w-3.5 text-yellow-400/80" />
               <span>IA en tiempo real · {prompt.length}/1000</span>
             </div>
             <div className="flex items-center gap-3">

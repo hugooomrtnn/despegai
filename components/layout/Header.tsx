@@ -9,11 +9,11 @@ export function Header() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 w-full flex items-center justify-between">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/25 group-hover:shadow-green-500/40 transition-all">
-            <Plane className="h-4 w-4 text-white" />
+          <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/30 group-hover:shadow-yellow-400/50 transition-all">
+            <Plane className="h-4 w-4 text-slate-900" />
           </div>
           <span className="font-extrabold text-white text-lg tracking-tight">
-            Fly<span className="text-green-400">AI</span>
+            Fly<span className="text-yellow-400">AI</span>
           </span>
         </a>
 
@@ -35,7 +35,7 @@ export function Header() {
           <button className="hidden sm:block text-sm text-white/60 hover:text-white/90 transition-colors font-medium px-3 py-1.5">
             Iniciar sesión
           </button>
-          <button className="text-sm font-semibold px-4 py-2 rounded-xl bg-green-500 hover:bg-green-400 text-white transition-all shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-0.5 active:translate-y-0">
+          <button className="text-sm font-semibold px-4 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-slate-900 transition-all shadow-lg shadow-yellow-400/30 hover:shadow-yellow-400/50 hover:-translate-y-0.5 active:translate-y-0">
             Empezar gratis
           </button>
         </div>
