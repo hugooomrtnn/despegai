@@ -6,6 +6,11 @@ const AIRLINES = [
   "Vueling", "Ryanair", "Iberia Express", "EasyJet", "Wizz Air",
   "Iberia", "Air Europa", "Transavia", "Volotea", "Norwegian",
   "British Airways", "Lufthansa", "Air France", "KLM",
+  "EgyptAir", "Emirates", "Qatar Airways", "Turkish Airlines",
+  "Ethiopian Airlines", "Kenya Airways", "Etihad Airways",
+  "Singapore Airlines", "Cathay Pacific", "Korean Air",
+  "Japan Airlines", "Air Canada", "Delta", "United Airlines",
+  "LATAM Airlines", "Avianca", "Air New Zealand", "Qantas",
 ];
 
 // ─── Catálogo completo de destinos ──────────────────────────────────────────
@@ -268,6 +273,123 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
     estimatedPriceLevel: "high", tags: ["city", "culture", "nature"], matchScore: 81,
   },
 
+  // Egipto
+  {
+    city: "El Cairo", country: "Egipto", airportCode: "CAI",
+    reason: "El río Nilo, las pirámides de Giza y el Museo Egipcio en una sola ciudad. Historia milenaria al alcance.",
+    estimatedPriceLevel: "medium", tags: ["culture", "history", "adventure"], matchScore: 90,
+  },
+  {
+    city: "Hurghada", country: "Egipto", airportCode: "HRG",
+    reason: "Mar Rojo cristalino, arrecifes de coral y resorts todo incluido a buen precio.",
+    estimatedPriceLevel: "low", tags: ["beach", "relax", "adventure"], matchScore: 87,
+  },
+  {
+    city: "Sharm el-Sheij", country: "Egipto", airportCode: "SSH",
+    reason: "Snorkel y buceo de primer nivel en el Mar Rojo, sol garantizado.",
+    estimatedPriceLevel: "low", tags: ["beach", "adventure", "relax"], matchScore: 85,
+  },
+  {
+    city: "Luxor", country: "Egipto", airportCode: "LXR",
+    reason: "La ciudad museo al aire libre más grande del mundo. Karnak, Valle de los Reyes.",
+    estimatedPriceLevel: "low", tags: ["culture", "history"], matchScore: 88,
+  },
+  // Oriente Medio
+  {
+    city: "Doha", country: "Catar", airportCode: "DOH",
+    reason: "La perla del Golfo Pérsico, museos de clase mundial y lujo a precio competitivo.",
+    estimatedPriceLevel: "high", tags: ["city", "culture", "adventure"], matchScore: 82,
+  },
+  {
+    city: "Tel Aviv", country: "Israel", airportCode: "TLV",
+    reason: "Ciudad vibrante junto al mar, gastronomía excepcional e historia milenaria.",
+    estimatedPriceLevel: "high", tags: ["city", "beach", "culture"], matchScore: 83,
+  },
+  {
+    city: "Amán", country: "Jordania", airportCode: "AMM",
+    reason: "Petra, Wadi Rum y el Mar Muerto en un mismo viaje. Joya oculta de Oriente Medio.",
+    estimatedPriceLevel: "medium", tags: ["culture", "history", "adventure"], matchScore: 86,
+  },
+  // África popular
+  {
+    city: "Nairobi", country: "Kenia", airportCode: "NBO",
+    reason: "Safari en el Masái Mara, leopardos, leones y elefantes en su hábitat natural.",
+    estimatedPriceLevel: "high", tags: ["adventure", "nature"], matchScore: 89,
+  },
+  {
+    city: "Zanzíbar", country: "Tanzania", airportCode: "ZNZ",
+    reason: "Playas blancas perfectas, ciudad histórica de Stone Town y aguas turquesa.",
+    estimatedPriceLevel: "medium", tags: ["beach", "culture", "relax"], matchScore: 88,
+  },
+  {
+    city: "Túnez", country: "Túnez", airportCode: "TUN",
+    reason: "Mediterráneo africano a precio muy bajo, medinas, ruinas romanas y playas.",
+    estimatedPriceLevel: "low", tags: ["culture", "beach", "history"], matchScore: 82,
+  },
+  {
+    city: "Ciudad del Cabo", country: "Sudáfrica", airportCode: "CPT",
+    reason: "Table Mountain, vinos de Stellenbosch y el encuentro de dos océanos.",
+    estimatedPriceLevel: "medium", tags: ["city", "nature", "adventure"], matchScore: 87,
+  },
+  // Asia popular
+  {
+    city: "Seúl", country: "Corea del Sur", airportCode: "ICN",
+    reason: "K-pop, gastronomía coreana, palacios históricos y tecnología de vanguardia.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture", "gastronomy"], matchScore: 87,
+  },
+  {
+    city: "Kuala Lumpur", country: "Malasia", airportCode: "KUL",
+    reason: "Torres Petronas, gastronomía multicultural y hub perfecto para Sudeste Asiático.",
+    estimatedPriceLevel: "low", tags: ["city", "culture", "adventure"], matchScore: 82,
+  },
+  {
+    city: "Pekín", country: "China", airportCode: "PEK",
+    reason: "La Gran Muralla, la Ciudad Prohibida y el Temple of Heaven en una misma ciudad.",
+    estimatedPriceLevel: "medium", tags: ["culture", "history", "city"], matchScore: 88,
+  },
+  {
+    city: "Shanghái", country: "China", airportCode: "PVG",
+    reason: "El horizonte más futurista del mundo, gastronomía y mezcla de culturas única.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture"], matchScore: 84,
+  },
+  {
+    city: "Siem Reap", country: "Camboya", airportCode: "REP",
+    reason: "Angkor Wat, uno de los templos más impresionantes del mundo. Precio de vida muy bajo.",
+    estimatedPriceLevel: "low", tags: ["culture", "history", "adventure"], matchScore: 86,
+  },
+  {
+    city: "Katmandú", country: "Nepal", airportCode: "KTM",
+    reason: "Puerta del Himalaya, trekking al Everest y templos budistas únicos.",
+    estimatedPriceLevel: "low", tags: ["adventure", "culture", "nature"], matchScore: 87,
+  },
+  {
+    city: "Colombo", country: "Sri Lanka", airportCode: "CMB",
+    reason: "Isla tropical con playas, templos budistas, té de Ceilán y fauna salvaje.",
+    estimatedPriceLevel: "low", tags: ["beach", "culture", "nature"], matchScore: 84,
+  },
+  // América
+  {
+    city: "Lima", country: "Perú", airportCode: "LIM",
+    reason: "Gastronomía top mundial, puerta a Machu Picchu y el lago Titicaca.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture", "gastronomy", "adventure"], matchScore: 88,
+  },
+  {
+    city: "Punta Cana", country: "República Dominicana", airportCode: "PUJ",
+    reason: "Playas de arena blanca y aguas turquesa. Caribe accesible con todo incluido.",
+    estimatedPriceLevel: "medium", tags: ["beach", "relax", "party"], matchScore: 87,
+  },
+  {
+    city: "Toronto", country: "Canadá", airportCode: "YYZ",
+    reason: "Ciudad multicultural con Niagara Falls a una hora y una escena gastronómica increíble.",
+    estimatedPriceLevel: "high", tags: ["city", "culture", "nature"], matchScore: 82,
+  },
+  // Oceanía
+  {
+    city: "Sídney", country: "Australia", airportCode: "SYD",
+    reason: "Opera House, Bondi Beach y la Gran Barrera de Coral al alcance. Destino icónico.",
+    estimatedPriceLevel: "high", tags: ["city", "beach", "adventure", "nature"], matchScore: 90,
+  },
+
   // Largo radio
   {
     city: "Tokio", country: "Japón", airportCode: "NRT",
@@ -319,8 +441,28 @@ const FLIGHT_DURATIONS: Record<string, number> = {
   KRK: 185, WAW: 190, IST: 205, AYT: 215,
   DBV: 195, SPU: 195, JTR: 220, JMK: 215, HER: 230,
   CPH: 195, ARN: 205, OSL: 210, HEL: 225,
-  // Largo radio
+  // Largo radio - Asia
   NRT: 720, BKK: 660, DPS: 750, DXB: 360, JFK: 480, CUN: 600, SIN: 720,
+  KIX: 720, PEK: 660, PVG: 670, HKG: 680, ICN: 700, MNL: 720, KUL: 720,
+  REP: 700, PNH: 710, RGN: 700, KTM: 600, CMB: 640, TPE: 700,
+  GYD: 290, TBS: 300, EVN: 290, TAS: 420, ALA: 420,
+  // Oriente Medio
+  CAI: 360, HRG: 360, SSH: 370, LXR: 400, ASW: 420,
+  AMM: 330, TLV: 340, DOH: 400, MCT: 440, KWI: 390,
+  BAH: 400, RUH: 420, BEY: 340, IKA: 420, BGW: 390,
+  // África
+  CPT: 660, JNB: 620, NBO: 540, ZNZ: 570, DAR: 560,
+  ADD: 540, TUN: 180, DJE: 190, ALG: 170, ACC: 540,
+  LOS: 600, DKR: 360, MRU: 720, SEZ: 720, RUN: 720,
+  TNR: 660, MPM: 630, LAD: 600,
+  // América
+  LIM: 660, SCL: 780, UIO: 680, SJO: 660, PTY: 630,
+  SDQ: 540, PUJ: 540, MBJ: 550, SJU: 540, BGI: 570,
+  NAS: 540, CCS: 580, MVD: 780, ASU: 700, LPB: 680,
+  GUA: 590, YYZ: 490, YVR: 600, YUL: 500,
+  MIA: 490, LAX: 610, ORD: 530,
+  // Oceanía
+  SYD: 1080, MEL: 1090, AKL: 1200, NAN: 1150,
 };
 
 // ─── Precios base por distancia ──────────────────────────────────────────────
@@ -334,6 +476,7 @@ function getFlightBasePrice(airportCode: string, priceLevel: "low" | "medium" | 
 
 // ─── Información de aeropuertos de origen ───────────────────────────────────
 const ORIGIN_INFO: Record<string, { code: string; city: string }> = {
+  // España
   "Madrid": { code: "MAD", city: "Madrid" },
   "Barcelona": { code: "BCN", city: "Barcelona" },
   "Valencia": { code: "VLC", city: "Valencia" },
@@ -346,6 +489,29 @@ const ORIGIN_INFO: Record<string, { code: string; city: string }> = {
   "Pamplona": { code: "PNA", city: "Pamplona" },
   "Santander": { code: "SDR", city: "Santander" },
   "San Sebastián": { code: "EAS", city: "San Sebastián" },
+  "Palma": { code: "PMI", city: "Palma de Mallorca" },
+  "Tenerife": { code: "TFS", city: "Tenerife" },
+  "Murcia": { code: "RMU", city: "Murcia" },
+  "Vigo": { code: "VGO", city: "Vigo" },
+  "Oviedo": { code: "OVD", city: "Oviedo" },
+  "A Coruña": { code: "LCG", city: "A Coruña" },
+  "Ibiza": { code: "IBZ", city: "Ibiza" },
+  "Valladolid": { code: "VLL", city: "Valladolid" },
+  // Otros países de origen habituales
+  "Lisboa": { code: "LIS", city: "Lisboa" },
+  "Oporto": { code: "OPO", city: "Oporto" },
+  "París": { code: "CDG", city: "París" },
+  "Londres": { code: "LHR", city: "Londres" },
+  "Roma": { code: "FCO", city: "Roma" },
+  "Berlín": { code: "BER", city: "Berlín" },
+  "Ámsterdam": { code: "AMS", city: "Ámsterdam" },
+  "Bruselas": { code: "BRU", city: "Bruselas" },
+  "Estambul": { code: "IST", city: "Estambul" },
+  "Dubái": { code: "DXB", city: "Dubái" },
+  "Buenos Aires": { code: "EZE", city: "Buenos Aires" },
+  "Lima": { code: "LIM", city: "Lima" },
+  "Bogotá": { code: "BOG", city: "Bogotá" },
+  "Ciudad de México": { code: "MEX", city: "Ciudad de México" },
 };
 
 function getOriginInfo(origin: string): { code: string; city: string } {
@@ -390,13 +556,16 @@ function buildSyntheticDestination(
   destinationName: string,
   airportCode: string
 ): DestinationRecommendation {
+  const duration = FLIGHT_DURATIONS[airportCode] ?? 180;
+  const priceLevel: "low" | "medium" | "high" =
+    duration < 200 ? "low" : duration < 500 ? "medium" : "high";
   return {
     city: destinationName,
-    country: "España",
+    country: "",
     airportCode,
-    reason: `Vuelos directos disponibles a ${destinationName}.`,
-    estimatedPriceLevel: "low",
-    tags: ["relax", "culture"],
+    reason: `Vuelos disponibles a ${destinationName}.`,
+    estimatedPriceLevel: priceLevel,
+    tags: ["relax", "culture", "adventure"],
     matchScore: 80,
   };
 }
