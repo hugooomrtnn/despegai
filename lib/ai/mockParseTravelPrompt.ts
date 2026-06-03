@@ -65,14 +65,15 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   faro: { name: "Faro", code: "FAO" },
   portugal: { name: "Lisboa", code: "LIS" },
 
-  // Francia
+  // Francia — ciudades específicas
   paris: { name: "París", code: "CDG" },
   niza: { name: "Niza", code: "NCE" },
   lyon: { name: "Lyon", code: "LYS" },
   marsella: { name: "Marsella", code: "MRS" },
-  francia: { name: "París", code: "CDG" },
+  // Francia — país → devuelve "Francia" para mostrar todas las ciudades
+  francia: { name: "Francia", code: "CDG" },
 
-  // Italia
+  // Italia — ciudades
   roma: { name: "Roma", code: "FCO" },
   rome: { name: "Roma", code: "FCO" },
   milan: { name: "Milán", code: "MXP" },
@@ -83,126 +84,175 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   cerdena: { name: "Cagliari", code: "CAG" },
   sicilia: { name: "Palermo", code: "PMO" },
   palermo: { name: "Palermo", code: "PMO" },
-  italia: { name: "Roma", code: "FCO" },
+  // Italia — país
+  italia: { name: "Italia", code: "FCO" },
 
-  // Reino Unido
+  // Reino Unido — ciudades
   londres: { name: "Londres", code: "LHR" },
   london: { name: "Londres", code: "LHR" },
-  "reino unido": { name: "Londres", code: "LHR" },
   manchester: { name: "Manchester", code: "MAN" },
   edimburgo: { name: "Edimburgo", code: "EDI" },
+  glasgow: { name: "Glasgow", code: "GLA" },
+  // Reino Unido — país
+  "reino unido": { name: "Reino Unido", code: "LHR" },
+  "gran bretana": { name: "Reino Unido", code: "LHR" },
+  inglaterra: { name: "Reino Unido", code: "LHR" },
 
-  // Alemania
+  // Alemania — ciudades
   berlin: { name: "Berlín", code: "BER" },
   munich: { name: "Múnich", code: "MUC" },
   frankfurt: { name: "Frankfurt", code: "FRA" },
-  alemania: { name: "Berlín", code: "BER" },
   hamburgo: { name: "Hamburgo", code: "HAM" },
+  dusseldorf: { name: "Düsseldorf", code: "DUS" },
+  colonia: { name: "Colonia", code: "CGN" },
+  stuttgart: { name: "Stuttgart", code: "STR" },
+  // Alemania — país
+  alemania: { name: "Alemania", code: "BER" },
+  germany: { name: "Alemania", code: "BER" },
 
   // Países Bajos
   amsterdam: { name: "Ámsterdam", code: "AMS" },
-  holanda: { name: "Ámsterdam", code: "AMS" },
+  holanda: { name: "Países Bajos", code: "AMS" },
+  "paises bajos": { name: "Países Bajos", code: "AMS" },
 
   // Bélgica
   bruselas: { name: "Bruselas", code: "BRU" },
-  belgica: { name: "Bruselas", code: "BRU" },
+  belgica: { name: "Bélgica", code: "BRU" },
 
-  // Europa del Este
+  // Europa del Este — ciudades
   budapest: { name: "Budapest", code: "BUD" },
-  hungria: { name: "Budapest", code: "BUD" },
   praga: { name: "Praga", code: "PRG" },
-  "republica checa": { name: "Praga", code: "PRG" },
   varsovia: { name: "Varsovia", code: "WAW" },
   cracovia: { name: "Cracovia", code: "KRK" },
-  polonia: { name: "Cracovia", code: "KRK" },
   viena: { name: "Viena", code: "VIE" },
-  austria: { name: "Viena", code: "VIE" },
   bucarest: { name: "Bucarest", code: "OTP" },
   sofia: { name: "Sofía", code: "SOF" },
+  // Europa del Este — países
+  hungria: { name: "Hungría", code: "BUD" },
+  "republica checa": { name: "República Checa", code: "PRG" },
+  polonia: { name: "Polonia", code: "KRK" },
+  austria: { name: "Austria", code: "VIE" },
+  rumania: { name: "Rumanía", code: "OTP" },
+  bulgaria: { name: "Bulgaria", code: "SOF" },
 
-  // Grecia
+  // Grecia — ciudades
   atenas: { name: "Atenas", code: "ATH" },
   athens: { name: "Atenas", code: "ATH" },
-  grecia: { name: "Atenas", code: "ATH" },
   tesalonica: { name: "Tesalónica", code: "SKG" },
   santorini: { name: "Santorini", code: "JTR" },
   mykonos: { name: "Mykonos", code: "JMK" },
   creta: { name: "Creta", code: "HER" },
   rodas: { name: "Rodas", code: "RHO" },
   corfu: { name: "Corfú", code: "CFU" },
+  // Grecia — país
+  grecia: { name: "Grecia", code: "ATH" },
+  greece: { name: "Grecia", code: "ATH" },
 
-  // Escandinavia
+  // Escandinavia — ciudades
   estocolmo: { name: "Estocolmo", code: "ARN" },
-  suecia: { name: "Estocolmo", code: "ARN" },
   oslo: { name: "Oslo", code: "OSL" },
-  noruega: { name: "Oslo", code: "OSL" },
   copenhague: { name: "Copenhague", code: "CPH" },
-  dinamarca: { name: "Copenhague", code: "CPH" },
   helsinki: { name: "Helsinki", code: "HEL" },
-  finlandia: { name: "Helsinki", code: "HEL" },
+  bergen: { name: "Bergen", code: "BGO" },
+  // Escandinavia — países
+  suecia: { name: "Suecia", code: "ARN" },
+  noruega: { name: "Noruega", code: "OSL" },
+  dinamarca: { name: "Dinamarca", code: "CPH" },
+  finlandia: { name: "Finlandia", code: "HEL" },
 
-  // Europa sur
+  // Europa sur — ciudades
   malta: { name: "Malta", code: "MLA" },
   dubrovnik: { name: "Dubrovnik", code: "DBV" },
-  croacia: { name: "Dubrovnik", code: "DBV" },
   split: { name: "Split", code: "SPU" },
   liubliana: { name: "Liubliana", code: "LJU" },
-  eslovenia: { name: "Liubliana", code: "LJU" },
+  zadar: { name: "Zadar", code: "ZAD" },
+  // Europa sur — países
+  croacia: { name: "Croacia", code: "DBV" },
+  eslovenia: { name: "Eslovenia", code: "LJU" },
 
   // Irlanda
   dublin: { name: "Dublín", code: "DUB" },
-  irlanda: { name: "Dublín", code: "DUB" },
+  irlanda: { name: "Irlanda", code: "DUB" },
 
-  // Marruecos
+  // Marruecos — ciudades
   marrakech: { name: "Marrakech", code: "RAK" },
   marrakesh: { name: "Marrakech", code: "RAK" },
   casablanca: { name: "Casablanca", code: "CMN" },
-  marruecos: { name: "Marrakech", code: "RAK" },
   fez: { name: "Fez", code: "FEZ" },
+  // Marruecos — país
+  marruecos: { name: "Marruecos", code: "RAK" },
+  morocco: { name: "Marruecos", code: "RAK" },
 
-  // Turquía
+  // Turquía — ciudades
   estambul: { name: "Estambul", code: "IST" },
   istanbul: { name: "Estambul", code: "IST" },
-  turquia: { name: "Estambul", code: "IST" },
   antalya: { name: "Antalya", code: "AYT" },
+  bodrum: { name: "Bodrum", code: "BJV" },
+  izmir: { name: "Izmir", code: "ADB" },
+  // Turquía — país
+  turquia: { name: "Turquía", code: "IST" },
+  turkey: { name: "Turquía", code: "IST" },
 
-  // Asia
+  // Japón — ciudades
   tokio: { name: "Tokio", code: "NRT" },
   tokyo: { name: "Tokio", code: "NRT" },
-  japon: { name: "Tokio", code: "NRT" },
   osaka: { name: "Osaka", code: "KIX" },
+  // Japón — país
+  japon: { name: "Japón", code: "NRT" },
+  japan: { name: "Japón", code: "NRT" },
+
+  // Tailandia — ciudades
   bangkok: { name: "Bangkok", code: "BKK" },
-  tailandia: { name: "Bangkok", code: "BKK" },
-  thailand: { name: "Bangkok", code: "BKK" },
+  // Tailandia — país
+  tailandia: { name: "Tailandia", code: "BKK" },
+  thailand: { name: "Tailandia", code: "BKK" },
+
+  // Indonesia
   bali: { name: "Bali", code: "DPS" },
+  indonesia: { name: "Bali", code: "DPS" },
+
+  // Singapur
   singapur: { name: "Singapur", code: "SIN" },
   singapore: { name: "Singapur", code: "SIN" },
+
+  // Dubái
   dubai: { name: "Dubái", code: "DXB" },
+
+  // Maldivas
   maldivas: { name: "Maldivas", code: "MLE" },
-  vietnam: { name: "Hanói", code: "HAN" },
+
+  // Vietnam
+  vietnam: { name: "Vietnam", code: "HAN" },
   hanoi: { name: "Hanói", code: "HAN" },
   "ho chi minh": { name: "Ho Chi Minh", code: "SGN" },
-  india: { name: "Nueva Delhi", code: "DEL" },
-  delhi: { name: "Nueva Delhi", code: "DEL" },
 
-  // América
+  // India
+  india: { name: "India", code: "DEL" },
+  delhi: { name: "Nueva Delhi", code: "DEL" },
+  mumbai: { name: "Bombay", code: "BOM" },
+  bombay: { name: "Bombay", code: "BOM" },
+
+  // América — ciudades
   "nueva york": { name: "Nueva York", code: "JFK" },
   "new york": { name: "Nueva York", code: "JFK" },
   miami: { name: "Miami", code: "MIA" },
   "los angeles": { name: "Los Ángeles", code: "LAX" },
   chicago: { name: "Chicago", code: "ORD" },
   cancun: { name: "Cancún", code: "CUN" },
-  mexico: { name: "Ciudad de México", code: "MEX" },
   "ciudad de mexico": { name: "Ciudad de México", code: "MEX" },
-  colombia: { name: "Bogotá", code: "BOG" },
   bogota: { name: "Bogotá", code: "BOG" },
   "buenos aires": { name: "Buenos Aires", code: "EZE" },
-  argentina: { name: "Buenos Aires", code: "EZE" },
-  brasil: { name: "São Paulo", code: "GRU" },
   "sao paulo": { name: "São Paulo", code: "GRU" },
   "rio de janeiro": { name: "Río de Janeiro", code: "GIG" },
-  cuba: { name: "La Habana", code: "HAV" },
   habana: { name: "La Habana", code: "HAV" },
+  // América — países
+  "estados unidos": { name: "Estados Unidos", code: "JFK" },
+  usa: { name: "Estados Unidos", code: "JFK" },
+  mexico: { name: "México", code: "CUN" },
+  colombia: { name: "Colombia", code: "BOG" },
+  argentina: { name: "Argentina", code: "EZE" },
+  brasil: { name: "Brasil", code: "GRU" },
+  cuba: { name: "Cuba", code: "HAV" },
 
   // Oriente Medio
   egipto: { name: "El Cairo", code: "CAI" },

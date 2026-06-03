@@ -203,9 +203,39 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
     estimatedPriceLevel: "medium", tags: ["city", "culture", "party"], matchScore: 86,
   },
   {
+    city: "Múnich", country: "Alemania", airportCode: "MUC",
+    reason: "La capital bávara, Oktoberfest, museos de clase mundial y los Alpes al alcance.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture", "gastronomy"], matchScore: 84,
+  },
+  {
+    city: "Frankfurt", country: "Alemania", airportCode: "FRA",
+    reason: "Hub financiero europeo, museos del Meno y puerta a la región del Rin.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture"], matchScore: 78,
+  },
+  {
+    city: "Hamburgo", country: "Alemania", airportCode: "HAM",
+    reason: "La ciudad portuaria más grande de Alemania, Elbphilharmonie y barrio Speicherstadt.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture"], matchScore: 80,
+  },
+  {
     city: "París", country: "Francia", airportCode: "CDG",
     reason: "La ciudad más romántica del mundo, accesible en vuelo directo.",
     estimatedPriceLevel: "medium", tags: ["city", "romantic", "culture", "gastronomy"], matchScore: 87,
+  },
+  {
+    city: "Niza", country: "Francia", airportCode: "NCE",
+    reason: "Costa Azul francesa: glamour, sol mediterráneo y Mónaco a un paso.",
+    estimatedPriceLevel: "medium", tags: ["beach", "culture", "city"], matchScore: 84,
+  },
+  {
+    city: "Lyon", country: "Francia", airportCode: "LYS",
+    reason: "Capital gastronómica de Francia, bouchons, mercados y arquitectura romana.",
+    estimatedPriceLevel: "medium", tags: ["city", "gastronomy", "culture"], matchScore: 80,
+  },
+  {
+    city: "Marsella", country: "Francia", airportCode: "MRS",
+    reason: "Puerto mediterráneo auténtico, Calanques y bouillabaisse original.",
+    estimatedPriceLevel: "low", tags: ["city", "beach", "culture"], matchScore: 78,
   },
   {
     city: "Viena", country: "Austria", airportCode: "VIE",
@@ -228,6 +258,16 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
     estimatedPriceLevel: "high", tags: ["city", "culture", "shopping"], matchScore: 86,
   },
   {
+    city: "Manchester", country: "Reino Unido", airportCode: "MAN",
+    reason: "Ciudad musical, fútbol y cultura del norte de Inglaterra con vuelos directos.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture", "party"], matchScore: 76,
+  },
+  {
+    city: "Glasgow", country: "Reino Unido", airportCode: "GLA",
+    reason: "La ciudad más vibrante de Escocia, whisky y arquitectura victoriana.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture"], matchScore: 74,
+  },
+  {
     city: "Estambul", country: "Turquía", airportCode: "IST",
     reason: "Puente entre Europa y Asia, mezquitas impresionantes y bazar histórico.",
     estimatedPriceLevel: "medium", tags: ["city", "culture", "exotic", "gastronomy"], matchScore: 87,
@@ -236,6 +276,16 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
     city: "Antalya", country: "Turquía", airportCode: "AYT",
     reason: "Turquía de sol y playa, todo incluido muy económico.",
     estimatedPriceLevel: "low", tags: ["beach", "relax", "culture"], matchScore: 82,
+  },
+  {
+    city: "Bodrum", country: "Turquía", airportCode: "BJV",
+    reason: "La Riviera turca: casco antiguo medieval, playas exclusivas y ambiente cosmopolita.",
+    estimatedPriceLevel: "medium", tags: ["beach", "relax", "city"], matchScore: 80,
+  },
+  {
+    city: "Izmir", country: "Turquía", airportCode: "ADB",
+    reason: "Ciudad costera vibrante, Éfeso a 70 km y gastronomía del Egeo turco.",
+    estimatedPriceLevel: "low", tags: ["city", "culture", "beach"], matchScore: 78,
   },
   {
     city: "Malta", country: "Malta", airportCode: "MLA",
@@ -397,6 +447,16 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
     estimatedPriceLevel: "high", tags: ["city", "culture", "adventure", "exotic"], matchScore: 94,
   },
   {
+    city: "Osaka", country: "Japón", airportCode: "KIX",
+    reason: "La capital gastronómica de Japón, más auténtica y accesible que Tokio.",
+    estimatedPriceLevel: "high", tags: ["city", "culture", "gastronomy", "exotic"], matchScore: 90,
+  },
+  {
+    city: "Hong Kong", country: "China", airportCode: "HKG",
+    reason: "Skyline espectacular, dim sum increíble y mezcla única de culturas.",
+    estimatedPriceLevel: "high", tags: ["city", "culture", "gastronomy"], matchScore: 87,
+  },
+  {
     city: "Bangkok", country: "Tailandia", airportCode: "BKK",
     reason: "Ciudad vibrante con templos, mercados nocturnos y precio de vida muy bajo.",
     estimatedPriceLevel: "medium", tags: ["adventure", "culture", "exotic", "beach"], matchScore: 88,
@@ -417,9 +477,24 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
     estimatedPriceLevel: "high", tags: ["city", "culture", "adventure"], matchScore: 91,
   },
   {
+    city: "Miami", country: "Estados Unidos", airportCode: "MIA",
+    reason: "Playas de South Beach, vida nocturna latina y clima tropical todo el año.",
+    estimatedPriceLevel: "high", tags: ["beach", "party", "city"], matchScore: 86,
+  },
+  {
+    city: "Los Ángeles", country: "Estados Unidos", airportCode: "LAX",
+    reason: "Hollywood, Venice Beach y la capital del entretenimiento mundial.",
+    estimatedPriceLevel: "high", tags: ["city", "beach", "culture"], matchScore: 84,
+  },
+  {
     city: "Cancún", country: "México", airportCode: "CUN",
     reason: "El Caribe mexicano: playas turquesa, ruinas mayas y todo incluido.",
     estimatedPriceLevel: "high", tags: ["beach", "culture", "party"], matchScore: 87,
+  },
+  {
+    city: "Ciudad de México", country: "México", airportCode: "MEX",
+    reason: "Megalópolis con gastronomía top mundial, museos y arquitectura azteca.",
+    estimatedPriceLevel: "medium", tags: ["city", "culture", "gastronomy"], matchScore: 84,
   },
 ];
 
@@ -434,13 +509,18 @@ const FLIGHT_DURATIONS: Record<string, number> = {
   // Marruecos
   RAK: 180, CMN: 170,
   // Europa próxima
-  CDG: 140, MXP: 140, FCO: 155, VCE: 155, FLR: 160, NAP: 155,
-  BRU: 160, AMS: 155, BER: 175, VIE: 175, PRG: 185, BUD: 175,
-  LHR: 155, EDI: 175, DUB: 165,
-  ATH: 220, MLA: 200, CAG: 90, PMO: 115,
-  KRK: 185, WAW: 190, IST: 205, AYT: 215,
-  DBV: 195, SPU: 195, JTR: 220, JMK: 215, HER: 230,
-  CPH: 195, ARN: 205, OSL: 210, HEL: 225,
+  CDG: 140, NCE: 130, LYS: 145, MRS: 130,
+  MXP: 140, FCO: 155, VCE: 155, FLR: 160, NAP: 155, CAG: 90, PMO: 115,
+  BRU: 160, AMS: 155,
+  BER: 175, MUC: 170, FRA: 175, HAM: 185, DUS: 175, STR: 170, CGN: 170,
+  VIE: 175, PRG: 185, BUD: 175,
+  LHR: 155, MAN: 160, EDI: 175, DUB: 165, GLA: 180,
+  ATH: 220, MLA: 200,
+  KRK: 185, WAW: 190, IST: 205, AYT: 215, ADB: 215, BJV: 210,
+  DBV: 195, SPU: 195, ZAD: 190, JTR: 220, JMK: 215, HER: 230, RHO: 210, CFU: 200,
+  SKG: 210, CHQ: 235,
+  CPH: 195, ARN: 205, OSL: 210, HEL: 225, BGO: 210,
+  LJU: 170, SOF: 195, OTP: 200, KIV: 210,
   // Largo radio - Asia
   NRT: 720, BKK: 660, DPS: 750, DXB: 360, JFK: 480, CUN: 600, SIN: 720,
   KIX: 720, PEK: 660, PVG: 670, HKG: 680, ICN: 700, MNL: 720, KUL: 720,
@@ -644,23 +724,41 @@ export const mockFlightProvider: FlightProvider = {
     let targets: DestinationRecommendation[] = [];
 
     if (request.destination && !request.flexibleDestination) {
-      // Busca en catálogo por nombre de ciudad, código IATA o país
       const destLower = request.destination.toLowerCase();
-      const found = DESTINATIONS_CATALOG.find(
+      const codeUpper = (request.destinationAirportCode ?? "").toUpperCase();
+
+      // 1. Buscar por código IATA exacto (más específico)
+      const byCode = codeUpper
+        ? DESTINATIONS_CATALOG.filter((d) => d.airportCode === codeUpper)
+        : [];
+
+      // 2. Buscar por nombre de ciudad
+      const byCity = DESTINATIONS_CATALOG.filter(
         (d) =>
           d.city.toLowerCase().includes(destLower) ||
-          destLower.includes(d.city.toLowerCase()) ||
-          d.airportCode.toLowerCase() === (request.destinationAirportCode ?? "").toLowerCase() ||
-          d.country.toLowerCase().includes(destLower)
+          destLower.includes(d.city.toLowerCase())
       );
 
-      if (found) {
-        targets = [found];
+      // 3. Buscar por país (puede devolver varias ciudades)
+      const byCountry = DESTINATIONS_CATALOG.filter((d) =>
+        d.country.toLowerCase() === destLower ||
+        d.country.toLowerCase().includes(destLower) ||
+        destLower.includes(d.country.toLowerCase())
+      );
+
+      if (byCity.length > 0 && byCity[0].city.toLowerCase() !== byCity[0].country.toLowerCase()) {
+        // Búsqueda de ciudad específica
+        targets = byCity.slice(0, 1);
+      } else if (byCountry.length > 1) {
+        // Búsqueda de país → devolver TODAS las ciudades del país
+        targets = byCountry;
+      } else if (byCode.length > 0) {
+        targets = byCode;
+      } else if (byCity.length > 0) {
+        targets = byCity.slice(0, 1);
       } else if (request.destinationAirportCode) {
-        // Destino no en catálogo pero tenemos el código IATA → destino sintético
         targets = [buildSyntheticDestination(request.destination, request.destinationAirportCode)];
       } else {
-        // Último recurso: destino sintético con código genérico
         targets = [buildSyntheticDestination(request.destination, "UNK")];
       }
     } else {
@@ -691,9 +789,12 @@ export const mockFlightProvider: FlightProvider = {
         .slice(0, 5);
     }
 
-    // Generar vuelos (más opciones para destino fijo que para flexible)
+    // Generar vuelos: ciudad concreta → 4-6, país/flexible → 2-3 por ciudad
     const flights: FlightResult[] = [];
-    const flightsPerDest = request.flexibleDestination ? 2 + Math.floor(Math.random() * 2) : 4 + Math.floor(Math.random() * 3);
+    const isCountrySearch = targets.length > 1 && !request.flexibleDestination;
+    const flightsPerDest = request.flexibleDestination || isCountrySearch
+      ? 2 + Math.floor(Math.random() * 2)
+      : 4 + Math.floor(Math.random() * 3);
 
     for (const dest of targets) {
       const generated = generateFlightsForDestination(dest, origin, request, flightsPerDest);
