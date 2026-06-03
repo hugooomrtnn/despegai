@@ -69,10 +69,10 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
   const isTopPick = rank === 0;
 
   return (
-    <div className={`card-premium rounded-2xl overflow-hidden ${isTopPick ? "ring-2 ring-orange-200 border-orange-100" : ""}`}>
+    <div className={`card-premium rounded-2xl overflow-hidden ${isTopPick ? "ring-2 ring-green-200 border-green-100" : ""}`}>
       {/* Top accent for best pick */}
       {isTopPick && (
-        <div className="h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500" />
+        <div className="h-1 bg-gradient-to-r from-green-500 via-emerald-400 to-green-500" />
       )}
 
       <div className="p-5">
@@ -91,7 +91,7 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
             })}
           </div>
           {isTopPick && (
-            <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">
+            <span className="text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
               ★ Mejor opción
             </span>
           )}
