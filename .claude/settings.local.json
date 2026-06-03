@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -X POST http://localhost:3000/api/travel-search -H \"Content-Type: application/json\" -d \"{\\\\\"prompt\\\\\":\\\\\"quiero ir a Roma en mayo 5 dias desde Madrid\\\\\"}\")",
+      "Bash(node -e \"let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\); const pr=r.parsedRequest; console.log\\('Origin:',pr.origin,'|','Destination:',pr.destination,'|','Duration:',pr.durationDays\\); console.log\\('Dest cities:',[...new Set\\(r.flights.map\\(f=>f.destinationCity\\)\\)].join\\(', '\\)\\)}\\)\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/travel-search -H \"Content-Type: application/json\" -d \"{\\\\\"prompt\\\\\":\\\\\"quiero playa barata desde Barcelona en julio finde\\\\\"}\")",
+      "Bash(node -e \"let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\); const pr=r.parsedRequest; console.log\\('Origin:',pr.origin,'| TripType:',pr.tripType,'| Flexible:',pr.flexibleDestination,'| Duration:',pr.durationDays\\); console.log\\('Dest recs:',\\(r.destinationRecommendations||[]\\).map\\(d=>d.city\\).join\\(', '\\)\\)}\\)\")",
+      "Bash(curl -s -X POST http://localhost:3000/api/travel-search -H \"Content-Type: application/json\" -d \"{\\\\\"prompt\\\\\":\\\\\"tengo 200 euros quiero ir a una ciudad europea bonita 4 dias\\\\\"}\")",
+      "Bash(node -e \"let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\); const pr=r.parsedRequest; console.log\\('Budget:',pr.budget,'| TripType:',pr.tripType,'| Duration:',pr.durationDays,'| Flexible:',pr.flexibleDestination\\)}\\)\")",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

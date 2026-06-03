@@ -1,29 +1,30 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 
-const inter = Inter({
+const font = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "FlyAI — Encuentra vuelos baratos con IA",
+  title: "FlyAI — Vuelos a cualquier destino con IA",
   description:
-    "Deja de usar formularios aburridos. Describe tu viaje en lenguaje natural y la IA encontrará los mejores vuelos y destinos para ti.",
-  keywords: ["vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos"],
+    "Describe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan para ti en segundos. Sin formularios, sin complicaciones.",
+  keywords: ["vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos", "agencias viaje"],
   openGraph: {
-    title: "FlyAI — Encuentra vuelos baratos con IA",
-    description: "Describe tu viaje en lenguaje natural y la IA encuentra los mejores vuelos.",
+    title: "FlyAI — Vuelos a cualquier destino con IA",
+    description: "Describe tu viaje en español y la IA encuentra los mejores vuelos en segundos.",
     type: "website",
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={inter.variable}>
-      <body className="min-h-screen antialiased">
+    <html lang="es" className={font.variable}>
+      <body className="min-h-screen antialiased font-[var(--font-sans)]">
         <Header />
         {children}
       </body>
