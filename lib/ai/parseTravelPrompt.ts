@@ -49,13 +49,28 @@ Schema:
   "rawPrompt": "the original prompt"
 }
 
-CRITICAL DATE RULES — follow exactly:
-- If the user asks for "cheapest", "más barato", "baratos", "económico", "mejor precio" WITHOUT specifying a date → set departureDate=null, flexibleDates=true. NEVER invent a date.
-- If the user says "en julio" (no day) → set departureDate=null, flexibleDates=true, durationDays inferred.
-- Only set a specific departureDate if the user gives an exact date ("el 15 de julio", "15/07", "next Friday").
-- If departureDate is null, returnDate must also be null.
-- "fin de semana" → durationDays=3, flexibleDates=true.
-- "una semana" → durationDays=7. "10 días" → durationDays=10.
+CRITICAL DATE RULES — follow exactly, no exceptions:
+
+RULE 1 — Month only (NO specific day given):
+  "en agosto", "en julio", "en verano", "este verano" → departureDate="YYYY-MM-01" (first of that month), flexibleDates=true
+  Examples:
+    "vuelos en agosto" → departureDate="2026-08-01", flexibleDates=true
+    "ir a París en agosto" → departureDate="2026-08-01", flexibleDates=true
+    "vuelos más baratos en agosto" → departureDate="2026-08-01", flexibleDates=true
+
+RULE 2 — "Cheapest" / no date at all:
+  "más barato", "baratos", "económico", "mejor precio", "más económico" WITHOUT any month or date → departureDate=null, flexibleDates=true
+  NEVER invent a specific date.
+
+RULE 3 — Specific date (day + month given):
+  "el 15 de agosto", "15/08", "el día 3" → set that exact date, flexibleDates=false
+
+RULE 4 — Duration keywords:
+  "fin de semana" → durationDays=3, flexibleDates=true
+  "una semana" → durationDays=7
+  "10 días" → durationDays=10
+
+RULE 5 — If departureDate is null → returnDate must also be null.
 
 DESTINATION RULES:
 - If destination is not specified or user says "sorpresa", "anywhere", "no sé" → flexibleDestination=true, destination=null.
