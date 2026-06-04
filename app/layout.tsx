@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var s=document.createElement('script');s.async=1;s.src='https://emrldtp.com/NTM2MzE3.js?t=536317';document.head.appendChild(s);})();`,
+            __html: `(function(){var s=document.createElement('script');s.async=1;s.src='https://emrldtp.com/NTM2Mzkx.js?t=536391';document.head.appendChild(s);})();`,
           }}
         />
       </head>
