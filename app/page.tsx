@@ -2,19 +2,16 @@
 
 import { useState } from "react";
 import {
-  Plane, Brain, FileText, Zap, Globe, Hotel, Map,
+  Plane, Brain, FileText, Zap, Globe,
   ChevronDown, ArrowRight, MapPin, Clock, Star, Sparkles,
 } from "lucide-react";
 import { AITravelSearch } from "@/components/travel/AITravelSearch";
 import { ParsedRequestSummary } from "@/components/travel/ParsedRequestSummary";
 import { DestinationRecommendations } from "@/components/travel/DestinationRecommendations";
-import { FlightResultsList } from "@/components/travel/FlightResultsList";
-import { HotelResultsList } from "@/components/travel/HotelResultsList";
+import { RealSearchPanel } from "@/components/travel/RealSearchPanel";
 import { TripPlanPanel } from "@/components/travel/TripPlanPanel";
-import { ProposalPanel } from "@/components/travel/ProposalPanel";
 import { LoadingState } from "@/components/travel/LoadingState";
 import { ErrorState } from "@/components/travel/ErrorState";
-import { EmptyState } from "@/components/travel/EmptyState";
 import type { TravelSearchResponse } from "@/types/travel";
 
 // ─── Datos del hero ─────────────────────────────────────────────────────────
@@ -77,18 +74,14 @@ const TICKER_QUERIES = [
   "Vuelo directo a Tailandia desde España en noviembre",
 ];
 
-type ResultTab = "flights" | "hotels" | "plan";
-
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const [results, setResults]     = useState<TravelSearchResponse | null>(null);
-  const [activeTab, setActiveTab] = useState<ResultTab>("flights");
 
   function handleResults(data: TravelSearchResponse) {
     setResults(data);
     setError(null);
-    setActiveTab("flights");
     setTimeout(() => {
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -96,9 +89,7 @@ export default function HomePage() {
   function handleError(msg: string) { setError(msg); setResults(null); }
   function handleRetry()            { setError(null); }
 
-  const hasResults   = results && results.flights.length > 0;
-  const hasNoFlights = results && results.flights.length === 0;
-  const showLanding  = !results && !isLoading && !error;
+  const showLanding = !results && !isLoading && !error;
 
   return (
     <main>
@@ -223,61 +214,14 @@ export default function HomePage() {
                   <DestinationRecommendations destinations={results.destinationRecommendations} />
                 )}
 
-                {hasResults && (
-                  <ProposalPanel
-                    parsedRequest={results.parsedRequest}
-                    flights={results.flights}
-                  />
+                <RealSearchPanel
+                  parsed={results.parsedRequest}
+                  recommendations={results.destinationRecommendations}
+                />
+
+                {results.tripPlan && (
+                  <TripPlanPanel plan={results.tripPlan} />
                 )}
-
-                {hasResults && (
-                  <div>
-                    {/* Tab navigation */}
-                    <div className="flex gap-1 bg-white border border-slate-100 rounded-2xl p-1.5 shadow-sm mb-5">
-                      {[
-                        { id: "flights" as ResultTab, label: "Vuelos",        icon: Plane, count: results.flights.length },
-                        { id: "hotels"  as ResultTab, label: "Hoteles",       icon: Hotel, count: results.hotels?.length },
-                        { id: "plan"    as ResultTab, label: "Plan de viaje", icon: Map,   count: null },
-                      ].map((tab) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => setActiveTab(tab.id)}
-                          className={`flex-1 flex items-center justify-center gap-2 text-sm font-semibold py-2.5 rounded-xl transition-all ${
-                            activeTab === tab.id
-                              ? "bg-slate-900 text-white shadow-sm"
-                              : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-                          }`}
-                        >
-                          <tab.icon className="h-4 w-4" />
-                          {tab.label}
-                          {tab.count != null && tab.count > 0 && (
-                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
-                              activeTab === tab.id
-                                ? "bg-white/20 text-white"
-                                : "bg-slate-100 text-slate-500"
-                            }`}>
-                              {tab.count}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-
-                    {activeTab === "flights" && <FlightResultsList flights={results.flights} />}
-                    {activeTab === "hotels"  && (
-                      results.hotels && results.hotels.length > 0
-                        ? <HotelResultsList hotels={results.hotels} nights={results.parsedRequest.durationDays ?? 3} />
-                        : <div className="text-center text-slate-400 py-12 text-sm">No hay hoteles disponibles para este destino.</div>
-                    )}
-                    {activeTab === "plan" && (
-                      results.tripPlan
-                        ? <TripPlanPanel plan={results.tripPlan} />
-                        : <div className="text-center text-slate-400 py-12 text-sm">Indica un destino concreto para ver el plan de viaje.</div>
-                    )}
-                  </div>
-                )}
-
-                {hasNoFlights && <EmptyState />}
               </>
             )}
           </div>
