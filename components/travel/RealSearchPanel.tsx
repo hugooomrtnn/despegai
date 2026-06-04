@@ -23,20 +23,25 @@ function formatDateEs(iso: string): string {
   return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
 }
 
-// Genera la URL de Jetradar con o sin fechas según si son flexibles
+// Para destino concreto siempre incluimos fecha (orientativa si no hay).
+// Sin fecha, Jetradar muestra "explorar destinos" en lugar de la ruta buscada.
 function buildJetradarUrl(
   origin: string,
   dest: string,
   date: string | null,
   adults: number,
   returnDate?: string | null,
-  flexible?: boolean,
 ): string {
-  const p = new URLSearchParams({ origin, destination: dest, adults: String(adults), marker: TP_MARKER, trs: TP_TRS });
-  if (date && !flexible) {
-    p.set("depart_date", date);
-    if (returnDate) p.set("return_date", returnDate);
-  }
+  const departDate = date ?? defaultDate();
+  const p = new URLSearchParams({
+    origin,
+    destination: dest,
+    depart_date: departDate,
+    adults: String(adults),
+    marker: TP_MARKER,
+    trs: TP_TRS,
+  });
+  if (returnDate) p.set("return_date", returnDate);
   return `https://search.jetradar.com/flights/?${p.toString()}`;
 }
 
@@ -127,7 +132,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
     const dest     = parsed.destinationAirportCode;
     const destName = parsed.destination ?? dest;
     const hUrls    = hotelCheckIn(date) ? buildHotelUrls(destName, date ?? defaultDate(), nights, adults) : null;
-    const jetradar = buildJetradarUrl(origin, dest, date, adults, returnDate, flexible);
+    const jetradar = buildJetradarUrl(origin, dest, date, adults, returnDate);
 
     return (
       <div className="space-y-4">
@@ -142,7 +147,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
               <p className="text-xs text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 {flexible
-                  ? "Fechas flexibles · muestra los días más baratos"
+                  ? `Fecha orientativa: ${formatDateEs(date ?? defaultDate())} · cámbiala en el buscador`
                   : `${date ? formatDateEs(date) : ""}${returnDate ? ` — ${formatDateEs(returnDate)}` : ""}`}
                 {" · "}{adults} {adults === 1 ? "adulto" : "adultos"}
               </p>
@@ -208,7 +213,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
 
         <div className="space-y-2">
           {recommendations.map(rec => {
-            const jetradar = buildJetradarUrl(origin, rec.airportCode, date, adults, returnDate, flexible);
+            const jetradar = buildJetradarUrl(origin, rec.airportCode, date, adults, returnDate);
             const isOpen   = expandedDest === rec.airportCode;
 
             return (
