@@ -10,7 +10,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%;
+    --primary: 22 100% 53%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -22,7 +22,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262.1 83.3% 57.8%;
+    --ring: 22 100% 53%;
     --radius: 0.75rem;
   }
 }
@@ -39,64 +39,103 @@
 @layer utilities {
   .text-balance { text-wrap: balance; }
 
-  .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
-  .animate-slide-up { animation: slide-up 0.6s ease-out forwards; }
-  .animate-float { animation: float 7s ease-in-out infinite; }
-  .animate-gradient { background-size: 300% 300%; animation: gradient-flow 6s ease infinite; }
-  .animate-pulse-slow { animation: pulse 3s ease-in-out infinite; }
+  .animate-fade-in      { animation: fade-in 0.6s ease-out forwards; }
+  .animate-slide-up     { animation: slide-up 0.6s ease-out forwards; }
+  .animate-float        { animation: float 7s ease-in-out infinite; }
+  .animate-gradient     { background-size: 300% 300%; animation: gradient-flow 6s ease infinite; }
+  .animate-pulse-slow   { animation: pulse 3s ease-in-out infinite; }
+  .animate-marquee      { animation: marquee 28s linear infinite; }
 }
 
-/* ─── Hero Background ────────────────────────────────────────────────────────── */
+/* ─── Hero Background ─────────────────────────────────────────────────────────
+   Concepto: amanecer desde la altura — cálido por abajo, espacio profundo arriba
+   ──────────────────────────────────────────────────────────────────────────── */
 .hero-dark {
   background:
-    radial-gradient(ellipse 70% 60% at 20% 30%, rgba(59, 130, 246, 0.18) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 50% at 80% 70%, rgba(139, 92, 246, 0.14) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 50% 0%, rgba(99, 102, 241, 0.22) 0%, transparent 55%),
-    linear-gradient(160deg, #020617 0%, #0c1330 40%, #050d1a 100%);
+    /* Cálido horizonte naranja/coral desde abajo */
+    radial-gradient(ellipse 130% 55% at 50% 115%, rgba(249,115,22,0.26) 0%, rgba(239,68,68,0.10) 45%, transparent 68%),
+    /* Frío profundo arriba-derecha */
+    radial-gradient(ellipse 65% 55% at 88% 15%, rgba(56,189,248,0.09) 0%, transparent 55%),
+    /* Violeta izquierda */
+    radial-gradient(ellipse 50% 45% at 8% 60%, rgba(167,139,250,0.07) 0%, transparent 52%),
+    /* Base — casi negro con matiz azul-morado */
+    linear-gradient(175deg, #030305 0%, #07061a 52%, #0d0508 100%);
 }
 
-/* Dot grid overlay */
+/* Cuadrícula de puntos sobre el hero */
 .hero-dark::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
-  background-size: 44px 44px;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.032) 1px, transparent 0);
+  background-size: 42px 42px;
   pointer-events: none;
 }
 
-/* ─── Glass effects ─────────────────────────────────────────────────────────── */
+/* Anillo horizonte curvo decorativo */
+.hero-horizon-ring {
+  position: absolute;
+  bottom: -90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160%;
+  height: 420px;
+  border: 1px solid rgba(249,115,22,0.09);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-horizon-ring-outer {
+  position: absolute;
+  bottom: -130px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 190%;
+  height: 480px;
+  border: 1px solid rgba(249,115,22,0.04);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ─── Glass effects ───────────────────────────────────────────────────────── */
 .glass-dark {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .glass-search {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(10, 8, 20, 0.72);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 32px 64px -12px rgba(0,0,0,0.70), inset 0 1px 0 rgba(255,255,255,0.10);
 }
 
-/* ─── Gradient text ─────────────────────────────────────────────────────────── */
+/* ─── Gradient text ───────────────────────────────────────────────────────── */
+/* Fuego — coral naranja, color acento principal */
 .text-gradient-amber {
-  background: linear-gradient(135deg, #fde047 0%, #facc15 50%, #eab308 100%);
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 45%, #ef4444 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.text-gradient-blue {
-  background: linear-gradient(135deg, #60a5fa 0%, #818cf8 100%);
+.text-gradient-fire {
+  background: linear-gradient(135deg, #fdba74 0%, #f97316 50%, #ef4444 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ─── Premium card ──────────────────────────────────────────────────────────── */
+.text-gradient-sky {
+  background: linear-gradient(135deg, #67e8f9 0%, #38bdf8 50%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Premium card ────────────────────────────────────────────────────────── */
 .card-premium {
   background: #ffffff;
   border: 1px solid #f1f5f9;
@@ -104,30 +143,43 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 .card-premium:hover {
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.04);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 28px rgba(0,0,0,0.11), 0 1px 3px rgba(0,0,0,0.04);
+  transform: translateY(-2px);
   border-color: #e2e8f0;
 }
 
-/* ─── CTA Button gradient ───────────────────────────────────────────────────── */
+/* ─── Destination mood card ───────────────────────────────────────────────── */
+.card-mood {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: all 0.25s ease;
+}
+.card-mood:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(249,115,22,0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(249,115,22,0.12);
+}
+
+/* ─── CTA Button ──────────────────────────────────────────────────────────── */
 .btn-cta {
-  background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
-  box-shadow: 0 4px 20px rgba(234, 179, 8, 0.4);
-  color: #0a0f1e !important;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  box-shadow: 0 4px 20px rgba(249,115,22,0.45);
+  color: #ffffff !important;
   font-weight: 700;
   transition: all 0.2s ease;
 }
 .btn-cta:hover {
-  background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
-  box-shadow: 0 6px 28px rgba(234, 179, 8, 0.55);
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  box-shadow: 0 6px 32px rgba(249,115,22,0.60);
   transform: translateY(-1px);
 }
 .btn-cta:active { transform: translateY(0); }
 
-/* ─── Skeleton shimmer ──────────────────────────────────────────────────────── */
+/* ─── Skeleton shimmer ────────────────────────────────────────────────────── */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
@@ -135,38 +187,40 @@
   animation: shimmer 1.5s infinite;
 }
 
-/* ─── Keyframes ─────────────────────────────────────────────────────────────── */
+/* ─── Marquee ticker ──────────────────────────────────────────────────────── */
+.marquee-track { overflow: hidden; mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent); }
+.marquee-inner { display: flex; gap: 0; width: max-content; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── Keyframes ───────────────────────────────────────────────────────────── */
 @keyframes fade-in {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 @keyframes slide-up {
   from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-12px) rotate(1deg); }
-  66% { transform: translateY(-6px) rotate(-1deg); }
+  0%, 100% { transform: translateY(0px)   rotate(0deg);  }
+  33%       { transform: translateY(-12px) rotate(1deg);  }
+  66%       { transform: translateY(-6px)  rotate(-1deg); }
 }
 @keyframes gradient-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
 }
 
-/* ─── Custom scrollbar ──────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+/* ─── Custom scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 6px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: #cbd5e1; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* ─── Section divider ───────────────────────────────────────────────────────── */
-.section-divider {
-  border-top: 1px solid #f1f5f9;
-}
-
-/* hero gradient legacy (results section) */
-.hero-gradient {
-  background: #f8fafc;
-}
+/* ─── Section divider ─────────────────────────────────────────────────────── */
+.section-divider { border-top: 1px solid #f1f5f9; }
+.hero-gradient   { background: #f8fafc; }

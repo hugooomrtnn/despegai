@@ -10,13 +10,13 @@ const font = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "FlyAI — Vuelos a cualquier destino con IA",
+  title: "Despegai — Busca vuelos con inteligencia artificial",
   description:
-    "Describe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan para ti en segundos. Sin formularios, sin complicaciones.",
-  keywords: ["vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos", "agencias viaje"],
+    "Escribe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan para ti en segundos. Sin formularios, sin complicaciones.",
+  keywords: ["vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos", "buscar vuelos IA", "despegai"],
   openGraph: {
-    title: "FlyAI — Vuelos a cualquier destino con IA",
-    description: "Describe tu viaje en español y la IA encuentra los mejores vuelos en segundos.",
+    title: "Despegai — Busca vuelos con inteligencia artificial",
+    description: "Escribe tu viaje en español y la IA encuentra los mejores vuelos en segundos.",
     type: "website",
   },
 };

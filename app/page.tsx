@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   Plane, Brain, FileText, Zap, Globe, Hotel, Map,
-  ChevronDown, ArrowRight, MapPin, Clock, Star,
+  ChevronDown, ArrowRight, MapPin, Clock, Star, Sparkles,
 } from "lucide-react";
 import { AITravelSearch } from "@/components/travel/AITravelSearch";
 import { ParsedRequestSummary } from "@/components/travel/ParsedRequestSummary";
@@ -17,55 +17,72 @@ import { ErrorState } from "@/components/travel/ErrorState";
 import { EmptyState } from "@/components/travel/EmptyState";
 import type { TravelSearchResponse } from "@/types/travel";
 
-const HOW_IT_WORKS = [
-  {
-    icon: Brain,
-    step: "01",
-    title: "Escribe en lenguaje natural",
-    description: "Describe el viaje tal como lo harías por WhatsApp. Sin filtros, sin formularios, sin listas.",
-    color: "from-violet-500 to-indigo-600",
-    glow: "shadow-violet-500/20",
-  },
-  {
-    icon: Zap,
-    step: "02",
-    title: "La IA lo interpreta todo",
-    description: "Detecta destino, fechas, presupuesto y preferencias. Busca vuelos, hoteles y crea un plan.",
-    color: "from-yellow-400 to-amber-500",
-    glow: "shadow-yellow-400/20",
-  },
-  {
-    icon: FileText,
-    step: "03",
-    title: "Propuesta lista en segundos",
-    description: "Copia el resumen para enviar por WhatsApp o email. De petición a propuesta en menos de 10s.",
-    color: "from-emerald-500 to-teal-500",
-    glow: "shadow-emerald-500/20",
-  },
+// ─── Datos del hero ─────────────────────────────────────────────────────────
+
+const DESTINATIONS_SHOWCASE = [
+  { name: "París",      country: "Francia",   flag: "🇫🇷", tag: "Romántico",  gradient: "from-rose-600/30 to-pink-500/15",     border: "border-rose-500/25",   tag_color: "text-rose-400" },
+  { name: "Tokio",      country: "Japón",     flag: "🇯🇵", tag: "Aventura",   gradient: "from-cyan-600/30 to-blue-500/15",     border: "border-cyan-500/25",   tag_color: "text-cyan-400" },
+  { name: "Roma",       country: "Italia",    flag: "🇮🇹", tag: "Cultura",    gradient: "from-orange-500/30 to-amber-500/15",  border: "border-orange-500/25", tag_color: "text-orange-400" },
+  { name: "Bali",       country: "Indonesia", flag: "🇮🇩", tag: "Playa",      gradient: "from-teal-600/30 to-emerald-500/15",  border: "border-teal-500/25",   tag_color: "text-teal-400" },
+  { name: "El Cairo",   country: "Egipto",    flag: "🇪🇬", tag: "Historia",   gradient: "from-amber-600/30 to-yellow-400/15",  border: "border-amber-500/25",  tag_color: "text-amber-400" },
+  { name: "Nueva York", country: "EE.UU.",    flag: "🇺🇸", tag: "Ciudad",     gradient: "from-violet-600/30 to-purple-500/15", border: "border-violet-500/25", tag_color: "text-violet-400" },
+];
+
+const TRAVEL_MOODS = [
+  { icon: "🏖️", label: "Playa y Sol",      desc: "Caribe, Mediterráneo, Índico",  gradient: "from-amber-500 to-orange-500",    query: "quiero playa con sol garantizado y agua cristalina" },
+  { icon: "🏙️", label: "Ciudad y Cultura", desc: "Capitales, museos, vida nocturna", gradient: "from-violet-500 to-indigo-600",  query: "ciudad europea con cultura y gastronomía de primer nivel" },
+  { icon: "🧗", label: "Aventura",         desc: "Senderismo, naturaleza salvaje",  gradient: "from-emerald-500 to-teal-500",   query: "destino de aventura y naturaleza impresionante" },
+  { icon: "💕", label: "Romántico",        desc: "Escapadas en pareja únicas",      gradient: "from-rose-500 to-pink-600",      query: "escapada romántica para dos con encanto especial" },
+  { icon: "🍷", label: "Gastronomía",      desc: "Sabores, mercados, restaurantes", gradient: "from-red-500 to-orange-600",     query: "destino famoso por su gastronomía y cultura culinaria" },
+  { icon: "🏛️", label: "Historia",         desc: "Civilizaciones, ruinas, legado",  gradient: "from-yellow-500 to-amber-600",   query: "destino con mucha historia antigua y patrimonio UNESCO" },
 ];
 
 const STATS = [
-  { value: "500+", label: "Destinos", icon: MapPin },
-  { value: "< 10s", label: "Por búsqueda", icon: Clock },
-  { value: "100%", label: "En español", icon: Globe },
-  { value: "0", label: "Formularios", icon: Star },
+  { value: "226+", label: "Destinos",      icon: MapPin },
+  { value: "< 10s", label: "Por búsqueda", icon: Clock  },
+  { value: "100%",  label: "En español",   icon: Globe  },
+  { value: "0",     label: "Formularios",  icon: Star   },
 ];
 
-const DESTINATIONS_SHOWCASE = [
-  { name: "París", flag: "🇫🇷", tag: "Romántico" },
-  { name: "Tokio", flag: "🇯🇵", tag: "Aventura" },
-  { name: "Roma", flag: "🇮🇹", tag: "Cultura" },
-  { name: "Bali", flag: "🇮🇩", tag: "Playa" },
-  { name: "Egipto", flag: "🇪🇬", tag: "Historia" },
-  { name: "Nueva York", flag: "🇺🇸", tag: "Ciudad" },
+const HOW_IT_WORKS = [
+  {
+    icon: Brain, step: "01",
+    title: "Escribe como hablas",
+    description: "Describe el viaje en español natural, como le contarías a un amigo. Sin filtros ni formularios.",
+    color: "from-violet-500 to-indigo-600", glow: "shadow-violet-500/20",
+  },
+  {
+    icon: Zap, step: "02",
+    title: "La IA lo interpreta todo",
+    description: "Detecta destino, fechas, presupuesto y preferencias. Busca vuelos, hoteles y crea un plan completo.",
+    color: "from-orange-400 to-red-500", glow: "shadow-orange-500/20",
+  },
+  {
+    icon: FileText, step: "03",
+    title: "Propuesta lista al instante",
+    description: "Copia el resumen y envíalo por WhatsApp o email. De petición a propuesta en menos de 10 segundos.",
+    color: "from-emerald-500 to-teal-500", glow: "shadow-emerald-500/20",
+  },
+];
+
+// Ticker de búsquedas de ejemplo que rota en el hero
+const TICKER_QUERIES = [
+  "Quiero playa barata en agosto para 2 adultos",
+  "Fin de semana romántico en Italia desde Madrid",
+  "Vuelo + hotel a Japón en marzo, máximo 1500€",
+  "Destinos baratos para Semana Santa desde Barcelona",
+  "Escapada de aventura en los Alpes sin pasaporte",
+  "Caribe todo incluido para 4 personas en julio",
+  "Ciudad europea con mucha historia para 5 días",
+  "Vuelo directo a Tailandia desde España en noviembre",
 ];
 
 type ResultTab = "flights" | "hotels" | "plan";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<TravelSearchResponse | null>(null);
+  const [error, setError]         = useState<string | null>(null);
+  const [results, setResults]     = useState<TravelSearchResponse | null>(null);
   const [activeTab, setActiveTab] = useState<ResultTab>("flights");
 
   function handleResults(data: TravelSearchResponse) {
@@ -76,50 +93,52 @@ export default function HomePage() {
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
   }
+  function handleError(msg: string) { setError(msg); setResults(null); }
+  function handleRetry()            { setError(null); }
 
-  function handleError(msg: string) {
-    setError(msg);
-    setResults(null);
-  }
-
-  function handleRetry() {
-    setError(null);
-  }
-
-  const hasResults = results && results.flights.length > 0;
+  const hasResults   = results && results.flights.length > 0;
   const hasNoFlights = results && results.flights.length === 0;
+  const showLanding  = !results && !isLoading && !error;
 
   return (
     <main>
-      {/* ─── HERO ──────────────────────────────────────────────────────────── */}
+      {/* ════════════════════════════════════════════════════════════
+          HERO
+      ════════════════════════════════════════════════════════════ */}
       <section className="hero-dark relative min-h-screen flex flex-col pt-16 overflow-hidden">
-        {/* Glow orbs */}
-        <div className="absolute top-1/4 left-[10%] w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 right-[5%] w-[400px] h-[400px] rounded-full bg-violet-600/10 blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full bg-yellow-500/5 blur-[80px] pointer-events-none" />
 
-        <div className="relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-20">
-          {/* Trust badge */}
+        {/* Anillos horizonte decorativos */}
+        <div className="hero-horizon-ring" />
+        <div className="hero-horizon-ring-outer" />
+
+        {/* Orbs de luz */}
+        <div className="absolute top-[18%] left-[8%]   w-[480px] h-[480px] rounded-full bg-blue-600/8   blur-[110px] pointer-events-none" />
+        <div className="absolute top-[30%] right-[4%]  w-[360px] h-[360px] rounded-full bg-violet-600/8  blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[700px] h-[220px] rounded-full bg-orange-500/10 blur-[90px] pointer-events-none" />
+
+        <div className="relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-16">
+
+          {/* Badge de confianza */}
           <div className="animate-fade-in flex items-center gap-2.5 px-4 py-2 rounded-full glass-dark mb-8">
-            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse-slow" />
-            <span className="text-sm text-white/60 font-medium">
-              500+ destinos · Sin formularios · IA nativa en español
+            <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse-slow" />
+            <Sparkles className="h-3.5 w-3.5 text-orange-400/80" />
+            <span className="text-sm text-white/55 font-medium">
+              226+ destinos · IA nativa en español · Sin formularios
             </span>
           </div>
 
-          {/* Headline */}
-          <h1 className="animate-slide-up text-5xl sm:text-6xl md:text-7xl font-extrabold text-white text-center max-w-4xl leading-[1.08] mb-6 text-balance">
-            El vuelo perfecto para{" "}
-            <span className="text-gradient-amber">cualquier destino</span>
-            {" "}del mundo
+          {/* Titular principal */}
+          <h1 className="animate-slide-up text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white text-center max-w-5xl leading-[1.04] mb-5 text-balance tracking-tight">
+            Dime a dónde{" "}
+            <span className="text-gradient-fire">quieres volar.</span>
           </h1>
 
-          <p className="animate-fade-in text-lg sm:text-xl text-white/50 text-center max-w-2xl mb-12 leading-relaxed text-balance">
-            Escribe el viaje en español, como le hablarías a un amigo.
-            La IA entiende, busca y propone en menos de 10 segundos.
+          <p className="animate-fade-in text-lg sm:text-xl text-white/45 text-center max-w-xl mb-10 leading-relaxed text-balance">
+            Escríbelo en español, como le hablarías a un amigo.<br className="hidden sm:block" />
+            La IA encuentra vuelos, hoteles y plan de viaje en segundos.
           </p>
 
-          {/* Search */}
+          {/* Buscador IA */}
           <div className="animate-fade-in w-full max-w-3xl">
             <AITravelSearch
               onResults={handleResults}
@@ -129,35 +148,54 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Destination showcase */}
-          <div className="mt-14 flex flex-wrap justify-center gap-3">
-            {DESTINATIONS_SHOWCASE.map((d) => (
-              <div
-                key={d.name}
-                className="flex items-center gap-2 px-4 py-2 rounded-full glass-dark text-sm text-white/60 hover:text-white/90 hover:bg-white/10 transition-all cursor-pointer"
-              >
-                <span className="text-base">{d.flag}</span>
-                <span className="font-medium">{d.name}</span>
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/8 text-white/40">{d.tag}</span>
+          {/* Ticker de ejemplos */}
+          {showLanding && (
+            <div className="mt-6 w-full max-w-3xl marquee-track">
+              <div className="marquee-inner animate-marquee">
+                {[...TICKER_QUERIES, ...TICKER_QUERIES].map((q, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-2 mx-3 px-3 py-1.5 rounded-full glass-dark text-xs text-white/40 whitespace-nowrap cursor-pointer hover:text-white/70 transition-colors"
+                  >
+                    <Plane className="h-3 w-3 text-orange-400/60 flex-shrink-0" />
+                    {q}
+                  </span>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
-          {!results && !isLoading && (
-            <div className="mt-16 flex flex-col items-center gap-2 text-white/20 animate-float">
+          {/* Destination showcase — tarjetas con gradiente */}
+          {showLanding && (
+            <div className="mt-12 grid grid-cols-3 sm:grid-cols-6 gap-3 w-full max-w-3xl">
+              {DESTINATIONS_SHOWCASE.map((d) => (
+                <div
+                  key={d.name}
+                  className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-2xl bg-gradient-to-br ${d.gradient} border ${d.border} hover:border-opacity-60 transition-all cursor-pointer group`}
+                >
+                  <span className="text-2xl group-hover:scale-110 transition-transform">{d.flag}</span>
+                  <span className="text-xs font-bold text-white/90 text-center leading-tight">{d.name}</span>
+                  <span className={`text-[10px] font-semibold ${d.tag_color}`}>{d.tag}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {showLanding && (
+            <div className="mt-12 flex flex-col items-center gap-2 text-white/20 animate-float">
               <ChevronDown className="h-5 w-5" />
             </div>
           )}
         </div>
 
         {/* Stats bar */}
-        {!results && !isLoading && !error && (
-          <div className="relative border-t border-white/5 bg-white/2 backdrop-blur-sm">
+        {showLanding && (
+          <div className="relative border-t border-white/[0.06] bg-white/[0.025] backdrop-blur-sm">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-6">
               {STATS.map((stat) => (
                 <div key={stat.label} className="flex flex-col items-center gap-1">
-                  <p className="text-2xl font-extrabold text-gradient-amber">{stat.value}</p>
-                  <p className="text-xs text-white/35 font-medium">{stat.label}</p>
+                  <p className="text-2xl font-black text-gradient-fire">{stat.value}</p>
+                  <p className="text-xs text-white/30 font-medium">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -165,7 +203,9 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ─── RESULTS ───────────────────────────────────────────────────────── */}
+      {/* ════════════════════════════════════════════════════════════
+          RESULTADOS
+      ════════════════════════════════════════════════════════════ */}
       {(isLoading || error || results) && (
         <section id="results" className="bg-slate-50 min-h-screen">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-6">
@@ -195,9 +235,9 @@ export default function HomePage() {
                     {/* Tab navigation */}
                     <div className="flex gap-1 bg-white border border-slate-100 rounded-2xl p-1.5 shadow-sm mb-5">
                       {[
-                        { id: "flights" as ResultTab, label: "Vuelos", icon: Plane, count: results.flights.length },
-                        { id: "hotels" as ResultTab, label: "Hoteles", icon: Hotel, count: results.hotels?.length },
-                        { id: "plan" as ResultTab, label: "Plan de viaje", icon: Map, count: null },
+                        { id: "flights" as ResultTab, label: "Vuelos",        icon: Plane, count: results.flights.length },
+                        { id: "hotels"  as ResultTab, label: "Hoteles",       icon: Hotel, count: results.hotels?.length },
+                        { id: "plan"    as ResultTab, label: "Plan de viaje", icon: Map,   count: null },
                       ].map((tab) => (
                         <button
                           key={tab.id}
@@ -223,31 +263,16 @@ export default function HomePage() {
                       ))}
                     </div>
 
-                    {activeTab === "flights" && (
-                      <FlightResultsList flights={results.flights} />
+                    {activeTab === "flights" && <FlightResultsList flights={results.flights} />}
+                    {activeTab === "hotels"  && (
+                      results.hotels && results.hotels.length > 0
+                        ? <HotelResultsList hotels={results.hotels} nights={results.parsedRequest.durationDays ?? 3} />
+                        : <div className="text-center text-slate-400 py-12 text-sm">No hay hoteles disponibles para este destino.</div>
                     )}
-
-                    {activeTab === "hotels" && (
-                      results.hotels && results.hotels.length > 0 ? (
-                        <HotelResultsList
-                          hotels={results.hotels}
-                          nights={results.parsedRequest.durationDays ?? 3}
-                        />
-                      ) : (
-                        <div className="text-center text-slate-400 py-12 text-sm">
-                          No hay hoteles disponibles para este destino.
-                        </div>
-                      )
-                    )}
-
                     {activeTab === "plan" && (
-                      results.tripPlan ? (
-                        <TripPlanPanel plan={results.tripPlan} />
-                      ) : (
-                        <div className="text-center text-slate-400 py-12 text-sm">
-                          Indica un destino concreto para ver el plan de viaje.
-                        </div>
-                      )
+                      results.tripPlan
+                        ? <TripPlanPanel plan={results.tripPlan} />
+                        : <div className="text-center text-slate-400 py-12 text-sm">Indica un destino concreto para ver el plan de viaje.</div>
                     )}
                   </div>
                 )}
@@ -259,22 +284,72 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ─── HOW IT WORKS ──────────────────────────────────────────────────── */}
-      {!results && !isLoading && !error && (
+      {/* ════════════════════════════════════════════════════════════
+          TRAVEL MOODS — sección nueva única
+      ════════════════════════════════════════════════════════════ */}
+      {showLanding && (
+        <section id="destinos" className="py-24 sm:py-32 bg-[#030305]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+
+            <div className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-dark mb-5 border border-orange-500/20">
+                <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse-slow" />
+                <span className="text-sm font-semibold text-orange-400">¿Qué tipo de viaje buscas?</span>
+              </div>
+              <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
+                Busca por{" "}
+                <span className="text-gradient-fire">estado de ánimo</span>
+              </h2>
+              <p className="text-lg text-white/35 max-w-lg mx-auto">
+                Haz clic en el tipo de viaje que te apetece y la IA buscará los mejores destinos para ti.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {TRAVEL_MOODS.map((mood) => (
+                <button
+                  key={mood.label}
+                  onClick={() => {
+                    document.getElementById("search-input")?.focus();
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="card-mood rounded-3xl p-6 text-left group cursor-pointer"
+                >
+                  <div className={`w-12 h-12 bg-gradient-to-br ${mood.gradient} rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-105 transition-transform shadow-lg`}>
+                    {mood.icon}
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-1">{mood.label}</h3>
+                  <p className="text-xs text-white/35 leading-relaxed">{mood.desc}</p>
+                  <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-orange-400/70 group-hover:text-orange-400 transition-colors">
+                    <span>Buscar destinos</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════
+          CÓMO FUNCIONA
+      ════════════════════════════════════════════════════════════ */}
+      {showLanding && (
         <section id="how-it-works" className="py-24 sm:py-32 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
+
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-50 rounded-full border border-yellow-200 mb-5">
-                <Zap className="h-4 w-4 text-yellow-500" />
-                <span className="text-sm font-semibold text-yellow-600">Cómo funciona</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border border-orange-100 mb-5">
+                <Zap className="h-4 w-4 text-orange-500" />
+                <span className="text-sm font-semibold text-orange-600">Cómo funciona</span>
               </div>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-4 leading-tight">
+              <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight">
                 De la petición a la propuesta
                 <br />
-                <span className="text-gradient-amber">en 3 pasos</span>
+                <span className="text-gradient-fire">en 3 pasos</span>
               </h2>
               <p className="text-lg text-slate-500 max-w-xl mx-auto">
-                Diseñado para agencias y asesores que reciben peticiones de clientes a diario.
+                Diseñado para agencias y viajeros que no tienen tiempo que perder.
               </p>
             </div>
 
@@ -300,23 +375,25 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Destinations grid */}
-            <div className="bg-slate-900 rounded-3xl p-10 text-center overflow-hidden relative">
-              <div className="absolute inset-0 opacity-30" style={{backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0)', backgroundSize: '32px 32px'}} />
+            {/* Mapa de destinos — panel oscuro */}
+            <div className="bg-[#030305] rounded-3xl p-10 text-center overflow-hidden relative border border-white/[0.06]">
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[150px] rounded-full bg-orange-500/10 blur-[60px] pointer-events-none" />
               <div className="relative">
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
-                  Más de 500 destinos en todo el mundo
+                <h3 className="text-2xl sm:text-3xl font-black text-white mb-3">
+                  Más de <span className="text-gradient-fire">226 destinos</span> en todo el mundo
                 </h3>
-                <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-                  Europa, América, Asia, África, Oriente Medio y Oceanía. Busca por ciudad, país o región.
+                <p className="text-white/35 mb-8 max-w-lg mx-auto">
+                  Europa completa, América, Asia, África, Oriente Medio y Oceanía. Busca por ciudad, país o región.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {[
                     "🇫🇷 Francia", "🇮🇹 Italia", "🇩🇪 Alemania", "🇬🇷 Grecia",
                     "🇹🇷 Turquía", "🇪🇬 Egipto", "🇯🇵 Japón", "🇹🇭 Tailandia",
-                    "🇧🇷 Brasil", "🇺🇸 EE.UU.", "🇦🇺 Australia", "🇿🇦 Sudáfrica",
+                    "🇧🇷 Brasil",  "🇺🇸 EE.UU.", "🇦🇺 Australia", "🇿🇦 Sudáfrica",
+                    "🇮🇳 India",   "🇲🇦 Marruecos", "🇨🇺 Cuba", "🇮🇸 Islandia",
                   ].map((d) => (
-                    <span key={d} className="text-sm px-3.5 py-1.5 rounded-full bg-white/6 border border-white/8 text-white/60 font-medium">
+                    <span key={d} className="text-sm px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/50 font-medium hover:border-orange-500/30 hover:text-white/70 transition-colors cursor-pointer">
                       {d}
                     </span>
                   ))}
@@ -327,24 +404,47 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ─── FOOTER ────────────────────────────────────────────────────────── */}
+      {/* ════════════════════════════════════════════════════════════
+          FOOTER
+      ════════════════════════════════════════════════════════════ */}
       {!results && !isLoading && (
-        <footer className="bg-slate-950 border-t border-white/5 py-10">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 bg-gradient-to-br from-yellow-400 to-amber-400 rounded-lg flex items-center justify-center">
-                <Plane className="h-3.5 w-3.5 text-white" />
+        <footer className="bg-[#030305] border-t border-white/[0.05] py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+
+              {/* Logo */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
+                  <Plane className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-extrabold text-white text-lg">
+                  Despeg<span className="text-orange-400">ai</span>
+                </span>
               </div>
-              <span className="font-extrabold text-white">
-                Fly<span className="text-yellow-400">AI</span>
-              </span>
+
+              {/* Links */}
+              <nav className="flex flex-wrap justify-center gap-6">
+                {["Cómo funciona", "Destinos", "Para agencias", "Precios"].map((l) => (
+                  <a key={l} href="#" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">
+                    {l}
+                  </a>
+                ))}
+              </nav>
+
+              {/* Idioma */}
+              <div className="flex items-center gap-1.5 text-sm text-white/25">
+                <Globe className="h-3.5 w-3.5" />
+                <span>Español</span>
+              </div>
             </div>
-            <p className="text-xs text-white/25">
-              © 2025 FlyAI · Herramienta de búsqueda con inteligencia artificial
-            </p>
-            <div className="flex items-center gap-1 text-xs text-white/25">
-              <Globe className="h-3 w-3" />
-              <span>Español</span>
+
+            <div className="border-t border-white/[0.05] pt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <p className="text-xs text-white/20">
+                © 2025 Despegai · Herramienta de búsqueda con inteligencia artificial
+              </p>
+              <p className="text-xs text-white/15">
+                Los precios mostrados son orientativos. Confírmelos en los buscadores oficiales.
+              </p>
             </div>
           </div>
         </footer>

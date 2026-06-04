@@ -64,6 +64,7 @@ export function AITravelSearch({ onResults, onError, isLoading, setIsLoading }: 
       <div className="glass-search rounded-3xl overflow-hidden">
         <div className="p-2">
           <textarea
+            id="search-input"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
