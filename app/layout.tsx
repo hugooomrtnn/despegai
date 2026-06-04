@@ -29,10 +29,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Travelpayouts Drive — tracking de conversiones */}
         <Script
           id="travelpayouts-drive"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var s=document.createElement("script");s.async=1;s.src="https://emrldtp.com/NTM2MzE3.js?t=536317";document.head.appendChild(s);})();`,
-          }}
+          src="https://emrldtp.com/NTM2MzE3.js?t=536317"
+          strategy="beforeInteractive"
         />
         <Header />
         {children}

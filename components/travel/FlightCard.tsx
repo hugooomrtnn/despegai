@@ -51,23 +51,39 @@ function AirlineBadge({ airline }: { airline: string }) {
   );
 }
 
+// ─── Travelpayouts affiliate config ─────────────────────────────────────────
+const TP_MARKER = "736116";
+const TP_TRS    = "536317";
+
 interface BookingUrls {
+  jetradar:   string;   // principal — comisión garantizada via Travelpayouts
   skyscanner: string;
-  kayak: string;
-  edreams: string;
-  kiwi: string;
+  kayak:      string;
+  edreams:    string;
 }
 
 function buildBookingUrls(flight: FlightResult): BookingUrls {
   const origin = flight.originAirport;
   const dest   = flight.destinationAirport;
-  const date   = flight.departureTime.slice(0, 10);           // YYYY-MM-DD
-  const dateYYMMDD  = date.replace(/-/g, "").slice(2);        // YYMMDD  (Skyscanner)
-  const dateCompact = date.replace(/-/g, "");                 // YYYYMMDD (eDreams)
+  const date   = flight.departureTime.slice(0, 10);       // YYYY-MM-DD
+  const dateYYMMDD  = date.replace(/-/g, "").slice(2);    // YYMMDD (Skyscanner)
+  const dateCompact = date.replace(/-/g, "");             // YYYYMMDD (eDreams)
 
   const returnDate        = flight.returnDepartureTime?.slice(0, 10);
   const returnDateCompact = returnDate?.replace(/-/g, "");
   const isRoundTrip       = !!returnDate;
+
+  // Jetradar (Travelpayouts) — link principal con tracking de afiliado
+  const jetradarBase = new URLSearchParams({
+    origin,
+    destination: dest,
+    depart_date: date,
+    adults: "1",
+    marker: TP_MARKER,
+    trs: TP_TRS,
+  });
+  if (isRoundTrip && returnDate) jetradarBase.set("return_date", returnDate);
+  const jetradar = `https://search.jetradar.com/flights/?${jetradarBase.toString()}`;
 
   const skyscanner = flight.bookingUrl ??
     `https://www.skyscanner.es/transporte/vuelos/${origin.toLowerCase()}/${dest.toLowerCase()}/${dateYYMMDD}/`;
@@ -78,17 +94,13 @@ function buildBookingUrls(flight: FlightResult): BookingUrls {
   let edreams = `https://www.edreams.es/search/#results/type=${isRoundTrip ? "ROUND_TRIP" : "ONE_WAY"};fromAirport=${origin};toAirport=${dest};departureDate=${dateCompact};adults=1`;
   if (isRoundTrip && returnDateCompact) edreams += `;returnDate=${returnDateCompact}`;
 
-  let kiwi = `https://www.kiwi.com/es/search/results/${origin}/${dest}/${date}`;
-  kiwi += isRoundTrip ? `/${returnDate}` : `/no-return`;
-
-  return { skyscanner, kayak, edreams, kiwi };
+  return { jetradar, skyscanner, kayak, edreams };
 }
 
 const PROVIDERS = [
-  { key: "skyscanner" as const, name: "Skyscanner", color: "hover:text-blue-600" },
+  { key: "skyscanner" as const, name: "Skyscanner", color: "hover:text-blue-600"  },
   { key: "kayak"      as const, name: "Kayak",      color: "hover:text-orange-500" },
-  { key: "edreams"    as const, name: "eDreams",    color: "hover:text-red-500" },
-  { key: "kiwi"       as const, name: "Kiwi.com",   color: "hover:text-sky-500" },
+  { key: "edreams"    as const, name: "eDreams",    color: "hover:text-red-500"   },
 ];
 
 interface FlightCardProps {
@@ -211,10 +223,21 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
           </div>
         </div>
 
-        {/* Booking providers */}
-        <div className="mt-3 flex items-center gap-2 flex-wrap">
+        {/* Botón principal — Jetradar con tracking afiliado */}
+        <a
+          href={urls.jetradar}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex items-center justify-center gap-2 w-full btn-cta py-2.5 rounded-xl text-sm font-bold"
+        >
+          <Plane className="h-4 w-4" />
+          Ver vuelos disponibles →
+        </a>
+
+        {/* Buscadores alternativos */}
+        <div className="mt-2 flex items-center gap-2 flex-wrap">
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-            Ver precio real en:
+            También en:
           </span>
           {PROVIDERS.map((p) => (
             <a
