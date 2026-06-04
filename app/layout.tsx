@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 
@@ -25,13 +24,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={font.variable}>
-      <body className="min-h-screen antialiased font-[var(--font-sans)]">
-        {/* Travelpayouts Drive — tracking de conversiones */}
-        <Script
-          id="travelpayouts-drive"
-          src="https://emrldtp.com/NTM2MzE3.js?t=536317"
-          strategy="beforeInteractive"
+      <head>
+        {/* Travelpayouts Drive — debe estar en el HTML inicial para ser detectado */}
+        {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var s=document.createElement('script');s.async=1;s.src='https://emrldtp.com/NTM2MzE3.js?t=536317';document.head.appendChild(s);})();`,
+          }}
         />
+      </head>
+      <body className="min-h-screen antialiased font-[var(--font-sans)]">
         <Header />
         {children}
       </body>
