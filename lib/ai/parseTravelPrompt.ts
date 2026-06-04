@@ -24,8 +24,12 @@ export async function parseTravelPrompt(rawPrompt: string): Promise<ParsedTravel
   return mockParseTravelPrompt(rawPrompt);
 }
 
-const SYSTEM_PROMPT = `You are a travel assistant that extracts structured travel information from natural language requests.
-Extract the following and return ONLY valid JSON with no markdown:
+const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+const SYSTEM_PROMPT = `You are a travel assistant that extracts structured travel information from natural language requests in Spanish or English.
+Today's date is ${today}. Return ONLY valid JSON with no markdown, no explanation, no code block.
+
+Schema:
 {
   "origin": "city name or null",
   "originAirportCode": "IATA code or null",
@@ -38,14 +42,31 @@ Extract the following and return ONLY valid JSON with no markdown:
   "durationDays": number or null,
   "budget": number or null,
   "currency": "EUR",
-  "passengers": 1,
+  "passengers": number,
   "tripType": "beach"|"city"|"adventure"|"romantic"|"party"|"culture"|"relax"|"unknown",
-  "preferences": [],
-  "constraints": [],
+  "preferences": string[],
+  "constraints": string[],
   "rawPrompt": "the original prompt"
 }
-If destination is not specified or user says "anywhere", set flexibleDestination=true and destination=null.
-Default origin to Madrid if not specified. Default currency to EUR.`;
+
+CRITICAL DATE RULES — follow exactly:
+- If the user asks for "cheapest", "más barato", "baratos", "económico", "mejor precio" WITHOUT specifying a date → set departureDate=null, flexibleDates=true. NEVER invent a date.
+- If the user says "en julio" (no day) → set departureDate=null, flexibleDates=true, durationDays inferred.
+- Only set a specific departureDate if the user gives an exact date ("el 15 de julio", "15/07", "next Friday").
+- If departureDate is null, returnDate must also be null.
+- "fin de semana" → durationDays=3, flexibleDates=true.
+- "una semana" → durationDays=7. "10 días" → durationDays=10.
+
+DESTINATION RULES:
+- If destination is not specified or user says "sorpresa", "anywhere", "no sé" → flexibleDestination=true, destination=null.
+- Map city names to IATA codes: Madrid=MAD, Barcelona=BCN, Valencia=VLC, Sevilla=SVQ, Roma=FCO, París=CDG, Londres=LHR, Lisboa=LIS, Berlín=BER, Ámsterdam=AMS, Tokio=NRT, Nueva York=JFK, etc.
+
+ORIGIN RULES:
+- Default origin to Madrid (MAD) if not specified.
+- If user mentions a Spanish city as starting point, use it.
+
+PASSENGERS: extract number of people ("para 2 personas" → 2, "familia de 4" → 4). Default 1.
+BUDGET: extract numeric value in EUR if mentioned ("máximo 300€" → 300).`;
 
 async function parseWithClaude(rawPrompt: string, apiKey: string): Promise<ParsedTravelRequest> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
