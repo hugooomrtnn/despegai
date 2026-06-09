@@ -19,6 +19,9 @@ export const metadata: Metadata = {
     description: "Escribe tu viaje en español y la IA encuentra los mejores vuelos en segundos.",
     type: "website",
   },
+  other: {
+    "google-adsense-account": "ca-pub-1669085762524524",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
