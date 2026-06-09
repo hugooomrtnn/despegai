@@ -25,6 +25,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={font.variable}>
       <head>
+        {/* Google AdSense */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1669085762524524"
+          crossOrigin="anonymous"
+        />
         {/* Travelpayouts Drive — debe estar en el HTML inicial para ser detectado */}
         {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
         <script
