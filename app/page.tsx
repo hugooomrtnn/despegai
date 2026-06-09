@@ -386,9 +386,14 @@ export default function HomePage() {
               <p className="text-xs text-white/20">
                 © 2025 Despegai · Herramienta de búsqueda con inteligencia artificial
               </p>
-              <p className="text-xs text-white/15">
-                Los precios mostrados son orientativos. Confírmelos en los buscadores oficiales.
-              </p>
+              <div className="flex items-center gap-4">
+                <a href="/politica-de-privacidad" className="text-xs text-white/25 hover:text-white/50 transition-colors">
+                  Política de privacidad
+                </a>
+                <a href="/terminos" className="text-xs text-white/25 hover:text-white/50 transition-colors">
+                  Términos y condiciones
+                </a>
+              </div>
             </div>
           </div>
         </footer>
