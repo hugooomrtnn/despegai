@@ -40,6 +40,13 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   "santiago de compostela": { name: "Santiago de Compostela", code: "SCQ" },
   vigo: { name: "Vigo", code: "VGO" },
 
+  // España — aeropuertos secundarios
+  girona: { name: "Girona", code: "GRO" },
+  reus: { name: "Reus (Tarragona)", code: "REU" },
+  tarragona: { name: "Reus (Tarragona)", code: "REU" },
+  jerez: { name: "Jerez de la Frontera", code: "XRY" },
+  "jerez de la frontera": { name: "Jerez de la Frontera", code: "XRY" },
+
   // Islas Baleares
   palma: { name: "Palma de Mallorca", code: "PMI" },
   mallorca: { name: "Palma de Mallorca", code: "PMI" },
@@ -179,6 +186,10 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   marrakesh: { name: "Marrakech", code: "RAK" },
   casablanca: { name: "Casablanca", code: "CMN" },
   fez: { name: "Fez", code: "FEZ" },
+  agadir: { name: "Agadir", code: "AGA" },
+  rabat: { name: "Rabat", code: "RBA" },
+  tanger: { name: "Tánger", code: "TNG" },
+  tánger: { name: "Tánger", code: "TNG" },
   // Marruecos — país
   marruecos: { name: "Marruecos", code: "RAK" },
   morocco: { name: "Marruecos", code: "RAK" },
@@ -232,19 +243,49 @@ const PLACE_DICT: Record<string, { name: string; code: string }> = {
   mumbai: { name: "Bombay", code: "BOM" },
   bombay: { name: "Bombay", code: "BOM" },
 
+  // Balcanes y Europa del Este adicional
+  belgrado: { name: "Belgrado", code: "BEG" },
+  belgrade: { name: "Belgrado", code: "BEG" },
+  serbia: { name: "Belgrado", code: "BEG" },
+  sarajevo: { name: "Sarajevo", code: "SJJ" },
+  bosnia: { name: "Sarajevo", code: "SJJ" },
+  tirana: { name: "Tirana", code: "TIA" },
+  albania: { name: "Tirana", code: "TIA" },
+  skopje: { name: "Skopie", code: "SKP" },
+  podgorica: { name: "Podgorica", code: "TGD" },
+  tivat: { name: "Tivat", code: "TIV" },
+  montenegro: { name: "Tivat", code: "TIV" },
+  chisinau: { name: "Chisinau", code: "KIV" },
+  moldova: { name: "Chisinau", code: "KIV" },
+  pristina: { name: "Pristina", code: "PRN" },
+  kosovo: { name: "Pristina", code: "PRN" },
+
   // América — ciudades
   "nueva york": { name: "Nueva York", code: "JFK" },
   "new york": { name: "Nueva York", code: "JFK" },
   miami: { name: "Miami", code: "MIA" },
   "los angeles": { name: "Los Ángeles", code: "LAX" },
   chicago: { name: "Chicago", code: "ORD" },
+  "las vegas": { name: "Las Vegas", code: "LAS" },
+  orlando: { name: "Orlando", code: "MCO" },
+  "san francisco": { name: "San Francisco", code: "SFO" },
+  seattle: { name: "Seattle", code: "SEA" },
+  boston: { name: "Boston", code: "BOS" },
+  washington: { name: "Washington D.C.", code: "IAD" },
   cancun: { name: "Cancún", code: "CUN" },
   "ciudad de mexico": { name: "Ciudad de México", code: "MEX" },
+  guadalajara: { name: "Guadalajara", code: "GDL" },
   bogota: { name: "Bogotá", code: "BOG" },
+  medellin: { name: "Medellín", code: "MDE" },
+  medellín: { name: "Medellín", code: "MDE" },
+  cartagena: { name: "Cartagena de Indias", code: "CTG" },
   "buenos aires": { name: "Buenos Aires", code: "EZE" },
   "sao paulo": { name: "São Paulo", code: "GRU" },
   "rio de janeiro": { name: "Río de Janeiro", code: "GIG" },
   habana: { name: "La Habana", code: "HAV" },
+  aruba: { name: "Aruba", code: "AUA" },
+  curacao: { name: "Curazao", code: "CUR" },
+  curazao: { name: "Curazao", code: "CUR" },
   // América — países
   "estados unidos": { name: "Estados Unidos", code: "JFK" },
   usa: { name: "Estados Unidos", code: "JFK" },
@@ -590,6 +631,10 @@ function extractDuration(text: string): number | null {
 
   if (/una\s+semana/.test(lower)) return 7;
   if (/dos\s+semanas/.test(lower)) return 14;
+  if (/tres\s+semanas/.test(lower)) return 21;
+
+  // "ida y vuelta" sin duración explícita → 7 días por defecto
+  if (/ida\s+y\s+vuelta/.test(lower)) return 7;
 
   return null;
 }
@@ -598,6 +643,38 @@ function extractDuration(text: string): number | null {
 function extractDepartureDate(text: string): string | null {
   const lower = text.toLowerCase();
 
+  // "mañana"
+  if (/\bma[ñn]ana\b/.test(lower)) {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split("T")[0];
+  }
+
+  // "este fin de semana", "este finde", "este weekend"
+  if (/este\s+(?:fin\s+de\s+semana|finde|weekend)/.test(lower)) {
+    const d = new Date();
+    const daysToSat = (6 - d.getDay() + 7) % 7 || 7;
+    d.setDate(d.getDate() + daysToSat);
+    return d.toISOString().split("T")[0];
+  }
+
+  // "la semana que viene", "la próxima semana", "la semana próxima"
+  if (/(?:la\s+)?semana\s+que\s+viene|(?:la\s+)?pr[oó]xima\s+semana|semana\s+pr[oó]xima/.test(lower)) {
+    const d = new Date();
+    const daysToMon = (8 - d.getDay()) % 7 || 7;
+    d.setDate(d.getDate() + daysToMon);
+    return d.toISOString().split("T")[0];
+  }
+
+  // "el mes que viene", "el próximo mes", "el mes próximo"
+  if (/(?:el\s+)?(?:pr[oó]ximo\s+mes|mes\s+que\s+viene|mes\s+pr[oó]ximo)/.test(lower)) {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    d.setDate(1);
+    return d.toISOString().split("T")[0];
+  }
+
+  // Mes por nombre ("en agosto", "para julio", "en el mes de octubre"…)
   for (const [monthName, monthNum] of Object.entries(MONTH_MAP)) {
     if (lower.includes(monthName)) {
       const now = new Date();
@@ -607,6 +684,7 @@ function extractDepartureDate(text: string): string | null {
     }
   }
 
+  // "próximas X semanas"
   const weeksMatch = lower.match(/pr[oó]ximas?\s+(\d+)\s+semanas?/i);
   if (weeksMatch) {
     const d = new Date();
@@ -614,6 +692,7 @@ function extractDepartureDate(text: string): string | null {
     return d.toISOString().split("T")[0];
   }
 
+  // "próximos X meses"
   const monthsMatch = lower.match(/pr[oó]ximos?\s+(\d+)\s+meses?/i);
   if (monthsMatch) {
     const d = new Date();

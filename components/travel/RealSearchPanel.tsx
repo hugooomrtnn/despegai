@@ -19,6 +19,13 @@ function defaultDate(): string {
   return d.toISOString().split("T")[0];
 }
 
+function nextMonthFirst(): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() + 1);
+  d.setDate(1);
+  return d.toISOString().split("T")[0];
+}
+
 function formatDateEs(iso: string): string {
   return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
 }
@@ -270,16 +277,17 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   const adults     = parsed.passengers ?? 1;
   const nights     = parsed.durationDays ?? 5;
   const flexible   = parsed.flexibleDates || !parsed.departureDate;
-  const baseDate   = parsed.departureDate ?? (flexible ? null : defaultDate());
+  // Sin fecha concreta: usamos el 1 del próximo mes para mostrar el acordeón de opciones
+  const baseDate   = parsed.departureDate ?? (flexible ? nextMonthFirst() : defaultDate());
 
-  const selectedDate = baseDate ?? defaultDate();
+  const selectedDate = baseDate;
 
   // Cuando hay duración, la vuelta se recalcula sobre la fecha seleccionada
   const returnDate = parsed.returnDate ??
     (parsed.durationDays ? addDays(selectedDate, parsed.durationDays) : null);
 
-  // Fechas semanales del mes cuando la búsqueda es flexible por mes (solo fechas futuras)
-  const _rawMonthDates = (flexible && baseDate) ? getMonthDates(baseDate) : null;
+  // Acordeón siempre activo cuando flexible (fechas futuras del mes)
+  const _rawMonthDates = flexible ? getMonthDates(baseDate) : null;
   const monthDates = _rawMonthDates && _rawMonthDates.length > 0 ? _rawMonthDates : null;
 
   // ── Destino concreto ────────────────────────────────────────────────────────
