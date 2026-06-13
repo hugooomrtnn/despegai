@@ -40,7 +40,7 @@ function buildJetradarUrl(
     adults: String(adults),
     marker: TP_MARKER,
     trs: TP_TRS,
-    currency: "EUR",
+    curr: "EUR",
     locale: "es",
   });
   if (returnDate) p.set("return_date", returnDate);
@@ -62,14 +62,38 @@ function buildKayakUrl(origin: string, dest: string, date: string | null, return
   return url;
 }
 
-function buildEdreamsUrl(origin: string, dest: string, date: string | null, returnDate?: string | null, adults?: number): string {
-  const compact = date?.replace(/-/g, "") ?? "";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function buildGoogleFlightsUrl(originCity: string, destName: string, _date?: string | null, _returnDate?: string | null): string {
+  const q = encodeURIComponent(`Vuelos de ${originCity} a ${destName}`);
+  return `https://www.google.es/travel/flights?hl=es&curr=EUR&q=${q}`;
+}
+
+function buildIberiaUrl(origin: string, dest: string, date: string | null, returnDate?: string | null, adults = 1): string {
+  const compact = (date ?? defaultDate()).replace(/-/g, "");
+  const tripType = returnDate ? "RT" : "OW";
   const retCompact = returnDate?.replace(/-/g, "") ?? "";
-  const type = returnDate ? "ROUND_TRIP" : "ONE_WAY";
-  let url = `https://www.edreams.es/search/#results/type=${type};fromAirport=${origin};toAirport=${dest};adults=${adults ?? 1}`;
-  if (compact) url += `;departureDate=${compact}`;
-  if (retCompact) url += `;returnDate=${retCompact}`;
+  let url = `https://www.iberia.com/es/flights/?origin=${origin}&destination=${dest}&departureDate=${compact}&tripType=${tripType}&adults=${adults}&cabin=Y`;
+  if (retCompact) url += `&returnDate=${retCompact}`;
   return url;
+}
+
+function buildVuelingUrl(origin: string, dest: string, date: string | null, returnDate?: string | null, adults = 1): string {
+  const dep = date ?? defaultDate();
+  const [y, m, d] = dep.split("-");
+  const depFormatted = `${d}/${m}/${y}`;
+  const flightType = returnDate ? "RT" : "OW";
+  let url = `https://www.vueling.com/es/ve-a-lo-que-vuelas/encuentra-tu-vuelo?departure=${origin}&arrival=${dest}&departureDate=${depFormatted}&adults=${adults}&flightType=${flightType}&lang=es`;
+  if (returnDate) {
+    const [ry, rm, rd] = returnDate.split("-");
+    url += `&returnDate=${rd}/${rm}/${ry}`;
+  }
+  return url;
+}
+
+function buildRyanairUrl(origin: string, dest: string, date: string | null): string {
+  const dep = (date ?? defaultDate()).replace(/-/g, "");
+  return `https://www.ryanair.com/es/es/vuelos-baratos?from=${origin}&to=${dest}&dateOut=${dep}&adults=1`;
 }
 
 function buildHotelUrls(city: string, checkIn: string, nights: number, adults: number) {
@@ -97,17 +121,44 @@ function FlightIframe({ src }: { src: string }) {
   );
 }
 
-// ─── Chips de buscadores alternativos ────────────────────────────────────────
-function AltProviders({ urls }: { urls: { name: string; url: string; color: string }[] }) {
+// ─── Grid de buscadores reconocidos ──────────────────────────────────────────
+const PROVIDER_STYLES: Record<string, string> = {
+  "Google Flights": "bg-white border-slate-200 hover:border-blue-300 hover:shadow-blue-100",
+  "Iberia":         "bg-white border-slate-200 hover:border-red-300 hover:shadow-red-100",
+  "Vueling":        "bg-white border-slate-200 hover:border-yellow-300 hover:shadow-yellow-100",
+  "Ryanair":        "bg-white border-slate-200 hover:border-blue-300 hover:shadow-blue-100",
+  "Skyscanner":     "bg-white border-slate-200 hover:border-sky-300 hover:shadow-sky-100",
+  "Kayak":          "bg-white border-slate-200 hover:border-orange-300 hover:shadow-orange-100",
+};
+const PROVIDER_EMOJI: Record<string, string> = {
+  "Google Flights": "✈️",
+  "Iberia":         "🔴",
+  "Vueling":        "🟡",
+  "Ryanair":        "💙",
+  "Skyscanner":     "🔵",
+  "Kayak":          "🟠",
+};
+
+function AltProviders({ urls }: { urls: { name: string; url: string }[] }) {
   return (
-    <div className="flex items-center gap-2 flex-wrap mt-3">
-      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">También en:</span>
-      {urls.map(p => (
-        <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer"
-          className={`text-xs font-semibold text-slate-500 bg-slate-100 ${p.color} hover:bg-slate-200 px-2.5 py-1 rounded-full transition-colors`}>
-          {p.name}
-        </a>
-      ))}
+    <div className="mt-4">
+      <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
+        Busca también en webs reconocidas
+      </p>
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+        {urls.map(p => (
+          <a
+            key={p.name}
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border text-center transition-all shadow-sm hover:shadow-md ${PROVIDER_STYLES[p.name] ?? "bg-white border-slate-200 hover:border-slate-300"}`}
+          >
+            <span className="text-lg leading-none">{PROVIDER_EMOJI[p.name] ?? "🔗"}</span>
+            <span className="text-[11px] font-bold text-slate-700 leading-tight">{p.name}</span>
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
@@ -169,9 +220,12 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
 
           {/* Buscadores alternativos */}
           <AltProviders urls={[
-            { name: "Skyscanner", url: buildSkyscannerUrl(origin, dest, date, flexible), color: "hover:text-blue-600" },
-            { name: "Kayak",      url: buildKayakUrl(origin, dest, date, returnDate, flexible), color: "hover:text-sky-500" },
-            { name: "eDreams",    url: buildEdreamsUrl(origin, dest, date, returnDate, adults),  color: "hover:text-red-500" },
+            { name: "Google Flights", url: buildGoogleFlightsUrl(originCity, destName, date, returnDate) },
+            { name: "Iberia",         url: buildIberiaUrl(origin, dest, date, returnDate, adults) },
+            { name: "Vueling",        url: buildVuelingUrl(origin, dest, date, returnDate, adults) },
+            { name: "Ryanair",        url: buildRyanairUrl(origin, dest, date) },
+            { name: "Skyscanner",     url: buildSkyscannerUrl(origin, dest, date, flexible) },
+            { name: "Kayak",          url: buildKayakUrl(origin, dest, date, returnDate, flexible) },
           ]} />
         </div>
 
@@ -257,9 +311,12 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
                     </div>
                     <FlightIframe src={jetradar} />
                     <AltProviders urls={[
-                      { name: "Skyscanner", url: buildSkyscannerUrl(origin, rec.airportCode, date, flexible), color: "hover:text-blue-600" },
-                      { name: "Kayak",      url: buildKayakUrl(origin, rec.airportCode, date, returnDate, flexible), color: "hover:text-sky-500" },
-                      { name: "eDreams",    url: buildEdreamsUrl(origin, rec.airportCode, date, returnDate, adults), color: "hover:text-red-500" },
+                      { name: "Google Flights", url: buildGoogleFlightsUrl(originCity, rec.city, date, returnDate) },
+                      { name: "Iberia",         url: buildIberiaUrl(origin, rec.airportCode, date, returnDate, adults) },
+                      { name: "Vueling",        url: buildVuelingUrl(origin, rec.airportCode, date, returnDate, adults) },
+                      { name: "Ryanair",        url: buildRyanairUrl(origin, rec.airportCode, date) },
+                      { name: "Skyscanner",     url: buildSkyscannerUrl(origin, rec.airportCode, date, flexible) },
+                      { name: "Kayak",          url: buildKayakUrl(origin, rec.airportCode, date, returnDate, flexible) },
                     ]} />
                   </div>
                 )}
