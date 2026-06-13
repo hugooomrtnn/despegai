@@ -116,32 +116,61 @@ function getMonthDates(baseDate: string, max = 5): string[] {
   return dates;
 }
 
-// ─── Selector de fecha dentro del mes ────────────────────────────────────────
-function DateSelector({ dates, selected, onSelect }: {
+// ─── Lista de fechas del mes como acordeón ───────────────────────────────────
+function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDate }: {
   dates: string[];
-  selected: string;
-  onSelect: (d: string) => void;
+  origin: string;
+  dest: string;
+  adults: number;
+  durationDays: number | null;
+  returnDate: string | null;
 }) {
+  const [openSet, setOpenSet] = useState<Set<string>>(new Set([dates[0]]));
+
+  function toggle(d: string) {
+    setOpenSet(prev => {
+      const next = new Set(prev);
+      if (next.has(d)) next.delete(d);
+      else next.add(d);
+      return next;
+    });
+  }
+
   return (
-    <div className="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
-      <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2.5">
-        Compara precios por fecha — elige un día del mes:
-      </p>
-      <div className="flex gap-2 flex-wrap">
-        {dates.map(d => (
-          <button
-            key={d}
-            onClick={() => onSelect(d)}
-            className={`text-xs px-3 py-1.5 rounded-xl font-semibold border transition-all ${
-              d === selected
-                ? "bg-sky-500 text-white border-sky-500 shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:border-sky-300 hover:text-sky-600"
-            }`}
-          >
-            {formatDateEs(d)}
-          </button>
-        ))}
-      </div>
+    <div className="space-y-2 mb-4">
+      {dates.map(d => {
+        const ret = durationDays ? addDays(d, durationDays) : returnDate;
+        const isOpen = openSet.has(d);
+        const jetradar = buildJetradarUrl(origin, dest, d, adults, ret ?? null);
+
+        return (
+          <div key={d} className="rounded-xl border border-slate-200 overflow-hidden">
+            <button
+              onClick={() => toggle(d)}
+              className="flex items-center justify-between w-full px-4 py-3 bg-white hover:bg-sky-50/40 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-sky-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Calendar className="h-4 w-4 text-sky-500" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-slate-800">{formatDateEs(d)}</p>
+                  {ret && <p className="text-xs text-slate-400">Vuelta: {formatDateEs(ret)}</p>}
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-500 group-hover:text-sky-600">
+                <span>{isOpen ? "Cerrar" : "Ver vuelos"}</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+              </div>
+            </button>
+            {isOpen && (
+              <div className="border-t border-slate-100">
+                <FlightIframe src={jetradar} />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -220,8 +249,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   const flexible   = parsed.flexibleDates || !parsed.departureDate;
   const baseDate   = parsed.departureDate ?? (flexible ? null : defaultDate());
 
-  // selectedDate controls el iframe — se inicializa con el día base y cambia al hacer clic en el selector
-  const [selectedDate, setSelectedDate] = useState<string>(baseDate ?? defaultDate());
+  const selectedDate = baseDate ?? defaultDate();
 
   // Cuando hay duración, la vuelta se recalcula sobre la fecha seleccionada
   const returnDate = parsed.returnDate ??
@@ -249,18 +277,16 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
               <h3 className="font-bold text-slate-900">Vuelos {originCity} → {destName}</h3>
               <p className="text-xs text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {formatDateEs(selectedDate)}
-                {returnDate ? ` — ${formatDateEs(returnDate)}` : ""}
+                {monthDates
+                  ? new Date((baseDate ?? selectedDate) + "T12:00:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+                  : formatDateEs(selectedDate)
+                }
+                {!monthDates && returnDate ? ` — ${formatDateEs(returnDate)}` : ""}
                 {" · "}{adults} {adults === 1 ? "adulto" : "adultos"}
                 {flexible && !monthDates && " · fecha orientativa"}
               </p>
             </div>
           </div>
-
-          {/* Selector de fechas del mes (solo búsquedas flexibles con mes concreto) */}
-          {monthDates && (
-            <DateSelector dates={monthDates} selected={selectedDate} onSelect={setSelectedDate} />
-          )}
 
           {/* Banner de transparencia */}
           <div className="flex items-center gap-2.5 bg-sky-50 border border-sky-100 rounded-xl px-4 py-2.5 mb-3">
@@ -270,8 +296,19 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
             </p>
           </div>
 
-          {/* Iframe Jetradar */}
-          <FlightIframe src={jetradar} />
+          {/* Vuelos: acordeón con todas las fechas del mes o iframe único */}
+          {monthDates ? (
+            <FlexibleDateList
+              dates={monthDates}
+              origin={origin}
+              dest={dest}
+              adults={adults}
+              durationDays={parsed.durationDays ?? null}
+              returnDate={parsed.returnDate ?? null}
+            />
+          ) : (
+            <FlightIframe src={jetradar} />
+          )}
 
           {/* Buscadores alternativos */}
           <AltProviders urls={[
