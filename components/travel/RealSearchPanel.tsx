@@ -139,7 +139,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
         {/* Cabecera */}
         <div className="card-premium rounded-2xl p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
               <Plane className="h-4 w-4 text-white" />
             </div>
             <div>
@@ -160,7 +160,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
           {/* Buscadores alternativos */}
           <AltProviders urls={[
             { name: "Skyscanner", url: buildSkyscannerUrl(origin, dest, date, flexible), color: "hover:text-blue-600" },
-            { name: "Kayak",      url: buildKayakUrl(origin, dest, date, returnDate, flexible), color: "hover:text-orange-500" },
+            { name: "Kayak",      url: buildKayakUrl(origin, dest, date, returnDate, flexible), color: "hover:text-sky-500" },
             { name: "eDreams",    url: buildEdreamsUrl(origin, dest, date, returnDate, adults),  color: "hover:text-red-500" },
           ]} />
         </div>
@@ -200,7 +200,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
     return (
       <div className="card-premium rounded-2xl p-5">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
             <MapPin className="h-4 w-4 text-white" />
           </div>
           <div>
@@ -220,7 +220,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
               <div key={rec.airportCode}>
                 <button
                   onClick={() => setExpandedDest(isOpen ? null : rec.airportCode)}
-                  className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/50 transition-all group"
+                  className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-slate-100 hover:border-sky-200 hover:bg-sky-50/50 transition-all group"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg font-mono">
@@ -231,7 +231,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
                       <p className="text-xs text-slate-400">{rec.country}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-orange-500">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-500">
                     <span>{isOpen ? "Cerrar" : "Ver vuelos"}</span>
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                   </div>
@@ -242,7 +242,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
                     <FlightIframe src={jetradar} />
                     <AltProviders urls={[
                       { name: "Skyscanner", url: buildSkyscannerUrl(origin, rec.airportCode, date, flexible), color: "hover:text-blue-600" },
-                      { name: "Kayak",      url: buildKayakUrl(origin, rec.airportCode, date, returnDate, flexible), color: "hover:text-orange-500" },
+                      { name: "Kayak",      url: buildKayakUrl(origin, rec.airportCode, date, returnDate, flexible), color: "hover:text-sky-500" },
                       { name: "eDreams",    url: buildEdreamsUrl(origin, rec.airportCode, date, returnDate, adults), color: "hover:text-red-500" },
                     ]} />
                   </div>

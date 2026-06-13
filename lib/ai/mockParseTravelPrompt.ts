@@ -598,7 +598,7 @@ function extractDepartureDate(text: string): string | null {
       const now = new Date();
       const targetMonth = monthNum - 1;
       const targetYear = targetMonth < now.getMonth() ? now.getFullYear() + 1 : now.getFullYear();
-      return new Date(targetYear, targetMonth, 15).toISOString().split("T")[0];
+      return new Date(targetYear, targetMonth, 1).toISOString().split("T")[0];
     }
   }
 
@@ -617,7 +617,7 @@ function extractDepartureDate(text: string): string | null {
   }
 
   if (/(?:este|el)\s+verano/.test(lower)) {
-    return new Date(new Date().getFullYear(), 6, 15).toISOString().split("T")[0];
+    return new Date(new Date().getFullYear(), 6, 1).toISOString().split("T")[0];
   }
   if (/navidad|navidades/.test(lower)) {
     return new Date(new Date().getFullYear(), 11, 22).toISOString().split("T")[0];
@@ -649,6 +649,34 @@ function detectTripType(text: string): TripType {
   }
 
   return "unknown";
+}
+
+// ─── Extraer número de pasajeros ─────────────────────────────────────────────
+function extractPassengers(text: string): number {
+  const lower = text.toLowerCase();
+  const patterns = [
+    /para\s+(\d+)\s*personas?/i,
+    /(\d+)\s+adultos?/i,
+    /somos\s+(\d+)/i,
+    /familia\s+de\s+(\d+)/i,
+    /grupo\s+de\s+(\d+)/i,
+    /viaje\s+de\s+(\d+)/i,
+    /nosotros\s+(\d+)/i,
+    /(\d+)\s+viajeros?/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) {
+      const n = parseInt(m[1]);
+      if (n >= 1 && n <= 9) return n;
+    }
+  }
+  // "dos", "tres"... literales
+  if (/\bdos\b/.test(lower)) return 2;
+  if (/\btres\b/.test(lower)) return 3;
+  if (/\bcuatro\b/.test(lower)) return 4;
+  if (/\bcinco\b/.test(lower)) return 5;
+  return 1;
 }
 
 // ─── Extraer preferencias ────────────────────────────────────────────────────
@@ -688,19 +716,25 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
     !departureDate ||
     /flexible|cualquier fecha|cuando sea|cuando quiera/.test(norm);
 
+  const dep = departureDate ?? null;
+  const dur = durationDays ?? null;
+  const returnDate = dep && dur
+    ? (() => { const d = new Date(dep); d.setDate(d.getDate() + dur); return d.toISOString().split("T")[0]; })()
+    : null;
+
   return {
     origin: origin?.name ?? "Madrid",
     originAirportCode: origin?.code ?? "MAD",
     destination: destination?.name ?? null,
     destinationAirportCode: destination?.code ?? null,
     flexibleDestination: isFlexibleDestination,
-    departureDate: departureDate ?? null,
-    returnDate: null,
+    departureDate: dep,
+    returnDate,
     flexibleDates: isFlexibleDates,
-    durationDays: durationDays ?? null,
+    durationDays: dur,
     budget,
     currency: "EUR",
-    passengers: 1,
+    passengers: extractPassengers(text),
     tripType,
     preferences,
     constraints: budget ? [`Presupuesto máximo: ${budget} EUR`] : [],

@@ -30,6 +30,16 @@ export async function POST(request: NextRequest) {
     // 1. Parse the natural language prompt
     const parsedRequest = await parseTravelPrompt(prompt.trim());
 
+    // Safety net: ensure returnDate is always calculated when possible,
+    // regardless of which parser ran (Claude, OpenAI or mock).
+    if (!parsedRequest.returnDate && parsedRequest.departureDate && parsedRequest.durationDays) {
+      const d = new Date(parsedRequest.departureDate);
+      d.setDate(d.getDate() + parsedRequest.durationDays);
+      parsedRequest.returnDate = d.toISOString().split("T")[0];
+    }
+    // Default passengers to 1 if parser left it undefined
+    if (!parsedRequest.passengers) parsedRequest.passengers = 1;
+
     // 2. Get destination recommendations if destination is flexible
     const destinationRecommendations = parsedRequest.flexibleDestination
       ? getDestinationRecommendations(parsedRequest)

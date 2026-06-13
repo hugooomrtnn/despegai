@@ -1548,17 +1548,47 @@ export function getDestinationRecommendations(
     if (byType.length >= 3) filtered = byType;
   }
 
-  if (request.budget) {
-    if (request.budget < 80) filtered = filtered.filter((d) => d.estimatedPriceLevel === "low");
-    else if (request.budget < 250) filtered = filtered.filter((d) => d.estimatedPriceLevel !== "high");
+  // Filtro duro: excluir destinos incompatibles con el presupuesto
+  const { budget } = request;
+  if (budget) {
+    if (budget < 150)       filtered = filtered.filter((d) => d.estimatedPriceLevel === "low");
+    else if (budget < 400)  filtered = filtered.filter((d) => d.estimatedPriceLevel !== "high");
   }
 
+  // Excluir origen
   if (request.origin) {
     const originLower = request.origin.toLowerCase();
     filtered = filtered.filter((d) => !d.city.toLowerCase().includes(originLower));
   }
 
-  return filtered
+  // Scoring dinámico: ajustar según contexto real del usuario
+  const NEARBY = new Set(["España", "Portugal", "Francia", "Marruecos", "Italia", "Alemania"]);
+  const scored = filtered.map((d) => {
+    let score = d.matchScore;
+
+    // Alineación de presupuesto
+    if (budget) {
+      if (budget < 300 && d.estimatedPriceLevel === "low")            score += 12;
+      if (budget >= 300 && budget < 700 && d.estimatedPriceLevel === "medium") score += 8;
+      if (budget >= 700 && d.estimatedPriceLevel === "high")          score += 10;
+    }
+
+    // Alineación de duración (fin de semana → cerca; viaje largo → lejos)
+    const dur = request.durationDays;
+    if (dur) {
+      const near = NEARBY.has(d.country);
+      if (dur <= 3 && near)   score += 10;
+      if (dur >= 10 && !near) score += 8;
+    }
+
+    // Preferencias del usuario
+    if (request.preferences?.includes("precio bajo") && d.estimatedPriceLevel === "low") score += 10;
+    if (request.preferences?.includes("vuelo directo") && NEARBY.has(d.country)) score += 6;
+
+    return { ...d, matchScore: score };
+  });
+
+  return scored
     .sort((a, b) => b.matchScore - a.matchScore)
-    .slice(0, 6);
+    .slice(0, 8);
 }

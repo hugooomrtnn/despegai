@@ -389,9 +389,12 @@ export default function HomePage() {
 
               {/* Links */}
               <nav className="flex flex-wrap justify-center gap-6">
-                {["Cómo funciona", "Destinos", "Para agencias", "Precios"].map((l) => (
-                  <a key={l} href="#" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">
-                    {l}
+                {[
+                  { label: "Cómo funciona", href: "#how-it-works" },
+                  { label: "Destinos",       href: "#destinos" },
+                ].map((l) => (
+                  <a key={l.label} href={l.href} className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">
+                    {l.label}
                   </a>
                 ))}
               </nav>
