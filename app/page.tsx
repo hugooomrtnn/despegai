@@ -19,7 +19,7 @@ import type { TravelSearchResponse } from "@/types/travel";
 const DESTINATIONS_SHOWCASE = [
   { name: "París",      country: "Francia",   flag: "🇫🇷", tag: "Romántico",  gradient: "from-rose-600/30 to-pink-500/15",     border: "border-rose-500/25",   tag_color: "text-rose-400" },
   { name: "Tokio",      country: "Japón",     flag: "🇯🇵", tag: "Aventura",   gradient: "from-cyan-600/30 to-blue-500/15",     border: "border-cyan-500/25",   tag_color: "text-cyan-400" },
-  { name: "Roma",       country: "Italia",    flag: "🇮🇹", tag: "Cultura",    gradient: "from-orange-500/30 to-amber-500/15",  border: "border-orange-500/25", tag_color: "text-orange-400" },
+  { name: "Roma",       country: "Italia",    flag: "🇮🇹", tag: "Cultura",    gradient: "from-orange-500/30 to-amber-500/15",  border: "border-orange-500/25", tag_color: "text-sky-400" },
   { name: "Bali",       country: "Indonesia", flag: "🇮🇩", tag: "Playa",      gradient: "from-teal-600/30 to-emerald-500/15",  border: "border-teal-500/25",   tag_color: "text-teal-400" },
   { name: "El Cairo",   country: "Egipto",    flag: "🇪🇬", tag: "Historia",   gradient: "from-amber-600/30 to-yellow-400/15",  border: "border-amber-500/25",  tag_color: "text-amber-400" },
   { name: "Nueva York", country: "EE.UU.",    flag: "🇺🇸", tag: "Ciudad",     gradient: "from-violet-600/30 to-purple-500/15", border: "border-violet-500/25", tag_color: "text-violet-400" },
@@ -52,7 +52,7 @@ const HOW_IT_WORKS = [
     icon: Zap, step: "02",
     title: "La IA lo interpreta todo",
     description: "Detecta destino, fechas, presupuesto y preferencias. Busca vuelos, hoteles y crea un plan completo.",
-    color: "from-orange-400 to-red-500", glow: "shadow-orange-500/20",
+    color: "from-violet-500 to-indigo-600", glow: "shadow-violet-500/20",
   },
   {
     icon: FileText, step: "03",
@@ -74,7 +74,7 @@ const TICKER_QUERIES = [
   "Vuelo directo a Tailandia desde España en noviembre",
 ];
 
-function scrollToSearch(query?: string, cb?: () => void) {
+function scrollToSearch(_query?: string, cb?: () => void) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   setTimeout(() => {
     document.getElementById("search-input")?.focus();
@@ -114,14 +114,14 @@ export default function HomePage() {
         {/* Orbs de luz */}
         <div className="absolute top-[18%] left-[8%]   w-[480px] h-[480px] rounded-full bg-blue-600/8   blur-[110px] pointer-events-none" />
         <div className="absolute top-[30%] right-[4%]  w-[360px] h-[360px] rounded-full bg-violet-600/8  blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[700px] h-[220px] rounded-full bg-orange-500/10 blur-[90px] pointer-events-none" />
+        <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[700px] h-[220px] rounded-full bg-sky-500/10 blur-[90px] pointer-events-none" />
 
         <div className="relative flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-16">
 
           {/* Badge de confianza */}
           <div className="animate-fade-in flex items-center gap-2.5 px-4 py-2 rounded-full glass-dark mb-8">
-            <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse-slow" />
-            <Sparkles className="h-3.5 w-3.5 text-orange-400/80" />
+            <span className="w-2 h-2 bg-sky-400 rounded-full animate-pulse-slow" />
+            <Sparkles className="h-3.5 w-3.5 text-sky-400/80" />
             <span className="text-sm text-white/55 font-medium">
               226+ destinos · IA nativa en español · Sin formularios
             </span>
@@ -160,7 +160,7 @@ export default function HomePage() {
                     onClick={() => scrollToSearch(q, () => setSearchPrompt(q))}
                     className="inline-flex items-center gap-2 mx-3 px-3 py-1.5 rounded-full glass-dark text-xs text-white/40 whitespace-nowrap cursor-pointer hover:text-white/70 transition-colors"
                   >
-                    <Plane className="h-3 w-3 text-orange-400/60 flex-shrink-0" />
+                    <Plane className="h-3 w-3 text-sky-400/60 flex-shrink-0" />
                     {q}
                   </span>
                 ))}
@@ -248,13 +248,13 @@ export default function HomePage() {
           TRAVEL MOODS — sección nueva única
       ════════════════════════════════════════════════════════════ */}
       {showLanding && (
-        <section id="destinos" className="py-24 sm:py-32 bg-[#030305]">
+        <section id="destinos" className="py-24 sm:py-32 bg-[#071120]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
             <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-dark mb-5 border border-orange-500/20">
-                <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse-slow" />
-                <span className="text-sm font-semibold text-orange-400">¿Qué tipo de viaje buscas?</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-dark mb-5 border border-sky-500/20">
+                <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse-slow" />
+                <span className="text-sm font-semibold text-sky-400">¿Qué tipo de viaje buscas?</span>
               </div>
               <h2 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
                 Busca por{" "}
@@ -277,7 +277,7 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-base font-bold text-white mb-1">{mood.label}</h3>
                   <p className="text-xs text-white/35 leading-relaxed">{mood.desc}</p>
-                  <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-orange-400/70 group-hover:text-orange-400 transition-colors">
+                  <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-sky-400/70 group-hover:text-sky-400 transition-colors">
                     <span>Buscar destinos</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
@@ -296,9 +296,9 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border border-orange-100 mb-5">
-                <Zap className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-semibold text-orange-600">Cómo funciona</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-sky-50 rounded-full border border-sky-100 mb-5">
+                <Zap className="h-4 w-4 text-sky-500" />
+                <span className="text-sm font-semibold text-sky-600">Cómo funciona</span>
               </div>
               <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight">
                 De la petición a la propuesta
@@ -333,9 +333,9 @@ export default function HomePage() {
             </div>
 
             {/* Mapa de destinos — panel oscuro */}
-            <div className="bg-[#030305] rounded-3xl p-10 text-center overflow-hidden relative border border-white/[0.06]">
+            <div className="bg-[#071120] rounded-3xl p-10 text-center overflow-hidden relative border border-white/[0.06]">
               <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[150px] rounded-full bg-orange-500/10 blur-[60px] pointer-events-none" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[150px] rounded-full bg-sky-500/10 blur-[60px] pointer-events-none" />
               <div className="relative">
                 <h3 className="text-2xl sm:text-3xl font-black text-white mb-3">
                   Más de <span className="text-gradient-fire">226 destinos</span> en todo el mundo
@@ -356,7 +356,7 @@ export default function HomePage() {
                       <button
                         key={d}
                         onClick={() => scrollToSearch(q, () => setSearchPrompt(q))}
-                        className="text-sm px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/50 font-medium hover:border-orange-500/30 hover:text-white/70 transition-colors cursor-pointer"
+                        className="text-sm px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/50 font-medium hover:border-sky-500/30 hover:text-white/70 transition-colors cursor-pointer"
                       >
                         {d}
                       </button>
@@ -373,17 +373,17 @@ export default function HomePage() {
           FOOTER
       ════════════════════════════════════════════════════════════ */}
       {!results && !isLoading && (
-        <footer className="bg-[#030305] border-t border-white/[0.05] py-12">
+        <footer className="bg-[#071120] border-t border-white/[0.05] py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
 
               {/* Logo */}
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/25">
+                <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/25">
                   <Plane className="h-4 w-4 text-white" />
                 </div>
                 <span className="font-extrabold text-white text-lg">
-                  Despeg<span className="text-orange-400">ai</span>
+                  Despeg<span className="text-sky-400">ai</span>
                 </span>
               </div>
 

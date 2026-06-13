@@ -10,7 +10,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 22 100% 53%;
+    --primary: 199 89% 48%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -22,7 +22,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 22 100% 53%;
+    --ring: 199 89% 48%;
     --radius: 0.75rem;
   }
 }
@@ -48,18 +48,18 @@
 }
 
 /* ─── Hero Background ─────────────────────────────────────────────────────────
-   Concepto: amanecer desde la altura — cálido por abajo, espacio profundo arriba
+   Concepto: cielo de aviación — navy profundo arriba, horizonte sky-blue abajo
    ──────────────────────────────────────────────────────────────────────────── */
 .hero-dark {
   background:
-    /* Cálido horizonte naranja/coral desde abajo */
-    radial-gradient(ellipse 130% 55% at 50% 115%, rgba(249,115,22,0.26) 0%, rgba(239,68,68,0.10) 45%, transparent 68%),
-    /* Frío profundo arriba-derecha */
-    radial-gradient(ellipse 65% 55% at 88% 15%, rgba(56,189,248,0.09) 0%, transparent 55%),
-    /* Violeta izquierda */
-    radial-gradient(ellipse 50% 45% at 8% 60%, rgba(167,139,250,0.07) 0%, transparent 52%),
-    /* Base — casi negro con matiz azul-morado */
-    linear-gradient(175deg, #030305 0%, #07061a 52%, #0d0508 100%);
+    /* Horizonte sky-blue desde abajo */
+    radial-gradient(ellipse 130% 55% at 50% 115%, rgba(14,165,233,0.28) 0%, rgba(56,189,248,0.10) 45%, transparent 68%),
+    /* Azul cielo arriba-derecha */
+    radial-gradient(ellipse 65% 55% at 88% 15%, rgba(99,179,237,0.10) 0%, transparent 55%),
+    /* Azul profundo izquierda */
+    radial-gradient(ellipse 50% 45% at 8% 60%, rgba(37,99,235,0.09) 0%, transparent 52%),
+    /* Base — navy aviación */
+    linear-gradient(175deg, #071120 0%, #0C1A2E 52%, #071525 100%);
 }
 
 /* Cuadrícula de puntos sobre el hero */
@@ -67,7 +67,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.032) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(56,189,248,0.045) 1px, transparent 0);
   background-size: 42px 42px;
   pointer-events: none;
 }
@@ -80,7 +80,7 @@
   transform: translateX(-50%);
   width: 160%;
   height: 420px;
-  border: 1px solid rgba(249,115,22,0.09);
+  border: 1px solid rgba(14,165,233,0.12);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -91,38 +91,38 @@
   transform: translateX(-50%);
   width: 190%;
   height: 480px;
-  border: 1px solid rgba(249,115,22,0.04);
+  border: 1px solid rgba(14,165,233,0.05);
   border-radius: 50%;
   pointer-events: none;
 }
 
 /* ─── Glass effects ───────────────────────────────────────────────────────── */
 .glass-dark {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(14, 56, 100, 0.14);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(56, 189, 248, 0.13);
 }
 
 .glass-search {
-  background: rgba(10, 8, 20, 0.72);
+  background: rgba(7, 17, 32, 0.80);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  box-shadow: 0 32px 64px -12px rgba(0,0,0,0.70), inset 0 1px 0 rgba(255,255,255,0.10);
+  border: 1px solid rgba(56, 189, 248, 0.14);
+  box-shadow: 0 32px 64px -12px rgba(0,0,0,0.70), inset 0 1px 0 rgba(56,189,248,0.08);
 }
 
 /* ─── Gradient text ───────────────────────────────────────────────────────── */
-/* Fuego — coral naranja, color acento principal */
-.text-gradient-amber {
-  background: linear-gradient(135deg, #fb923c 0%, #f97316 45%, #ef4444 100%);
+/* Sky — azul aviación, color acento principal */
+.text-gradient-fire {
+  background: linear-gradient(135deg, #93C5FD 0%, #38BDF8 50%, #0EA5E9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.text-gradient-fire {
-  background: linear-gradient(135deg, #fdba74 0%, #f97316 50%, #ef4444 100%);
+.text-gradient-amber {
+  background: linear-gradient(135deg, #93C5FD 0%, #38BDF8 45%, #6366F1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -138,14 +138,14 @@
 /* ─── Premium card ────────────────────────────────────────────────────────── */
 .card-premium {
   background: #ffffff;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+  border: 1px solid #e0eaf8;
+  box-shadow: 0 1px 3px rgba(14,165,233,0.06), 0 4px 16px rgba(14,165,233,0.04);
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 .card-premium:hover {
-  box-shadow: 0 4px 28px rgba(0,0,0,0.11), 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 28px rgba(14,165,233,0.14), 0 1px 3px rgba(14,165,233,0.06);
   transform: translateY(-2px);
-  border-color: #e2e8f0;
+  border-color: #bae6fd;
 }
 
 /* ─── Destination mood card ───────────────────────────────────────────────── */
@@ -155,23 +155,23 @@
   transition: all 0.25s ease;
 }
 .card-mood:hover {
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(249,115,22,0.35);
+  background: rgba(14,165,233,0.08);
+  border-color: rgba(14,165,233,0.38);
   transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(249,115,22,0.12);
+  box-shadow: 0 16px 40px rgba(14,165,233,0.14);
 }
 
 /* ─── CTA Button ──────────────────────────────────────────────────────────── */
 .btn-cta {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  box-shadow: 0 4px 20px rgba(249,115,22,0.45);
+  background: linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%);
+  box-shadow: 0 4px 20px rgba(14,165,233,0.45);
   color: #ffffff !important;
   font-weight: 700;
   transition: all 0.2s ease;
 }
 .btn-cta:hover {
-  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-  box-shadow: 0 6px 32px rgba(249,115,22,0.60);
+  background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
+  box-shadow: 0 6px 32px rgba(14,165,233,0.60);
   transform: translateY(-1px);
 }
 .btn-cta:active { transform: translateY(0); }
@@ -218,9 +218,9 @@
 /* ─── Custom scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar          { width: 6px; }
 ::-webkit-scrollbar-track    { background: transparent; }
-::-webkit-scrollbar-thumb    { background: #cbd5e1; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-thumb    { background: #93c5fd; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
 
 /* ─── Section divider ─────────────────────────────────────────────────────── */
-.section-divider { border-top: 1px solid #f1f5f9; }
+.section-divider { border-top: 1px solid #e0eaf8; }
 .hero-gradient   { background: #f8fafc; }
