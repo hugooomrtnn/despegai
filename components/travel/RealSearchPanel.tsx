@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plane, Hotel, ExternalLink, MapPin, Calendar, ChevronDown } from "lucide-react";
+import { Plane, Hotel, ExternalLink, MapPin, Calendar, ChevronDown, ShieldCheck } from "lucide-react";
 import type { ParsedTravelRequest, DestinationRecommendation } from "@/types/travel";
 
 const TP_MARKER = "736116";
@@ -40,6 +40,8 @@ function buildJetradarUrl(
     adults: String(adults),
     marker: TP_MARKER,
     trs: TP_TRS,
+    currency: "EUR",
+    locale: "es",
   });
   if (returnDate) p.set("return_date", returnDate);
   return `https://search.jetradar.com/flights/?${p.toString()}`;
@@ -154,6 +156,14 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
             </div>
           </div>
 
+          {/* Banner de transparencia */}
+          <div className="flex items-center gap-2.5 bg-sky-50 border border-sky-100 rounded-xl px-4 py-2.5 mb-3">
+            <ShieldCheck className="h-4 w-4 text-sky-500 flex-shrink-0" />
+            <p className="text-xs text-slate-600">
+              <span className="font-semibold text-slate-800">Selecciona tu vuelo</span> — al pulsar «Comprar» te llevamos directamente a la aerolínea o agencia oficial para completar la reserva de forma segura.
+            </p>
+          </div>
+
           {/* Iframe Jetradar */}
           <FlightIframe src={jetradar} />
 
@@ -239,6 +249,12 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
 
                 {isOpen && (
                   <div className="mt-2 mb-1">
+                    <div className="flex items-center gap-2.5 bg-sky-50 border border-sky-100 rounded-xl px-4 py-2.5 mb-3">
+                      <ShieldCheck className="h-4 w-4 text-sky-500 flex-shrink-0" />
+                      <p className="text-xs text-slate-600">
+                        <span className="font-semibold text-slate-800">Selecciona tu vuelo</span> — al pulsar «Comprar» te llevamos a la aerolínea o agencia oficial para reservar de forma segura.
+                      </p>
+                    </div>
                     <FlightIframe src={jetradar} />
                     <AltProviders urls={[
                       { name: "Skyscanner", url: buildSkyscannerUrl(origin, rec.airportCode, date, flexible), color: "hover:text-blue-600" },

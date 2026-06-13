@@ -92,8 +92,11 @@ export default function HomePage() {
     setResults(data);
     setError(null);
     setTimeout(() => {
-      document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+      const el = document.getElementById("results");
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 72; // 72 = header height + gap
+      window.scrollTo({ top, behavior: "smooth" });
+    }, 350);
   }
   function handleError(msg: string) { setError(msg); setResults(null); }
   function handleRetry()            { setError(null); }
