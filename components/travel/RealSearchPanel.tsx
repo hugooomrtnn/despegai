@@ -104,6 +104,48 @@ function buildHotelUrls(city: string, checkIn: string, nights: number, adults: n
   };
 }
 
+// ─── Fechas semanales del mes para búsqueda flexible ─────────────────────────
+function getMonthDates(baseDate: string, max = 5): string[] {
+  const dates: string[] = [];
+  const [y, m] = baseDate.split("-").map(Number);
+  const current = new Date(y, m - 1, 1);
+  while (current.getMonth() === m - 1 && dates.length < max) {
+    dates.push(current.toISOString().split("T")[0]);
+    current.setDate(current.getDate() + 7);
+  }
+  return dates;
+}
+
+// ─── Selector de fecha dentro del mes ────────────────────────────────────────
+function DateSelector({ dates, selected, onSelect }: {
+  dates: string[];
+  selected: string;
+  onSelect: (d: string) => void;
+}) {
+  return (
+    <div className="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+      <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2.5">
+        Compara precios por fecha — elige un día del mes:
+      </p>
+      <div className="flex gap-2 flex-wrap">
+        {dates.map(d => (
+          <button
+            key={d}
+            onClick={() => onSelect(d)}
+            className={`text-xs px-3 py-1.5 rounded-xl font-semibold border transition-all ${
+              d === selected
+                ? "bg-sky-500 text-white border-sky-500 shadow-sm"
+                : "bg-white text-slate-600 border-slate-200 hover:border-sky-300 hover:text-sky-600"
+            }`}
+          >
+            {formatDateEs(d)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Componente iframe de vuelos ──────────────────────────────────────────────
 function FlightIframe({ src }: { src: string }) {
   return (
@@ -143,7 +185,7 @@ function AltProviders({ urls }: { urls: { name: string; url: string }[] }) {
   return (
     <div className="mt-4">
       <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
-        Busca también en webs reconocidas
+        ¿Dónde quieres comprar tu vuelo?
       </p>
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
         {urls.map(p => (
@@ -176,16 +218,24 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   const adults     = parsed.passengers ?? 1;
   const nights     = parsed.durationDays ?? 5;
   const flexible   = parsed.flexibleDates || !parsed.departureDate;
-  const date       = parsed.departureDate ?? (flexible ? null : defaultDate());
+  const baseDate   = parsed.departureDate ?? (flexible ? null : defaultDate());
+
+  // selectedDate controls el iframe — se inicializa con el día base y cambia al hacer clic en el selector
+  const [selectedDate, setSelectedDate] = useState<string>(baseDate ?? defaultDate());
+
+  // Cuando hay duración, la vuelta se recalcula sobre la fecha seleccionada
   const returnDate = parsed.returnDate ??
-    (parsed.durationDays && date ? addDays(date, parsed.durationDays) : null);
+    (parsed.durationDays ? addDays(selectedDate, parsed.durationDays) : null);
+
+  // Fechas semanales del mes cuando la búsqueda es flexible por mes
+  const monthDates = (flexible && baseDate) ? getMonthDates(baseDate) : null;
 
   // ── Destino concreto ────────────────────────────────────────────────────────
   if (!parsed.flexibleDestination && parsed.destinationAirportCode) {
     const dest     = parsed.destinationAirportCode;
     const destName = parsed.destination ?? dest;
-    const hUrls    = hotelCheckIn(date) ? buildHotelUrls(destName, date ?? defaultDate(), nights, adults) : null;
-    const jetradar = buildJetradarUrl(origin, dest, date, adults, returnDate);
+    const hUrls    = buildHotelUrls(destName, selectedDate, nights, adults);
+    const jetradar = buildJetradarUrl(origin, dest, selectedDate, adults, returnDate);
 
     return (
       <div className="space-y-4">
@@ -199,13 +249,18 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
               <h3 className="font-bold text-slate-900">Vuelos {originCity} → {destName}</h3>
               <p className="text-xs text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {flexible
-                  ? `Fecha orientativa: ${formatDateEs(date ?? defaultDate())} · cámbiala en el buscador`
-                  : `${date ? formatDateEs(date) : ""}${returnDate ? ` — ${formatDateEs(returnDate)}` : ""}`}
+                {formatDateEs(selectedDate)}
+                {returnDate ? ` — ${formatDateEs(returnDate)}` : ""}
                 {" · "}{adults} {adults === 1 ? "adulto" : "adultos"}
+                {flexible && !monthDates && " · fecha orientativa"}
               </p>
             </div>
           </div>
+
+          {/* Selector de fechas del mes (solo búsquedas flexibles con mes concreto) */}
+          {monthDates && (
+            <DateSelector dates={monthDates} selected={selectedDate} onSelect={setSelectedDate} />
+          )}
 
           {/* Banner de transparencia */}
           <div className="flex items-center gap-2.5 bg-sky-50 border border-sky-100 rounded-xl px-4 py-2.5 mb-3">
@@ -220,12 +275,12 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
 
           {/* Buscadores alternativos */}
           <AltProviders urls={[
-            { name: "Google Flights", url: buildGoogleFlightsUrl(originCity, destName, date, returnDate) },
-            { name: "Iberia",         url: buildIberiaUrl(origin, dest, date, returnDate, adults) },
-            { name: "Vueling",        url: buildVuelingUrl(origin, dest, date, returnDate, adults) },
-            { name: "Ryanair",        url: buildRyanairUrl(origin, dest, date) },
-            { name: "Skyscanner",     url: buildSkyscannerUrl(origin, dest, date, flexible) },
-            { name: "Kayak",          url: buildKayakUrl(origin, dest, date, returnDate, flexible) },
+            { name: "Google Flights", url: buildGoogleFlightsUrl(originCity, destName, selectedDate, returnDate) },
+            { name: "Iberia",         url: buildIberiaUrl(origin, dest, selectedDate, returnDate, adults) },
+            { name: "Vueling",        url: buildVuelingUrl(origin, dest, selectedDate, returnDate, adults) },
+            { name: "Ryanair",        url: buildRyanairUrl(origin, dest, selectedDate) },
+            { name: "Skyscanner",     url: buildSkyscannerUrl(origin, dest, selectedDate, false) },
+            { name: "Kayak",          url: buildKayakUrl(origin, dest, selectedDate, returnDate, false) },
           ]} />
         </div>
 
@@ -277,7 +332,7 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
 
         <div className="space-y-2">
           {recommendations.map(rec => {
-            const jetradar = buildJetradarUrl(origin, rec.airportCode, date, adults, returnDate);
+            const jetradar = buildJetradarUrl(origin, rec.airportCode, baseDate, adults, returnDate);
             const isOpen   = expandedDest === rec.airportCode;
 
             return (
@@ -311,12 +366,12 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
                     </div>
                     <FlightIframe src={jetradar} />
                     <AltProviders urls={[
-                      { name: "Google Flights", url: buildGoogleFlightsUrl(originCity, rec.city, date, returnDate) },
-                      { name: "Iberia",         url: buildIberiaUrl(origin, rec.airportCode, date, returnDate, adults) },
-                      { name: "Vueling",        url: buildVuelingUrl(origin, rec.airportCode, date, returnDate, adults) },
-                      { name: "Ryanair",        url: buildRyanairUrl(origin, rec.airportCode, date) },
-                      { name: "Skyscanner",     url: buildSkyscannerUrl(origin, rec.airportCode, date, flexible) },
-                      { name: "Kayak",          url: buildKayakUrl(origin, rec.airportCode, date, returnDate, flexible) },
+                      { name: "Google Flights", url: buildGoogleFlightsUrl(originCity, rec.city, baseDate, returnDate) },
+                      { name: "Iberia",         url: buildIberiaUrl(origin, rec.airportCode, baseDate, returnDate, adults) },
+                      { name: "Vueling",        url: buildVuelingUrl(origin, rec.airportCode, baseDate, returnDate, adults) },
+                      { name: "Ryanair",        url: buildRyanairUrl(origin, rec.airportCode, baseDate) },
+                      { name: "Skyscanner",     url: buildSkyscannerUrl(origin, rec.airportCode, baseDate, flexible) },
+                      { name: "Kayak",          url: buildKayakUrl(origin, rec.airportCode, baseDate, returnDate, flexible) },
                     ]} />
                   </div>
                 )}
@@ -331,7 +386,3 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   return null;
 }
 
-// helper
-function hotelCheckIn(date: string | null): date is string {
-  return !!date;
-}
