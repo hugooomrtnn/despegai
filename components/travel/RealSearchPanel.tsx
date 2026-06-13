@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Plane, Hotel, ExternalLink, MapPin, Calendar, ChevronDown, ShieldCheck } from "lucide-react";
 import type { ParsedTravelRequest, DestinationRecommendation } from "@/types/travel";
 
@@ -28,6 +28,10 @@ function nextMonthFirst(): string {
 
 function formatDateEs(iso: string): string {
   return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function formatDateChip(iso: string): string {
+  return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
 }
 
 // Para destino concreto siempre incluimos fecha (orientativa si no hay).
@@ -138,6 +142,7 @@ function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDat
 }) {
   const [openSet, setOpenSet] = useState<Set<string>>(new Set([dates[0]]));
   const allOpen = dates.every(d => openSet.has(d));
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   function toggle(d: string) {
     setOpenSet(prev => {
@@ -152,8 +157,32 @@ function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDat
     setOpenSet(allOpen ? new Set() : new Set(dates));
   }
 
+  function jumpToDate(d: string) {
+    setOpenSet(prev => { const next = new Set(prev); next.add(d); return next; });
+    setTimeout(() => {
+      sectionRefs.current[d]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  }
+
   return (
     <div className="mb-4">
+      {/* Chips de navegación rápida */}
+      <div className="flex gap-2 flex-wrap mb-3">
+        {dates.map(d => (
+          <button
+            key={d}
+            onClick={() => jumpToDate(d)}
+            className={`text-xs px-3 py-1.5 rounded-full font-semibold border transition-all ${
+              openSet.has(d)
+                ? "bg-sky-500 text-white border-sky-500 shadow-sm"
+                : "bg-white text-slate-600 border-slate-200 hover:border-sky-300 hover:text-sky-600"
+            }`}
+          >
+            {formatDateChip(d)}
+          </button>
+        ))}
+      </div>
+
       <div className="flex items-center justify-between mb-2.5">
         <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
           Compara precios por fecha
@@ -173,7 +202,7 @@ function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDat
         const jetradar = buildJetradarUrl(origin, dest, d, adults, ret ?? null);
 
         return (
-          <div key={d} className="rounded-xl border border-slate-200 overflow-hidden">
+          <div key={d} ref={el => { sectionRefs.current[d] = el; }} className="rounded-xl border border-slate-200 overflow-hidden">
             <button
               onClick={() => toggle(d)}
               className="flex items-center justify-between w-full px-4 py-3 bg-white hover:bg-sky-50/40 transition-colors group"
