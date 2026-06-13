@@ -18,10 +18,14 @@ interface AITravelSearchProps {
   onError: (error: string) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  value?: string;
+  onChange?: (v: string) => void;
 }
 
-export function AITravelSearch({ onResults, onError, isLoading, setIsLoading }: AITravelSearchProps) {
-  const [prompt, setPrompt] = useState("");
+export function AITravelSearch({ onResults, onError, isLoading, setIsLoading, value, onChange }: AITravelSearchProps) {
+  const [internalPrompt, setInternalPrompt] = useState("");
+  const prompt  = value    !== undefined ? value    : internalPrompt;
+  const setPrompt = onChange !== undefined ? onChange : setInternalPrompt;
 
   async function handleSearch() {
     const trimmed = prompt.trim();

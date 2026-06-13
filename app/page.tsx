@@ -74,10 +74,19 @@ const TICKER_QUERIES = [
   "Vuelo directo a Tailandia desde España en noviembre",
 ];
 
+function scrollToSearch(query?: string, cb?: () => void) {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  setTimeout(() => {
+    document.getElementById("search-input")?.focus();
+    cb?.();
+  }, 350);
+}
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const [results, setResults]     = useState<TravelSearchResponse | null>(null);
+  const [searchPrompt, setSearchPrompt] = useState("");
 
   function handleResults(data: TravelSearchResponse) {
     setResults(data);
@@ -136,6 +145,8 @@ export default function HomePage() {
               onError={handleError}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
+              value={searchPrompt}
+              onChange={setSearchPrompt}
             />
           </div>
 
@@ -146,6 +157,7 @@ export default function HomePage() {
                 {[...TICKER_QUERIES, ...TICKER_QUERIES].map((q, i) => (
                   <span
                     key={i}
+                    onClick={() => scrollToSearch(q, () => setSearchPrompt(q))}
                     className="inline-flex items-center gap-2 mx-3 px-3 py-1.5 rounded-full glass-dark text-xs text-white/40 whitespace-nowrap cursor-pointer hover:text-white/70 transition-colors"
                   >
                     <Plane className="h-3 w-3 text-orange-400/60 flex-shrink-0" />
@@ -162,6 +174,10 @@ export default function HomePage() {
               {DESTINATIONS_SHOWCASE.map((d) => (
                 <div
                   key={d.name}
+                  onClick={() => {
+                    const q = `Vuelos a ${d.name} para 2 personas`;
+                    scrollToSearch(q, () => setSearchPrompt(q));
+                  }}
                   className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-2xl bg-gradient-to-br ${d.gradient} border ${d.border} hover:border-opacity-60 transition-all cursor-pointer group`}
                 >
                   <span className="text-2xl group-hover:scale-110 transition-transform">{d.flag}</span>
@@ -253,10 +269,7 @@ export default function HomePage() {
               {TRAVEL_MOODS.map((mood) => (
                 <button
                   key={mood.label}
-                  onClick={() => {
-                    document.getElementById("search-input")?.focus();
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
+                  onClick={() => scrollToSearch(mood.query, () => setSearchPrompt(mood.query))}
                   className="card-mood rounded-3xl p-6 text-left group cursor-pointer"
                 >
                   <div className={`w-12 h-12 bg-gradient-to-br ${mood.gradient} rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-105 transition-transform shadow-lg`}>
@@ -336,11 +349,19 @@ export default function HomePage() {
                     "🇹🇷 Turquía", "🇪🇬 Egipto", "🇯🇵 Japón", "🇹🇭 Tailandia",
                     "🇧🇷 Brasil",  "🇺🇸 EE.UU.", "🇦🇺 Australia", "🇿🇦 Sudáfrica",
                     "🇮🇳 India",   "🇲🇦 Marruecos", "🇨🇺 Cuba", "🇮🇸 Islandia",
-                  ].map((d) => (
-                    <span key={d} className="text-sm px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/50 font-medium hover:border-orange-500/30 hover:text-white/70 transition-colors cursor-pointer">
-                      {d}
-                    </span>
-                  ))}
+                  ].map((d) => {
+                    const country = d.replace(/^\S+\s/, "");
+                    const q = `Vuelos a ${country} para 2 personas`;
+                    return (
+                      <button
+                        key={d}
+                        onClick={() => scrollToSearch(q, () => setSearchPrompt(q))}
+                        className="text-sm px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/50 font-medium hover:border-orange-500/30 hover:text-white/70 transition-colors cursor-pointer"
+                      >
+                        {d}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -384,7 +405,7 @@ export default function HomePage() {
 
             <div className="border-t border-white/[0.05] pt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-xs text-white/20">
-                © 2025 Despegai · Herramienta de búsqueda con inteligencia artificial
+                © 2026 Despegai · Herramienta de búsqueda con inteligencia artificial
               </p>
               <div className="flex items-center gap-4">
                 <a href="/politica-de-privacidad" className="text-xs text-white/25 hover:text-white/50 transition-colors">

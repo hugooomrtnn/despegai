@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Responsable del tratamiento</h2>
             <p>
-              El responsable del tratamiento de los datos personales recogidos a través de <strong>despegai.vercel.app</strong> (en adelante, "Despegai") es el titular del sitio web, con domicilio en España.
+              El responsable del tratamiento de los datos personales recogidos a través de <strong>despegai.vercel.app</strong> (en adelante, &ldquo;Despegai&rdquo;) es el titular del sitio web, con domicilio en España.
               Para cualquier consulta relacionada con la privacidad, puede contactar en: <a href="mailto:hugo.moya.martin@gmail.com" className="text-orange-500 hover:underline">hugo.moya.martin@gmail.com</a>
             </p>
           </section>
