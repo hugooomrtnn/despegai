@@ -108,9 +108,13 @@ function buildHotelUrls(city: string, checkIn: string, nights: number, adults: n
 function getMonthDates(baseDate: string, max = 5): string[] {
   const dates: string[] = [];
   const [y, m] = baseDate.split("-").map(Number);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const current = new Date(y, m - 1, 1);
   while (current.getMonth() === m - 1 && dates.length < max) {
-    dates.push(current.toISOString().split("T")[0]);
+    if (current >= today) {
+      dates.push(current.toISOString().split("T")[0]);
+    }
     current.setDate(current.getDate() + 7);
   }
   return dates;
@@ -255,8 +259,9 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   const returnDate = parsed.returnDate ??
     (parsed.durationDays ? addDays(selectedDate, parsed.durationDays) : null);
 
-  // Fechas semanales del mes cuando la búsqueda es flexible por mes
-  const monthDates = (flexible && baseDate) ? getMonthDates(baseDate) : null;
+  // Fechas semanales del mes cuando la búsqueda es flexible por mes (solo fechas futuras)
+  const _rawMonthDates = (flexible && baseDate) ? getMonthDates(baseDate) : null;
+  const monthDates = _rawMonthDates && _rawMonthDates.length > 0 ? _rawMonthDates : null;
 
   // ── Destino concreto ────────────────────────────────────────────────────────
   if (!parsed.flexibleDestination && parsed.destinationAirportCode) {

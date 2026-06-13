@@ -407,10 +407,15 @@ const MONTH_MAP: Record<string, number> = {
   july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
 };
 
-const FLEXIBLE_KEYWORDS = [
-  "me da igual", "da igual", "cualquier", "sorprendeme", "donde sea",
-  "donde quiera", "algun sitio", "no importa el destino", "no importa donde",
-  "abierto a", "flexible",
+// Palabras que indican destino flexible (el usuario NO sabe a donde ir)
+const FLEXIBLE_DESTINATION_KEYWORDS = [
+  "me da igual", "da igual",
+  "sorprendeme", "sorpresa",
+  "donde sea", "donde quiera",
+  "cualquier sitio", "cualquier destino", "cualquier lugar",
+  "algun sitio", "algun lugar",
+  "no importa el destino", "no importa donde",
+  "abierto a",
 ];
 
 // "norte" solo es destino con contexto explícito, no en scan libre
@@ -504,7 +509,7 @@ function extractDestination(
   const norm = normalize(text);
 
   // Si el usuario pide destino flexible → sin destino concreto
-  if (FLEXIBLE_KEYWORDS.some((k) => norm.includes(normalize(k)))) return null;
+  if (FLEXIBLE_DESTINATION_KEYWORDS.some((k) => norm.includes(normalize(k)))) return null;
 
   // ── Método 1: buscar después de indicadores de destino explícitos ──────────
   const destPatterns = [
@@ -710,11 +715,12 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
 
   const isFlexibleDestination =
     !destination ||
-    FLEXIBLE_KEYWORDS.some((k) => norm.includes(normalize(k)));
+    FLEXIBLE_DESTINATION_KEYWORDS.some((k) => norm.includes(normalize(k)));
 
+  // "cualquier día/fecha", "flexible con las fechas", "cuando sea", etc.
   const isFlexibleDates =
     !departureDate ||
-    /flexible|cualquier fecha|cuando sea|cuando quiera/.test(norm);
+    /flexible|cualquier|cuando sea|cuando quiera|no importa la fecha|cualquier momento/.test(norm);
 
   const dep = departureDate ?? null;
   const dur = durationDays ?? null;
