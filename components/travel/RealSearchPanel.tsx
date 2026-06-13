@@ -130,6 +130,7 @@ function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDat
   returnDate: string | null;
 }) {
   const [openSet, setOpenSet] = useState<Set<string>>(new Set([dates[0]]));
+  const allOpen = dates.every(d => openSet.has(d));
 
   function toggle(d: string) {
     setOpenSet(prev => {
@@ -140,8 +141,25 @@ function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDat
     });
   }
 
+  function toggleAll() {
+    setOpenSet(allOpen ? new Set() : new Set(dates));
+  }
+
   return (
-    <div className="space-y-2 mb-4">
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-2.5">
+        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          Compara precios por fecha
+        </p>
+        <button
+          onClick={toggleAll}
+          className="flex items-center gap-1 text-xs font-bold text-sky-500 hover:text-sky-700 transition-colors px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100"
+        >
+          {allOpen ? "Cerrar todas" : "Ver todas las fechas"}
+          <ChevronDown className={`h-3 w-3 transition-transform ${allOpen ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+    <div className="space-y-2">
       {dates.map(d => {
         const ret = durationDays ? addDays(d, durationDays) : returnDate;
         const isOpen = openSet.has(d);
@@ -175,6 +193,7 @@ function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDat
           </div>
         );
       })}
+    </div>
     </div>
   );
 }
