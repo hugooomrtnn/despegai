@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Plane, X } from "lucide-react";
 
 export function Header() {
@@ -36,12 +37,12 @@ export function Header() {
           <a href="#how-it-works" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
             Cómo funciona
           </a>
-          <a href="#destinos" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
-            Destinos
-          </a>
-          <a href="#" onClick={(e) => { e.preventDefault(); showComingSoon(); }} className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
-            Para agencias
-          </a>
+          <Link href="/guias" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
+            Guías
+          </Link>
+          <Link href="/consejos" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
+            Consejos
+          </Link>
         </nav>
 
         {/* CTA */}
