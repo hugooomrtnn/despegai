@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Plane, Brain, FileText, Zap, Globe,
   ChevronDown, ArrowRight, MapPin, Clock, Star, Sparkles, Search,
@@ -178,6 +179,17 @@ const TICKER_QUERIES = [
   "Vuelo directo a Tailandia desde España en noviembre",
 ];
 
+// Componente auxiliar para leer ?q= (necesita Suspense en Next.js 14)
+function QueryLauncher({ onQuery }: { onQuery: (q: string) => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q.trim().length >= 5) onQuery(q.trim());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
@@ -209,6 +221,11 @@ export default function HomePage() {
 
   return (
     <main>
+      {/* Lee ?q= de la URL y lanza la búsqueda automáticamente */}
+      <Suspense fallback={null}>
+        <QueryLauncher onQuery={(q) => { setSearchPrompt(q); setTimeout(() => searchRef.current?.submit(q), 200); }} />
+      </Suspense>
+
       {/* ════════════════════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════════════════════ */}
