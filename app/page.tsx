@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Plane, Brain, FileText, Zap, Globe,
-  ChevronDown, ArrowRight, MapPin, Clock, Star, Sparkles,
+  ChevronDown, ArrowRight, MapPin, Clock, Star, Sparkles, Search,
 } from "lucide-react";
 import { AITravelSearch } from "@/components/travel/AITravelSearch";
+import type { AITravelSearchHandle } from "@/components/travel/AITravelSearch";
 import { ParsedRequestSummary } from "@/components/travel/ParsedRequestSummary";
 import { DestinationRecommendations } from "@/components/travel/DestinationRecommendations";
 import { RealSearchPanel } from "@/components/travel/RealSearchPanel";
@@ -76,6 +77,95 @@ const HOW_IT_WORKS = [
   },
 ];
 
+// ─── Consultas populares ─────────────────────────────────────────────────────
+
+const CONSULTAS = [
+  {
+    icon: "🏖️",
+    query: "Vuelos baratos a Canarias para 2 personas en agosto",
+    category: "Playa",
+    color: "from-amber-500/15 to-orange-400/10 border-amber-500/20 hover:border-amber-400/50",
+    tag: "bg-amber-100 text-amber-700",
+  },
+  {
+    icon: "🏛️",
+    query: "Fin de semana en Roma, ida y vuelta desde Madrid en octubre",
+    category: "Cultural",
+    color: "from-violet-500/15 to-indigo-400/10 border-violet-500/20 hover:border-violet-400/50",
+    tag: "bg-violet-100 text-violet-700",
+  },
+  {
+    icon: "💕",
+    query: "Escapada romántica a París para 2 personas el puente de octubre",
+    category: "Pareja",
+    color: "from-rose-500/15 to-pink-400/10 border-rose-500/20 hover:border-rose-400/50",
+    tag: "bg-rose-100 text-rose-700",
+  },
+  {
+    icon: "👨‍👩‍👧‍👦",
+    query: "Familia con 2 niños a Mallorca en julio, máximo 600€ en total",
+    category: "Familia",
+    color: "from-emerald-500/15 to-teal-400/10 border-emerald-500/20 hover:border-emerald-400/50",
+    tag: "bg-emerald-100 text-emerald-700",
+  },
+  {
+    icon: "✈️",
+    query: "Vuelo directo a Japón en marzo para 1 persona, máximo 700€",
+    category: "Asia",
+    color: "from-sky-500/15 to-blue-400/10 border-sky-500/20 hover:border-sky-400/50",
+    tag: "bg-sky-100 text-sky-700",
+  },
+  {
+    icon: "🌍",
+    query: "Sorpréndeme con un destino barato desde Barcelona para este fin de semana",
+    category: "Flexible",
+    color: "from-cyan-500/15 to-blue-400/10 border-cyan-500/20 hover:border-cyan-400/50",
+    tag: "bg-cyan-100 text-cyan-700",
+  },
+  {
+    icon: "🎉",
+    query: "Despedida de soltero en Ámsterdam, 4 personas, 3 noches en junio",
+    category: "Grupos",
+    color: "from-yellow-500/15 to-amber-400/10 border-yellow-500/20 hover:border-yellow-400/50",
+    tag: "bg-yellow-100 text-yellow-700",
+  },
+  {
+    icon: "🏔️",
+    query: "Destino de aventura en los Alpes sin pasaporte para febrero",
+    category: "Aventura",
+    color: "from-teal-500/15 to-emerald-400/10 border-teal-500/20 hover:border-teal-400/50",
+    tag: "bg-teal-100 text-teal-700",
+  },
+  {
+    icon: "🌊",
+    query: "Caribe todo incluido para 2 personas en diciembre, presupuesto 1500€",
+    category: "Lujo",
+    color: "from-blue-500/15 to-indigo-400/10 border-blue-500/20 hover:border-blue-400/50",
+    tag: "bg-blue-100 text-blue-700",
+  },
+  {
+    icon: "🍷",
+    query: "Ciudad europea con gastronomía increíble para 3 días en septiembre",
+    category: "Gastro",
+    color: "from-red-500/15 to-orange-400/10 border-red-500/20 hover:border-red-400/50",
+    tag: "bg-red-100 text-red-700",
+  },
+  {
+    icon: "🧳",
+    query: "Vuelos baratos desde Valencia a cualquier destino en noviembre",
+    category: "Económico",
+    color: "from-green-500/15 to-emerald-400/10 border-green-500/20 hover:border-green-400/50",
+    tag: "bg-green-100 text-green-700",
+  },
+  {
+    icon: "🏙️",
+    query: "Nueva York para 2 personas en diciembre 5 noches, vuelos + hotel",
+    category: "Ciudad",
+    color: "from-slate-500/15 to-gray-400/10 border-slate-500/20 hover:border-slate-400/50",
+    tag: "bg-slate-100 text-slate-700",
+  },
+];
+
 // Ticker de búsquedas de ejemplo que rota en el hero
 const TICKER_QUERIES = [
   "Quiero playa barata en agosto para 2 adultos",
@@ -88,19 +178,19 @@ const TICKER_QUERIES = [
   "Vuelo directo a Tailandia desde España en noviembre",
 ];
 
-function scrollToSearch(_query?: string, cb?: () => void) {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  setTimeout(() => {
-    document.getElementById("search-input")?.focus();
-    cb?.();
-  }, 350);
-}
-
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const [results, setResults]     = useState<TravelSearchResponse | null>(null);
   const [searchPrompt, setSearchPrompt] = useState("");
+  const searchRef = useRef<AITravelSearchHandle>(null);
+
+  function handleDirectSearch(q: string) {
+    setSearchPrompt(q);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Lanza la búsqueda inmediatamente pasando el query directamente
+    setTimeout(() => searchRef.current?.submit(q), 100);
+  }
 
   function handleResults(data: TravelSearchResponse) {
     setResults(data);
@@ -158,6 +248,7 @@ export default function HomePage() {
           {/* Buscador IA */}
           <div className="animate-fade-in w-full max-w-3xl">
             <AITravelSearch
+              ref={searchRef}
               onResults={handleResults}
               onError={handleError}
               isLoading={isLoading}
@@ -174,7 +265,7 @@ export default function HomePage() {
                 {[...TICKER_QUERIES, ...TICKER_QUERIES].map((q, i) => (
                   <span
                     key={i}
-                    onClick={() => scrollToSearch(q, () => setSearchPrompt(q))}
+                    onClick={() => handleDirectSearch(q)}
                     className="inline-flex items-center gap-2 mx-3 px-3 py-1.5 rounded-full glass-dark text-xs text-white/40 whitespace-nowrap cursor-pointer hover:text-white/70 transition-colors"
                   >
                     <Plane className="h-3 w-3 text-sky-400/60 flex-shrink-0" />
@@ -193,7 +284,7 @@ export default function HomePage() {
                   key={d.name}
                   onClick={() => {
                     const q = `Vuelos a ${d.name} para 2 personas`;
-                    scrollToSearch(q, () => setSearchPrompt(q));
+                    handleDirectSearch(q);
                   }}
                   className={`flex flex-col items-center gap-1.5 px-3 py-3 rounded-2xl bg-gradient-to-br ${d.gradient} border ${d.border} hover:border-opacity-60 transition-all cursor-pointer group`}
                 >
@@ -262,6 +353,64 @@ export default function HomePage() {
       )}
 
       {/* ════════════════════════════════════════════════════════════
+          CONSULTAS POPULARES
+      ════════════════════════════════════════════════════════════ */}
+      {showLanding && (
+        <section id="consultas" className="py-24 sm:py-32 bg-slate-50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+
+            <div className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-50 border border-sky-100 mb-5">
+                <Search className="h-4 w-4 text-sky-500" />
+                <span className="text-sm font-semibold text-sky-600">Consultas populares</span>
+              </div>
+              <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight">
+                ¿No sabes por dónde empezar?
+                <br />
+                <span className="text-gradient-fire">Prueba con estos ejemplos</span>
+              </h2>
+              <p className="text-lg text-slate-500 max-w-xl mx-auto">
+                Haz clic en cualquier búsqueda y la IA lo lanza al instante — sin escribir nada.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              {CONSULTAS.map((c) => (
+                <button
+                  key={c.query}
+                  onClick={() => handleDirectSearch(c.query)}
+                  className={`group flex items-center gap-4 p-4 rounded-2xl border bg-gradient-to-br ${c.color} text-left transition-all hover:shadow-md hover:-translate-y-0.5`}
+                >
+                  <span className="text-2xl flex-shrink-0">{c.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 leading-snug group-hover:text-slate-900 line-clamp-2">
+                      {c.query}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 flex flex-col items-end gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.tag}`}>
+                      {c.category}
+                    </span>
+                    <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-sky-500 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-center text-sm text-slate-400 mt-8">
+              O escribe directamente lo que buscas en el{" "}
+              <button
+                onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => document.getElementById("search-input")?.focus(), 400); }}
+                className="text-sky-500 font-semibold hover:underline"
+              >
+                buscador de arriba
+              </button>
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════
           TRAVEL MOODS — sección nueva única
       ════════════════════════════════════════════════════════════ */}
       {showLanding && (
@@ -286,7 +435,7 @@ export default function HomePage() {
               {TRAVEL_MOODS.map((mood) => (
                 <button
                   key={mood.label}
-                  onClick={() => scrollToSearch(mood.query, () => setSearchPrompt(mood.query))}
+                  onClick={() => handleDirectSearch(mood.query)}
                   className="card-mood rounded-3xl p-6 text-left group cursor-pointer"
                 >
                   <div className={`w-12 h-12 bg-gradient-to-br ${mood.gradient} rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-105 transition-transform shadow-lg`}>
@@ -378,7 +527,7 @@ export default function HomePage() {
                     return (
                       <button
                         key={d}
-                        onClick={() => scrollToSearch(q, () => setSearchPrompt(q))}
+                        onClick={() => handleDirectSearch(q)}
                         className="text-sm px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/50 font-medium hover:border-sky-500/30 hover:text-white/70 transition-colors cursor-pointer"
                       >
                         {d}
