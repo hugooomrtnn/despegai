@@ -33,16 +33,11 @@ export function Header() {
         </a>
 
         {/* Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          <a href="#how-it-works" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
-            Cómo funciona
-          </a>
-          <Link href="/guias" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
-            Guías
-          </Link>
-          <Link href="/consejos" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">
-            Consejos
-          </Link>
+        <nav className="hidden md:flex items-center gap-7">
+          <Link href="/destinos" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">Destinos</Link>
+          <Link href="/guias" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">Guías</Link>
+          <Link href="/consejos" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">Consejos</Link>
+          <Link href="/quienes-somos" className="text-sm text-white/45 hover:text-white/90 transition-colors font-medium">Quiénes somos</Link>
         </nav>
 
         {/* CTA */}

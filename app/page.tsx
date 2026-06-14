@@ -412,14 +412,11 @@ export default function HomePage() {
 
               {/* Links */}
               <nav className="flex flex-wrap justify-center gap-6">
-                {[
-                  { label: "Cómo funciona", href: "#how-it-works" },
-                  { label: "Destinos",       href: "#destinos" },
-                ].map((l) => (
-                  <a key={l.label} href={l.href} className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">
-                    {l.label}
-                  </a>
-                ))}
+                <a href="#how-it-works" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">Cómo funciona</a>
+                <a href="/destinos" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">Destinos</a>
+                <a href="/guias" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">Guías</a>
+                <a href="/consejos" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">Consejos</a>
+                <a href="/quienes-somos" className="text-sm text-white/30 hover:text-white/70 transition-colors font-medium">Quiénes somos</a>
               </nav>
 
               {/* Idioma */}
