@@ -44,21 +44,35 @@ const STATS = [
 const HOW_IT_WORKS = [
   {
     icon: Brain, step: "01",
-    title: "Escribe como hablas",
-    description: "Describe el viaje en español natural, como le contarías a un amigo. Sin filtros ni formularios.",
-    color: "from-violet-500 to-indigo-600", glow: "shadow-violet-500/20",
+    color: "from-sky-400 to-blue-600", glow: "shadow-sky-500/20",
+    title: "Cuéntale qué quieres buscar",
+    description: "Escribe en español natural lo que buscas, como si le hablaras a un amigo. No hace falta rellenar formularios ni elegir fechas en un calendario.",
+    examples: [
+      "Dame vuelos baratos a París cualquier día de agosto",
+      "Vuelos Madrid → Roma para 2 personas ida y vuelta la semana que viene",
+      "Sorpréndeme con un destino de playa barato para este fin de semana",
+    ],
   },
   {
     icon: Zap, step: "02",
-    title: "La IA lo interpreta todo",
-    description: "Detecta destino, fechas, presupuesto y preferencias. Busca vuelos, hoteles y crea un plan completo.",
     color: "from-violet-500 to-indigo-600", glow: "shadow-violet-500/20",
+    title: "La IA detecta todo automáticamente",
+    description: "Despegai extrae el destino, las fechas, los pasajeros y tus preferencias. Si el destino es flexible, te sugiere opciones con precio bajo. Si pides un mes entero, te muestra varias fechas para comparar.",
+    examples: [],
   },
   {
     icon: FileText, step: "03",
-    title: "Propuesta lista al instante",
-    description: "Copia el resumen y envíalo por WhatsApp o email. De petición a propuesta en menos de 10 segundos.",
-    color: "from-emerald-500 to-teal-500", glow: "shadow-emerald-500/20",
+    color: "from-emerald-400 to-teal-600", glow: "shadow-emerald-500/20",
+    title: "Compara precios fecha a fecha",
+    description: "Los resultados se muestran agrupados por fecha en secciones desplegables. Abre la que más te interese y verás vuelos reales con sus precios actuales. Puedes abrir varias fechas a la vez para comparar cuál sale más barata.",
+    examples: [],
+  },
+  {
+    icon: ArrowRight, step: "04",
+    color: "from-sky-400 to-blue-600", glow: "shadow-sky-500/20",
+    title: "Elige dónde comprar y reserva",
+    description: "Cuando encuentres el vuelo que te encaje, pulsa en él para ir directamente a la aerolínea o plataforma oficial. También puedes elegir entre Iberia, Vueling, Ryanair, Google Flights, Skyscanner o Kayak — siempre la compra en el sitio oficial, sin intermediarios.",
+    examples: [],
   },
 ];
 
@@ -296,40 +310,46 @@ export default function HomePage() {
       ════════════════════════════════════════════════════════════ */}
       {showLanding && (
         <section id="how-it-works" className="py-24 sm:py-32 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
 
-            <div className="text-center mb-16">
+            <div className="text-center mb-14">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-sky-50 rounded-full border border-sky-100 mb-5">
                 <Zap className="h-4 w-4 text-sky-500" />
                 <span className="text-sm font-semibold text-sky-600">Cómo funciona</span>
               </div>
               <h2 className="text-4xl sm:text-5xl font-black text-slate-900 mb-4 leading-tight">
-                De la petición a la propuesta
+                De la búsqueda al vuelo
                 <br />
-                <span className="text-gradient-fire">en 3 pasos</span>
+                <span className="text-gradient-fire">en cuatro pasos</span>
               </h2>
               <p className="text-lg text-slate-500 max-w-xl mx-auto">
-                Diseñado para agencias y viajeros que no tienen tiempo que perder.
+                Sin formularios, sin calendarios. Solo escribe lo que quieres y Despegai hace el resto.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 mb-16">
-              {HOW_IT_WORKS.map((step, i) => (
-                <div key={step.title} className="relative group">
-                  {i < HOW_IT_WORKS.length - 1 && (
-                    <div className="hidden md:block absolute top-10 left-full w-6 -translate-x-3 z-10">
-                      <ArrowRight className="h-5 w-5 text-slate-200 mx-auto" />
+            <div className="space-y-5 mb-16">
+              {HOW_IT_WORKS.map((step) => (
+                <div key={step.title} className="card-premium rounded-3xl p-7 flex gap-5 items-start group">
+                  <div className="flex-shrink-0 flex flex-col items-center gap-2 pt-1">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center shadow-lg ${step.glow} group-hover:scale-105 transition-transform`}>
+                      <step.icon className="h-5 w-5 text-white" />
                     </div>
-                  )}
-                  <div className="card-premium rounded-3xl p-8 h-full">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className={`w-14 h-14 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center shadow-xl ${step.glow} group-hover:scale-105 transition-transform`}>
-                        <step.icon className="h-7 w-7 text-white" />
+                    <span className="text-xs font-black text-slate-100 select-none">{step.step}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-slate-900 mb-1">{step.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed mb-3">{step.description}</p>
+                    {step.examples.length > 0 && (
+                      <div className="bg-slate-50 rounded-xl p-3 space-y-1.5">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Ejemplos que puedes escribir:</p>
+                        {step.examples.map(ex => (
+                          <div key={ex} className="flex items-start gap-2">
+                            <span className="text-sky-400 font-bold text-xs flex-shrink-0 mt-0.5">›</span>
+                            <p className="text-xs text-slate-600 italic">&ldquo;{ex}&rdquo;</p>
+                          </div>
+                        ))}
                       </div>
-                      <span className="text-4xl font-black text-slate-50 select-none">{step.step}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
-                    <p className="text-sm text-slate-500 leading-relaxed">{step.description}</p>
+                    )}
                   </div>
                 </div>
               ))}
