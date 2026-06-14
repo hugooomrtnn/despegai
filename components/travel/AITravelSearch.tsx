@@ -20,6 +20,7 @@ interface AITravelSearchProps {
   setIsLoading: (loading: boolean) => void;
   value?: string;
   onChange?: (v: string) => void;
+  onBeforeSearch?: () => boolean; // devuelve false para cancelar la búsqueda
 }
 
 export interface AITravelSearchHandle {
@@ -27,12 +28,13 @@ export interface AITravelSearchHandle {
 }
 
 export const AITravelSearch = forwardRef<AITravelSearchHandle, AITravelSearchProps>(
-  function AITravelSearch({ onResults, onError, isLoading, setIsLoading, value, onChange }, ref) {
+  function AITravelSearch({ onResults, onError, isLoading, setIsLoading, value, onChange, onBeforeSearch }, ref) {
     const [internalPrompt, setInternalPrompt] = useState("");
     const prompt    = value    !== undefined ? value    : internalPrompt;
     const setPrompt = onChange !== undefined ? onChange : setInternalPrompt;
 
-    async function handleSearch(queryOverride?: string) {
+    async function handleSearch(queryOverride?: string, skipBeforeSearch = false) {
+      if (!skipBeforeSearch && onBeforeSearch && !onBeforeSearch()) return;
       const trimmed = (queryOverride ?? prompt).trim();
       if (!trimmed || trimmed.length < 5) {
         onError("Por favor, describe qué tipo de viaje quieres (mínimo 5 caracteres).");
@@ -61,7 +63,8 @@ export const AITravelSearch = forwardRef<AITravelSearchHandle, AITravelSearchPro
     }
 
     useImperativeHandle(ref, () => ({
-      submit: (queryOverride?: string) => handleSearch(queryOverride),
+      // skipBeforeSearch=true porque el check ya se hizo en handleDirectSearch
+      submit: (queryOverride?: string) => handleSearch(queryOverride, true),
     }));
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {

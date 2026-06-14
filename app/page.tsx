@@ -8,6 +8,28 @@ import {
 } from "lucide-react";
 import { AITravelSearch } from "@/components/travel/AITravelSearch";
 import type { AITravelSearchHandle } from "@/components/travel/AITravelSearch";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { SearchLimitModal } from "@/components/auth/SearchLimitModal";
+
+const FREE_SEARCH_LIMIT = 5;
+
+function getSearchCount(): number {
+  try {
+    const stored = localStorage.getItem("despegai_free");
+    if (!stored) return 0;
+    const { count, date } = JSON.parse(stored);
+    if (date !== new Date().toDateString()) return 0;
+    return count;
+  } catch { return 0; }
+}
+
+function incrementSearchCount(): number {
+  try {
+    const count = getSearchCount() + 1;
+    localStorage.setItem("despegai_free", JSON.stringify({ count, date: new Date().toDateString() }));
+    return count;
+  } catch { return 1; }
+}
 import { ParsedRequestSummary } from "@/components/travel/ParsedRequestSummary";
 import { DestinationRecommendations } from "@/components/travel/DestinationRecommendations";
 import { RealSearchPanel } from "@/components/travel/RealSearchPanel";
@@ -195,12 +217,27 @@ export default function HomePage() {
   const [error, setError]         = useState<string | null>(null);
   const [results, setResults]     = useState<TravelSearchResponse | null>(null);
   const [searchPrompt, setSearchPrompt] = useState("");
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [searchesUsed, setSearchesUsed]     = useState(0);
   const searchRef = useRef<AITravelSearchHandle>(null);
+  const { user } = useAuth();
+
+  function checkCanSearch(): boolean {
+    if (user) return true;
+    const count = getSearchCount();
+    if (count >= FREE_SEARCH_LIMIT) {
+      setSearchesUsed(count);
+      setShowLimitModal(true);
+      return false;
+    }
+    setSearchesUsed(incrementSearchCount());
+    return true;
+  }
 
   function handleDirectSearch(q: string) {
+    if (!checkCanSearch()) return;
     setSearchPrompt(q);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // Lanza la búsqueda inmediatamente pasando el query directamente
     setTimeout(() => searchRef.current?.submit(q), 100);
   }
 
@@ -221,9 +258,21 @@ export default function HomePage() {
 
   return (
     <main>
+      {showLimitModal && (
+        <SearchLimitModal
+          onClose={() => setShowLimitModal(false)}
+          searchesUsed={searchesUsed}
+          limit={FREE_SEARCH_LIMIT}
+        />
+      )}
+
       {/* Lee ?q= de la URL y lanza la búsqueda automáticamente */}
       <Suspense fallback={null}>
-        <QueryLauncher onQuery={(q) => { setSearchPrompt(q); setTimeout(() => searchRef.current?.submit(q), 200); }} />
+        <QueryLauncher onQuery={(q) => {
+          if (!checkCanSearch()) return;
+          setSearchPrompt(q);
+          setTimeout(() => searchRef.current?.submit(q), 200);
+        }} />
       </Suspense>
 
       {/* ════════════════════════════════════════════════════════════
@@ -272,6 +321,7 @@ export default function HomePage() {
               setIsLoading={setIsLoading}
               value={searchPrompt}
               onChange={setSearchPrompt}
+              onBeforeSearch={checkCanSearch}
             />
           </div>
 
