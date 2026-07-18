@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Plane, Hotel, ExternalLink, MapPin, Calendar, ChevronDown, ShieldCheck } from "lucide-react";
-import type { ParsedTravelRequest, DestinationRecommendation } from "@/types/travel";
+import type { ParsedTravelRequest, DestinationRecommendation, FlightResult } from "@/types/travel";
+import { FlightResultsList } from "./FlightResultsList";
 
 const TP_MARKER = "736116";
 const TP_TRS    = "536391";
@@ -28,10 +29,6 @@ function nextMonthFirst(): string {
 
 function formatDateEs(iso: string): string {
   return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
-}
-
-function formatDateChip(iso: string): string {
-  return new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
 }
 
 // Para destino concreto siempre incluimos fecha (orientativa si no hay).
@@ -115,125 +112,6 @@ function buildHotelUrls(city: string, checkIn: string, nights: number, adults: n
   };
 }
 
-// ─── Fechas semanales del mes para búsqueda flexible ─────────────────────────
-function getMonthDates(baseDate: string, max = 5): string[] {
-  const dates: string[] = [];
-  const [y, m] = baseDate.split("-").map(Number);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const current = new Date(y, m - 1, 1);
-  while (current.getMonth() === m - 1 && dates.length < max) {
-    if (current >= today) {
-      dates.push(current.toISOString().split("T")[0]);
-    }
-    current.setDate(current.getDate() + 7);
-  }
-  return dates;
-}
-
-// ─── Lista de fechas del mes como acordeón ───────────────────────────────────
-function FlexibleDateList({ dates, origin, dest, adults, durationDays, returnDate }: {
-  dates: string[];
-  origin: string;
-  dest: string;
-  adults: number;
-  durationDays: number | null;
-  returnDate: string | null;
-}) {
-  const [openSet, setOpenSet] = useState<Set<string>>(new Set([dates[0]]));
-  const allOpen = dates.every(d => openSet.has(d));
-  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  function toggle(d: string) {
-    setOpenSet(prev => {
-      const next = new Set(prev);
-      if (next.has(d)) next.delete(d);
-      else next.add(d);
-      return next;
-    });
-  }
-
-  function toggleAll() {
-    setOpenSet(allOpen ? new Set() : new Set(dates));
-  }
-
-  function jumpToDate(d: string) {
-    setOpenSet(prev => { const next = new Set(prev); next.add(d); return next; });
-    setTimeout(() => {
-      sectionRefs.current[d]?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
-  }
-
-  return (
-    <div className="mb-4">
-      {/* Chips de navegación rápida */}
-      <div className="flex gap-2 flex-wrap mb-3">
-        {dates.map(d => (
-          <button
-            key={d}
-            onClick={() => jumpToDate(d)}
-            className={`text-xs px-3 py-1.5 rounded-full font-semibold border transition-all ${
-              openSet.has(d)
-                ? "bg-sky-500 text-white border-sky-500 shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:border-sky-300 hover:text-sky-600"
-            }`}
-          >
-            {formatDateChip(d)}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between mb-2.5">
-        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-          Compara precios por fecha
-        </p>
-        <button
-          onClick={toggleAll}
-          className="flex items-center gap-1 text-xs font-bold text-sky-500 hover:text-sky-700 transition-colors px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100"
-        >
-          {allOpen ? "Cerrar todas" : "Ver todas las fechas"}
-          <ChevronDown className={`h-3 w-3 transition-transform ${allOpen ? "rotate-180" : ""}`} />
-        </button>
-      </div>
-    <div className="space-y-2">
-      {dates.map(d => {
-        const ret = durationDays ? addDays(d, durationDays) : returnDate;
-        const isOpen = openSet.has(d);
-        const jetradar = buildJetradarUrl(origin, dest, d, adults, ret ?? null);
-
-        return (
-          <div key={d} ref={el => { sectionRefs.current[d] = el; }} className="rounded-xl border border-slate-200 overflow-hidden">
-            <button
-              onClick={() => toggle(d)}
-              className="flex items-center justify-between w-full px-4 py-3 bg-white hover:bg-sky-50/40 transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-sky-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Calendar className="h-4 w-4 text-sky-500" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-bold text-slate-800">{formatDateEs(d)}</p>
-                  {ret && <p className="text-xs text-slate-400">Vuelta: {formatDateEs(ret)}</p>}
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-500 group-hover:text-sky-600">
-                <span>{isOpen ? "Cerrar" : "Ver vuelos"}</span>
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-              </div>
-            </button>
-            {isOpen && (
-              <div className="border-t border-slate-100">
-                <FlightIframe src={jetradar} />
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-    </div>
-  );
-}
-
 // ─── Componente iframe de vuelos ──────────────────────────────────────────────
 function FlightIframe({ src }: { src: string }) {
   return (
@@ -296,9 +174,10 @@ function AltProviders({ urls }: { urls: { name: string; url: string }[] }) {
 interface Props {
   parsed: ParsedTravelRequest;
   recommendations: DestinationRecommendation[];
+  flights: FlightResult[];
 }
 
-export function RealSearchPanel({ parsed, recommendations }: Props) {
+export function RealSearchPanel({ parsed, recommendations, flights }: Props) {
   const [expandedDest, setExpandedDest] = useState<string | null>(null);
 
   const origin     = parsed.originAirportCode ?? "MAD";
@@ -306,7 +185,6 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   const adults     = parsed.passengers ?? 1;
   const nights     = parsed.durationDays ?? 5;
   const flexible   = parsed.flexibleDates || !parsed.departureDate;
-  // Sin fecha concreta: usamos el 1 del próximo mes para mostrar el acordeón de opciones
   const baseDate   = parsed.departureDate ?? (flexible ? nextMonthFirst() : defaultDate());
 
   const selectedDate = baseDate;
@@ -315,16 +193,13 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
   const returnDate = parsed.returnDate ??
     (parsed.durationDays ? addDays(selectedDate, parsed.durationDays) : null);
 
-  // Acordeón siempre activo cuando flexible (fechas futuras del mes)
-  const _rawMonthDates = flexible ? getMonthDates(baseDate) : null;
-  const monthDates = _rawMonthDates && _rawMonthDates.length > 0 ? _rawMonthDates : null;
-
   // ── Destino concreto ────────────────────────────────────────────────────────
   if (!parsed.flexibleDestination && parsed.destinationAirportCode) {
-    const dest     = parsed.destinationAirportCode;
-    const destName = parsed.destination ?? dest;
-    const hUrls    = buildHotelUrls(destName, selectedDate, nights, adults);
-    const jetradar = buildJetradarUrl(origin, dest, selectedDate, adults, returnDate);
+    const dest      = parsed.destinationAirportCode;
+    const destName  = parsed.destination ?? dest;
+    const hUrls     = buildHotelUrls(destName, selectedDate, nights, adults);
+    const jetradar  = buildJetradarUrl(origin, dest, selectedDate, adults, returnDate);
+    const destFlights = flights.filter((f) => f.destinationAirport === dest);
 
     return (
       <div className="space-y-4">
@@ -338,13 +213,12 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
               <h3 className="font-bold text-slate-900">Vuelos {originCity} → {destName}</h3>
               <p className="text-xs text-slate-400 flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {monthDates
-                  ? new Date((baseDate ?? selectedDate) + "T12:00:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+                {flexible
+                  ? "El vuelo más barato encontrado, sea cual sea la fecha"
                   : formatDateEs(selectedDate)
                 }
-                {!monthDates && returnDate ? ` — ${formatDateEs(returnDate)}` : ""}
+                {!flexible && returnDate ? ` — ${formatDateEs(returnDate)}` : ""}
                 {" · "}{adults} {adults === 1 ? "adulto" : "adultos"}
-                {flexible && !monthDates && " · fecha orientativa"}
               </p>
             </div>
           </div>
@@ -357,16 +231,9 @@ export function RealSearchPanel({ parsed, recommendations }: Props) {
             </p>
           </div>
 
-          {/* Vuelos: acordeón con todas las fechas del mes o iframe único */}
-          {monthDates ? (
-            <FlexibleDateList
-              dates={monthDates}
-              origin={origin}
-              dest={dest}
-              adults={adults}
-              durationDays={parsed.durationDays ?? null}
-              returnDate={parsed.returnDate ?? null}
-            />
+          {/* Vuelos: lista ordenada por precio (el más barato primero) cuando la fecha es flexible, o iframe único con fecha exacta */}
+          {flexible && destFlights.length > 0 ? (
+            <FlightResultsList flights={destFlights} defaultSort="price" />
           ) : (
             <FlightIframe src={jetradar} />
           )}

@@ -7,10 +7,11 @@ import type { FlightResult, FlightSortOption } from "@/types/travel";
 
 interface FlightResultsListProps {
   flights: FlightResult[];
+  defaultSort?: FlightSortOption;
 }
 
-export function FlightResultsList({ flights }: FlightResultsListProps) {
-  const [sortBy, setSortBy] = useState<FlightSortOption>("score");
+export function FlightResultsList({ flights, defaultSort = "score" }: FlightResultsListProps) {
+  const [sortBy, setSortBy] = useState<FlightSortOption>(defaultSort);
 
   const sorted = useMemo(() => {
     return [...flights].sort((a, b) => {

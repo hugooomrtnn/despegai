@@ -360,6 +360,7 @@ export default function HomePage() {
                 <RealSearchPanel
                   parsed={results.parsedRequest}
                   recommendations={results.destinationRecommendations}
+                  flights={results.flights}
                 />
 
                 {results.tripPlan && (
