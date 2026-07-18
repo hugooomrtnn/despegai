@@ -1273,12 +1273,39 @@ export const FLIGHT_DURATIONS: Record<string, number> = {
 };
 
 // ─── Precios base por distancia ──────────────────────────────────────────────
+// Interpolación lineal por tramos (en vez de un escalón fijo) para que aeropuertos
+// con duraciones parecidas no acaben todos con el mismo precio exacto.
+const DURATION_PRICE_POINTS: Array<[number, number]> = [
+  [0, 20], [100, 35], [200, 55], [300, 90], [500, 180], [900, 380], [1300, 480],
+];
+
+function interpolatePrice(duration: number, points: Array<[number, number]>): number {
+  if (duration <= points[0][0]) return points[0][1];
+  for (let i = 1; i < points.length; i++) {
+    const [x0, y0] = points[i - 1];
+    const [x1, y1] = points[i];
+    if (duration <= x1) {
+      const t = (duration - x0) / (x1 - x0);
+      return y0 + t * (y1 - y0);
+    }
+  }
+  return points[points.length - 1][1];
+}
+
+function hashCode(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
 export function getFlightBasePrice(airportCode: string, priceLevel: "low" | "medium" | "high"): number {
   const duration = FLIGHT_DURATIONS[airportCode] || 120;
-  // Base según duración (más lejos = más caro) + nivel de precio del destino
-  const distanceFactor = duration < 100 ? 35 : duration < 200 ? 55 : duration < 300 ? 90 : duration < 500 ? 180 : 380;
+  const distanceFactor = interpolatePrice(duration, DURATION_PRICE_POINTS);
   const priceMult = priceLevel === "low" ? 0.8 : priceLevel === "medium" ? 1.0 : 1.4;
-  return distanceFactor * priceMult;
+  // Variación determinista por aeropuerto (±12%) — misma ciudad siempre da el mismo
+  // precio, pero dos destinos con duración parecida ya no muestran el mismo número.
+  const jitter = 0.88 + (hashCode(airportCode) % 25) / 100;
+  return distanceFactor * priceMult * jitter;
 }
 
 // ─── Información de aeropuertos de origen ───────────────────────────────────
@@ -1352,8 +1379,9 @@ function generateDepartureDate(request: ParsedTravelRequest): Date {
     }
   }
 
-  // No date: within next 2 months
-  base.setDate(base.getDate() + 7 + Math.floor(Math.random() * 45));
+  // Sin fecha concreta: reparte los vuelos a lo largo de todo el año que viene,
+  // no solo de las próximas semanas — un chollo puede ser para dentro de meses.
+  base.setDate(base.getDate() + 14 + Math.floor(Math.random() * 350));
   base.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
   return base;
 }
@@ -1407,15 +1435,12 @@ function generateFlightsForDestination(
     const arrivalDate = addMinutes(departureDate, durationMinutes);
     const airline = AIRLINES[Math.floor(Math.random() * AIRLINES.length)];
 
-    let returnDepartureTime: string | undefined;
-    let returnArrivalTime: string | undefined;
-    if (request.durationDays || request.returnDate) {
-      const days = request.durationDays ?? 4;
-      const returnBase = new Date(departureDate.getTime() + days * 24 * 60 * 60 * 1000);
-      returnBase.setHours(randomHour(8, 20), Math.floor(Math.random() * 60), 0, 0);
-      returnDepartureTime = returnBase.toISOString();
-      returnArrivalTime = addMinutes(returnBase, durationMinutes);
-    }
+    // Siempre incluimos vuelta (viaje redondo por defecto de 5 días si no se especifica)
+    const tripDays = request.durationDays ?? 5;
+    const returnBase = new Date(departureDate.getTime() + tripDays * 24 * 60 * 60 * 1000);
+    returnBase.setHours(randomHour(8, 20), Math.floor(Math.random() * 60), 0, 0);
+    const returnDepartureTime = returnBase.toISOString();
+    const returnArrivalTime = addMinutes(returnBase, durationMinutes);
 
     flights.push({
       id: `mock-${dest.airportCode}-${i}-${Date.now() + i}`,

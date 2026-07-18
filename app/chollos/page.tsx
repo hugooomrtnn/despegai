@@ -1,16 +1,16 @@
 import { Flame } from "lucide-react";
 import type { Metadata } from "next";
 import { DESTINATIONS_CATALOG, getFlightBasePrice } from "@/lib/flights/mockFlightProvider";
-import { getContinent, getFlag, roundPrice } from "@/lib/data/destinationMeta";
+import { getContinent, getFlag, roundPrice, CONTINENTS } from "@/lib/data/destinationMeta";
 import { ChollosExplorer } from "@/components/travel/ChollosExplorer";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
 
 export const metadata: Metadata = {
   title: "Chollos de vuelos internacionales — Despegai",
-  description: "Los vuelos internacionales más baratos detectados desde España, y alertas de precio para tus destinos favoritos.",
+  description: "Los vuelos internacionales más baratos detectados desde España, en Europa y fuera de Europa, y alertas de precio para tus destinos favoritos.",
 };
 
-const INTERNATIONAL_DEALS: DestinationCard[] = DESTINATIONS_CATALOG
+const ALL_INTERNATIONAL: DestinationCard[] = DESTINATIONS_CATALOG
   .filter((d) => d.country !== "España")
   .map((d) => ({
     city: d.city,
@@ -20,9 +20,18 @@ const INTERNATIONAL_DEALS: DestinationCard[] = DESTINATIONS_CATALOG
     price: roundPrice(getFlightBasePrice(d.airportCode, d.estimatedPriceLevel)),
     tags: d.tags.slice(0, 3),
     continent: getContinent(d.country),
-  }))
-  .sort((a, b) => a.price - b.price)
-  .slice(0, 36);
+  }));
+
+// Los vuelos más baratos son casi siempre de corta distancia (Europa). Para que
+// también aparezcan chollos fuera de Europa, se coge lo más barato POR CONTINENTE
+// en vez de ordenar todo el catálogo por precio global.
+const PER_CONTINENT = 6;
+const INTERNATIONAL_DEALS: DestinationCard[] = CONTINENTS.flatMap((continent) =>
+  ALL_INTERNATIONAL
+    .filter((d) => d.continent === continent)
+    .sort((a, b) => a.price - b.price)
+    .slice(0, PER_CONTINENT)
+);
 
 export default function CholloPage() {
   return (

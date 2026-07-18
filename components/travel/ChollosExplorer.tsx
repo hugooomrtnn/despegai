@@ -1,11 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Bell, Loader2, Trash2, TrendingDown } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { TAG_COLORS, TAG_LABELS } from "@/lib/data/destinationMeta";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
+
+function DealCard({ dest }: { dest: DestinationCard }) {
+  return (
+    <Link
+      href={`/?q=${encodeURIComponent(`Vuelos baratos a ${dest.city}`)}`}
+      className="card-premium rounded-2xl p-4 hover:shadow-md transition-all hover:border-sky-200 group block"
+    >
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{dest.flag}</span>
+          <div>
+            <p className="font-bold text-slate-900 text-sm group-hover:text-sky-600 transition-colors">{dest.city}</p>
+            <p className="text-xs text-slate-400">{dest.country}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg flex-shrink-0">
+          <TrendingDown className="h-3 w-3" />
+          desde {dest.price}€
+        </div>
+      </div>
+      <div className="flex gap-1.5 flex-wrap">
+        {dest.tags.map((tag) => (
+          <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-slate-100 text-slate-500"}`}>
+            {TAG_LABELS[tag] ?? tag}
+          </span>
+        ))}
+      </div>
+    </Link>
+  );
+}
 
 type PriceAlert = {
   id: string;
@@ -75,37 +105,34 @@ export function ChollosExplorer({ deals }: { deals: DestinationCard[] }) {
     await fetch(`/api/alerts?id=${id}`, { method: "DELETE" });
   }
 
+  // Agrupados por continente en el orden en que llegan (ya vienen agrupados desde la página)
+  // para que se vea claramente que hay chollos fuera de Europa, no solo los más baratos globales.
+  const byContinent = useMemo(() => {
+    const groups: Array<{ continent: string; deals: DestinationCard[] }> = [];
+    for (const dest of deals) {
+      const last = groups[groups.length - 1];
+      if (last && last.continent === dest.continent) last.deals.push(dest);
+      else groups.push({ continent: dest.continent, deals: [dest] });
+    }
+    return groups;
+  }, [deals]);
+
   return (
     <div className="space-y-12">
-      {/* Grid de chollos */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {deals.map((dest) => (
-          <Link
-            key={dest.code}
-            href={`/?q=${encodeURIComponent(`Vuelos baratos a ${dest.city}`)}`}
-            className="card-premium rounded-2xl p-4 hover:shadow-md transition-all hover:border-sky-200 group block"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{dest.flag}</span>
-                <div>
-                  <p className="font-bold text-slate-900 text-sm group-hover:text-sky-600 transition-colors">{dest.city}</p>
-                  <p className="text-xs text-slate-400">{dest.country}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg flex-shrink-0">
-                <TrendingDown className="h-3 w-3" />
-                desde {dest.price}€
-              </div>
-            </div>
-            <div className="flex gap-1.5 flex-wrap">
-              {dest.tags.map((tag) => (
-                <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-slate-100 text-slate-500"}`}>
-                  {TAG_LABELS[tag] ?? tag}
-                </span>
+      {/* Grid de chollos, agrupados por continente */}
+      <div className="space-y-8">
+        {byContinent.map((group) => (
+          <div key={group.continent}>
+            <h2 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+              <span className="w-1 h-4 bg-sky-500 rounded-full inline-block" />
+              {group.continent}
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {group.deals.map((dest) => (
+                <DealCard key={dest.code} dest={dest} />
               ))}
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 
