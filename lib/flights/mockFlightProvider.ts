@@ -1,6 +1,7 @@
 import type { FlightResult, ParsedTravelRequest, DestinationRecommendation } from "@/types/travel";
 import type { FlightProvider } from "./types";
 import { buildRecommendationReason } from "./scoreFlight";
+import { roundPrice } from "@/lib/data/destinationMeta";
 
 const AIRLINES = [
   "Vueling", "Ryanair", "Iberia Express", "EasyJet", "Wizz Air",
@@ -1399,9 +1400,9 @@ function generateFlightsForDestination(
     const stops = Math.random() < stopChance ? 1 : 0;
     const durationMinutes = stops > 0 ? rawDuration + 85 + Math.floor(Math.random() * 50) : rawDuration;
 
-    // Price: first option tends to be cheaper
-    const priceMult = i === 0 ? 0.82 + Math.random() * 0.15 : 0.95 + Math.random() * 0.4;
-    const price = Math.round(basePrice * priceMult);
+    // La opción más barata coincide siempre con el precio mostrado en /destinos y /chollos
+    const anchorPrice = roundPrice(basePrice);
+    const price = i === 0 ? anchorPrice : Math.round(anchorPrice * (1.05 + Math.random() * 0.35));
 
     const arrivalDate = addMinutes(departureDate, durationMinutes);
     const airline = AIRLINES[Math.floor(Math.random() * AIRLINES.length)];
