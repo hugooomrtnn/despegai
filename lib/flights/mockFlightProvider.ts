@@ -14,7 +14,7 @@ const AIRLINES = [
 ];
 
 // ─── Catálogo completo de destinos ──────────────────────────────────────────
-const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
+export const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
   // España – nacional
   {
     city: "Palma de Mallorca", country: "España", airportCode: "PMI",
@@ -1214,7 +1214,7 @@ const DESTINATIONS_CATALOG: DestinationRecommendation[] = [
 ];
 
 // ─── Tabla de duración en minutos desde España (aprox.) ─────────────────────
-const FLIGHT_DURATIONS: Record<string, number> = {
+export const FLIGHT_DURATIONS: Record<string, number> = {
   // Nacional
   PMI: 55, IBZ: 60, MAH: 65, TFS: 170, LPA: 165, ACE: 175, FUE: 180,
   AGP: 70, SVQ: 75, GRX: 80, SCQ: 90, OVD: 85, SDR: 80, EAS: 65,
@@ -1272,7 +1272,7 @@ const FLIGHT_DURATIONS: Record<string, number> = {
 };
 
 // ─── Precios base por distancia ──────────────────────────────────────────────
-function getFlightBasePrice(airportCode: string, priceLevel: "low" | "medium" | "high"): number {
+export function getFlightBasePrice(airportCode: string, priceLevel: "low" | "medium" | "high"): number {
   const duration = FLIGHT_DURATIONS[airportCode] || 120;
   // Base según duración (más lejos = más caro) + nivel de precio del destino
   const distanceFactor = duration < 100 ? 35 : duration < 200 ? 55 : duration < 300 ? 90 : duration < 500 ? 180 : 380;

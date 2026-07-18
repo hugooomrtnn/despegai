@@ -48,16 +48,30 @@ create table if not exists public.user_preferences (
   updated_at timestamptz default now() not null
 );
 
+-- Price alerts (chollos internacionales)
+create table if not exists public.price_alerts (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  destination_city text not null,
+  destination_country text not null,
+  destination_airport_code text not null,
+  max_price numeric(10, 2) not null,
+  active boolean default true not null,
+  created_at timestamptz default now() not null
+);
+
 -- Indexes
 create index if not exists idx_travel_searches_user_id on public.travel_searches(user_id);
 create index if not exists idx_travel_searches_created_at on public.travel_searches(created_at desc);
 create index if not exists idx_saved_flights_user_id on public.saved_flights(user_id);
+create index if not exists idx_price_alerts_user_id on public.price_alerts(user_id);
 
 -- Row Level Security
 alter table public.profiles enable row level security;
 alter table public.travel_searches enable row level security;
 alter table public.saved_flights enable row level security;
 alter table public.user_preferences enable row level security;
+alter table public.price_alerts enable row level security;
 
 -- Profiles policies
 create policy "Users can view own profile"
@@ -97,6 +111,23 @@ create policy "Users can view own preferences"
 
 create policy "Users can upsert own preferences"
   on public.user_preferences for all
+  using (auth.uid() = user_id);
+
+-- Price alerts policies
+create policy "Users can view own alerts"
+  on public.price_alerts for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own alerts"
+  on public.price_alerts for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own alerts"
+  on public.price_alerts for update
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own alerts"
+  on public.price_alerts for delete
   using (auth.uid() = user_id);
 
 -- Function to handle new user signup
