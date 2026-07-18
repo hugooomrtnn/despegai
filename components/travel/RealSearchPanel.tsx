@@ -199,7 +199,11 @@ export function RealSearchPanel({ parsed, recommendations, flights }: Props) {
     const destName  = parsed.destination ?? dest;
     const hUrls     = buildHotelUrls(destName, selectedDate, nights, adults);
     const jetradar  = buildJetradarUrl(origin, dest, selectedDate, adults, returnDate);
-    const destFlights = flights.filter((f) => f.destinationAirport === dest);
+    // No filtramos por código de aeropuerto: el parser (IA o mock) y el catálogo de
+    // precios usan mapeos independientes y pueden no coincidir en el código exacto.
+    // `flights` ya viene acotado a esta búsqueda desde la API, así que se usa tal cual
+    // para garantizar que el precio mostrado aquí sea siempre el mismo que en /chollos.
+    const destFlights = flights;
 
     return (
       <div className="space-y-4">

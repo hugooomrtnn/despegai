@@ -1,4 +1,5 @@
 import type { ParsedTravelRequest, TripType } from "@/types/travel";
+import { DESTINATIONS_CATALOG } from "@/lib/flights/mockFlightProvider";
 
 const PLACE_DICT: Record<string, { name: string; code: string }> = {
   // España – principales aeropuertos
@@ -468,9 +469,19 @@ function normalize(text: string): string {
 }
 
 // ─── Mapa de búsqueda normalizado (construido una vez al cargar el módulo) ───
+// PLACE_DICT tiene prioridad (alias curados, países → ciudad principal). Como
+// respaldo, cualquier ciudad del catálogo de precios (lib/flights/mockFlightProvider)
+// que no tenga ya una entrada también queda buscable — así un destino de /destinos
+// o /chollos siempre se reconoce por su nombre exacto y coincide con el precio mostrado.
 const NORMALIZED_DICT: Map<string, { name: string; code: string }> = new Map(
   Object.entries(PLACE_DICT).map(([k, v]) => [normalize(k), v])
 );
+for (const d of DESTINATIONS_CATALOG) {
+  const key = normalize(d.city);
+  if (!NORMALIZED_DICT.has(key)) {
+    NORMALIZED_DICT.set(key, { name: d.city, code: d.airportCode });
+  }
+}
 
 // Lista de claves ordenadas de mayor a menor longitud (para preferir matches específicos)
 const SORTED_KEYS: string[] = Array.from(NORMALIZED_DICT.keys()).sort(
