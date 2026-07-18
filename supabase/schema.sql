@@ -60,10 +60,28 @@ create table if not exists public.price_alerts (
   created_at timestamptz default now() not null
 );
 
+-- Chollos detectados automáticamente (precios reales vía Travelpayouts, refrescados por cron)
+create table if not exists public.chollos (
+  id uuid default uuid_generate_v4() primary key,
+  origin_code text not null,
+  destination_code text not null,
+  destination_city text,
+  destination_country text,
+  price numeric(10, 2) not null,
+  currency text default 'EUR' not null,
+  airline text,
+  departure_at timestamptz,
+  return_at timestamptz,
+  source text default 'travelpayouts' not null,
+  detected_at timestamptz default now() not null
+);
+
 -- Indexes
 create index if not exists idx_travel_searches_user_id on public.travel_searches(user_id);
 create index if not exists idx_travel_searches_created_at on public.travel_searches(created_at desc);
 create index if not exists idx_saved_flights_user_id on public.saved_flights(user_id);
+create index if not exists idx_chollos_price on public.chollos(price);
+create unique index if not exists idx_chollos_unique_route on public.chollos(origin_code, destination_code);
 create index if not exists idx_price_alerts_user_id on public.price_alerts(user_id);
 
 -- Row Level Security
@@ -72,6 +90,12 @@ alter table public.travel_searches enable row level security;
 alter table public.saved_flights enable row level security;
 alter table public.user_preferences enable row level security;
 alter table public.price_alerts enable row level security;
+alter table public.chollos enable row level security;
+
+-- Chollos: lectura pública, escritura solo desde el cron (service role, salta RLS)
+create policy "Anyone can view chollos"
+  on public.chollos for select
+  using (true);
 
 -- Profiles policies
 create policy "Users can view own profile"

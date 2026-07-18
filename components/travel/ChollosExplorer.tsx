@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Bell, Loader2, Trash2, TrendingDown } from "lucide-react";
+import { Bell, BadgeCheck, Info, Loader2, Trash2, TrendingDown } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { TAG_COLORS, TAG_LABELS } from "@/lib/data/destinationMeta";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
@@ -45,7 +45,17 @@ type PriceAlert = {
   max_price: number;
 };
 
-export function ChollosExplorer({ deals }: { deals: DestinationCard[] }) {
+function formatUpdatedAt(iso: string): string {
+  return new Date(iso).toLocaleString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+interface ChollosExplorerProps {
+  deals: DestinationCard[];
+  isReal: boolean;
+  lastUpdated: string | null;
+}
+
+export function ChollosExplorer({ deals, isReal, lastUpdated }: ChollosExplorerProps) {
   const { user, loading: authLoading } = useAuth();
 
   const [alerts, setAlerts] = useState<PriceAlert[]>([]);
@@ -119,6 +129,24 @@ export function ChollosExplorer({ deals }: { deals: DestinationCard[] }) {
 
   return (
     <div className="space-y-12">
+      {/* Transparencia: si los precios son reales (Travelpayouts) o una estimación */}
+      {isReal ? (
+        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-2.5">
+          <BadgeCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+          <p className="text-xs text-emerald-800">
+            <span className="font-semibold">Precios reales</span> detectados automáticamente.
+            {lastUpdated && <> Última actualización: {formatUpdatedAt(lastUpdated)}.</>}
+          </p>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
+          <Info className="h-4 w-4 text-amber-600 flex-shrink-0" />
+          <p className="text-xs text-amber-800">
+            <span className="font-semibold">Precios estimados</span> — todavía no hay datos reales conectados para esta ruta. Al buscar el vuelo verás el precio real de la aerolínea.
+          </p>
+        </div>
+      )}
+
       {/* Grid de chollos, agrupados por continente */}
       <div className="space-y-8">
         {byContinent.map((group) => (

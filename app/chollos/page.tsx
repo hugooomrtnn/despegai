@@ -4,36 +4,91 @@ import { DESTINATIONS_CATALOG, getFlightBasePrice } from "@/lib/flights/mockFlig
 import { getContinent, getFlag, roundPrice, CONTINENTS } from "@/lib/data/destinationMeta";
 import { ChollosExplorer } from "@/components/travel/ChollosExplorer";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Chollos de vuelos internacionales — Despegai",
   description: "Los vuelos internacionales más baratos detectados desde España, en Europa y fuera de Europa, y alertas de precio para tus destinos favoritos.",
 };
 
-const ALL_INTERNATIONAL: DestinationCard[] = DESTINATIONS_CATALOG
-  .filter((d) => d.country !== "España")
-  .map((d) => ({
-    city: d.city,
-    country: d.country,
-    code: d.airportCode,
-    flag: getFlag(d.country),
-    price: roundPrice(getFlightBasePrice(d.airportCode, d.estimatedPriceLevel)),
-    tags: d.tags.slice(0, 3),
-    continent: getContinent(d.country),
-  }));
+const PER_CONTINENT = 8;
 
 // Los vuelos más baratos son casi siempre de corta distancia (Europa). Para que
 // también aparezcan chollos fuera de Europa, se coge lo más barato POR CONTINENTE
-// en vez de ordenar todo el catálogo por precio global.
-const PER_CONTINENT = 6;
-const INTERNATIONAL_DEALS: DestinationCard[] = CONTINENTS.flatMap((continent) =>
-  ALL_INTERNATIONAL
-    .filter((d) => d.continent === continent)
-    .sort((a, b) => a.price - b.price)
-    .slice(0, PER_CONTINENT)
-);
+// en vez de ordenar todo el catálogo/tabla por precio global.
+function pickTopPerContinent(items: DestinationCard[], perContinent = PER_CONTINENT): DestinationCard[] {
+  return CONTINENTS.flatMap((continent) =>
+    items
+      .filter((d) => d.continent === continent)
+      .sort((a, b) => a.price - b.price)
+      .slice(0, perContinent)
+  );
+}
 
-export default function CholloPage() {
+function buildSimulatedDeals(): DestinationCard[] {
+  const all: DestinationCard[] = DESTINATIONS_CATALOG
+    .filter((d) => d.country !== "España")
+    .map((d) => ({
+      city: d.city,
+      country: d.country,
+      code: d.airportCode,
+      flag: getFlag(d.country),
+      price: roundPrice(getFlightBasePrice(d.airportCode, d.estimatedPriceLevel)),
+      tags: d.tags.slice(0, 3),
+      continent: getContinent(d.country),
+    }));
+  return pickTopPerContinent(all);
+}
+
+type RealDealsResult = { deals: DestinationCard[]; lastUpdated: string } | null;
+
+// Lee los chollos que el cron (/api/cron/refresh-chollos) va guardando con
+// precios reales de la Travelpayouts Data API. Si aún no hay datos (token sin
+// configurar, cron no ejecutado todavía, o falla la consulta) devuelve null y
+// la página cae de vuelta a la estimación simulada.
+async function getRealDeals(): Promise<RealDealsResult> {
+  if (!isSupabaseConfigured()) return null;
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("chollos")
+      .select("destination_code, destination_city, destination_country, price, detected_at")
+      .order("price", { ascending: true })
+      .limit(300);
+
+    if (error || !data || data.length === 0) return null;
+
+    const byCode = new Map(DESTINATIONS_CATALOG.map((d) => [d.airportCode, d]));
+    const deals: DestinationCard[] = data
+      .filter((row) => row.destination_country && row.destination_country !== "España")
+      .map((row) => {
+        const catalogEntry = byCode.get(row.destination_code);
+        const country = row.destination_country ?? catalogEntry?.country ?? "";
+        return {
+          city: row.destination_city ?? catalogEntry?.city ?? row.destination_code,
+          country,
+          code: row.destination_code,
+          flag: getFlag(country),
+          price: Math.round(row.price),
+          tags: catalogEntry?.tags.slice(0, 3) ?? [],
+          continent: getContinent(country),
+        };
+      });
+
+    const lastUpdated = data.reduce((max, r) => (r.detected_at > max ? r.detected_at : max), data[0].detected_at);
+    return { deals: pickTopPerContinent(deals), lastUpdated };
+  } catch (e) {
+    console.warn("[/chollos] No se pudieron leer precios reales, usando estimación:", e);
+    return null;
+  }
+}
+
+export default async function CholloPage() {
+  const real = await getRealDeals();
+  const deals = real?.deals ?? buildSimulatedDeals();
+  const isReal = !!real;
+
   return (
     <main className="min-h-screen bg-slate-50">
       <section className="hero-dark py-16 px-4">
@@ -52,7 +107,7 @@ export default function CholloPage() {
       </section>
 
       <div className="max-w-5xl mx-auto px-4 py-10">
-        <ChollosExplorer deals={INTERNATIONAL_DEALS} />
+        <ChollosExplorer deals={deals} isReal={isReal} lastUpdated={real?.lastUpdated ?? null} />
       </div>
     </main>
   );
