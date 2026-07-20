@@ -64,7 +64,14 @@ export async function GET(request: NextRequest) {
       results[origin] = rows.length;
     } catch (e) {
       console.error(`[cron/refresh-chollos] Error con origen ${origin}:`, e);
-      results[origin] = e instanceof Error ? e.message : "error desconocido";
+      if (e instanceof Error) {
+        results[origin] = e.message;
+      } else if (e && typeof e === "object") {
+        const { message, details, hint, code } = e as Record<string, unknown>;
+        results[origin] = JSON.stringify({ message, details, hint, code });
+      } else {
+        results[origin] = String(e);
+      }
     }
   }
 
