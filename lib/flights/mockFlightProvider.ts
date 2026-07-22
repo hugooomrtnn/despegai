@@ -2,6 +2,7 @@ import type { FlightResult, ParsedTravelRequest, DestinationRecommendation } fro
 import type { FlightProvider } from "./types";
 import { buildRecommendationReason } from "./scoreFlight";
 import { roundPrice, getContinent, randomTripDays } from "@/lib/data/destinationMeta";
+import { getRealAnchorPrices } from "./realPriceLookup";
 
 const AIRLINES = [
   "Vueling", "Ryanair", "Iberia Express", "EasyJet", "Wizz Air",
@@ -1410,7 +1411,8 @@ function generateFlightsForDestination(
   dest: DestinationRecommendation,
   origin: { code: string; city: string },
   request: ParsedTravelRequest,
-  count: number
+  count: number,
+  realAnchorPrice: number | null
 ): FlightResult[] {
   const flights: FlightResult[] = [];
   const baseDuration = FLIGHT_DURATIONS[dest.airportCode] ?? 120;
@@ -1429,8 +1431,9 @@ function generateFlightsForDestination(
     const stops = Math.random() < stopChance ? 1 : 0;
     const durationMinutes = stops > 0 ? rawDuration + 85 + Math.floor(Math.random() * 50) : rawDuration;
 
-    // La opción más barata coincide siempre con el precio mostrado en /destinos y /chollos
-    const anchorPrice = roundPrice(basePrice);
+    // Si hay un precio real reciente (Travelpayouts) para esta ruta se usa ese en vez
+    // de la fórmula, para que coincida con lo que se ve al pinchar "Ver vuelos disponibles".
+    const anchorPrice = realAnchorPrice ?? roundPrice(basePrice);
     const price = i === 0 ? anchorPrice : Math.round(anchorPrice * (1.05 + Math.random() * 0.35));
 
     const arrivalDate = addMinutes(departureDate, durationMinutes);
@@ -1550,8 +1553,10 @@ export const mockFlightProvider: FlightProvider = {
       ? 2 + Math.floor(Math.random() * 2)
       : 4 + Math.floor(Math.random() * 3);
 
+    const realPrices = await getRealAnchorPrices(origin.code, targets.map((t) => t.airportCode));
+
     for (const dest of targets) {
-      const generated = generateFlightsForDestination(dest, origin, request, flightsPerDest);
+      const generated = generateFlightsForDestination(dest, origin, request, flightsPerDest, realPrices.get(dest.airportCode) ?? null);
       flights.push(...generated);
     }
 
