@@ -72,9 +72,17 @@ create table if not exists public.chollos (
   airline text,
   departure_at timestamptz,
   return_at timestamptz,
+  stops int,
+  duration_out int,
+  duration_back int,
   source text default 'travelpayouts' not null,
   detected_at timestamptz default now() not null
 );
+
+-- Por si la tabla ya existía de una ejecución anterior sin estas columnas
+alter table public.chollos add column if not exists stops int;
+alter table public.chollos add column if not exists duration_out int;
+alter table public.chollos add column if not exists duration_back int;
 
 -- Indexes
 create index if not exists idx_travel_searches_user_id on public.travel_searches(user_id);

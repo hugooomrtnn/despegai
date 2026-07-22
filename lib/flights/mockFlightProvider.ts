@@ -2,7 +2,7 @@ import type { FlightResult, ParsedTravelRequest, DestinationRecommendation } fro
 import type { FlightProvider } from "./types";
 import { buildRecommendationReason } from "./scoreFlight";
 import { roundPrice, getContinent, randomTripDays } from "@/lib/data/destinationMeta";
-import { getRealAnchorPrices } from "./realPriceLookup";
+import { getRealTickets, type RealTicket } from "./realPriceLookup";
 
 const AIRLINES = [
   "Vueling", "Ryanair", "Iberia Express", "EasyJet", "Wizz Air",
@@ -1368,7 +1368,12 @@ function generateDepartureDate(request: ParsedTravelRequest): Date {
   const now = new Date();
   const base = new Date(now);
 
-  if (request.departureDate) {
+  // Solo se respeta una fecha concreta cuando el usuario NO ha pedido fechas
+  // flexibles. Si flexibleDates es true (lo habitual al buscar "lo más barato"),
+  // se ignora cualquier mes/fecha que el parser haya podido suponer y se reparte
+  // por todo el año — así se compara de verdad contra los 365 días, no solo
+  // contra un mes concreto.
+  if (request.departureDate && !request.flexibleDates) {
     const parsed = new Date(request.departureDate);
     if (!isNaN(parsed.getTime()) && parsed > now) {
       // Scatter around the target month (±7 days)
@@ -1380,8 +1385,9 @@ function generateDepartureDate(request: ParsedTravelRequest): Date {
     }
   }
 
-  // Sin fecha concreta: reparte los vuelos a lo largo de todo el año que viene,
-  // no solo de las próximas semanas — un chollo puede ser para dentro de meses.
+  // Fecha flexible o sin fecha: reparte los vuelos a lo largo de todo el año que
+  // viene (14-364 días), no solo de las próximas semanas — un chollo puede ser
+  // para dentro de meses.
   base.setDate(base.getDate() + 14 + Math.floor(Math.random() * 350));
   base.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
   return base;
@@ -1412,29 +1418,72 @@ function generateFlightsForDestination(
   origin: { code: string; city: string },
   request: ParsedTravelRequest,
   count: number,
-  realAnchorPrice: number | null
+  realTicket: RealTicket | null
 ): FlightResult[] {
   const flights: FlightResult[] = [];
   const baseDuration = FLIGHT_DURATIONS[dest.airportCode] ?? 120;
   const basePrice = getFlightBasePrice(dest.airportCode, dest.estimatedPriceLevel);
   const continent = getContinent(dest.country || "España");
+  const realAnchorPrice = realTicket?.price ?? null;
 
-  for (let i = 0; i < count; i++) {
+  // El vuelo real (precio, fecha, aerolínea, escalas y duración, tal cual los
+  // detectó Travelpayouts) se muestra tal cual, sin inventar nada — es la opción
+  // que de verdad coincide con lo que se ve al pinchar "Ver vuelos disponibles".
+  const realDeparture = realTicket?.departureAt ? new Date(realTicket.departureAt) : null;
+  const useRealFlight = !!(realTicket && realDeparture && !isNaN(realDeparture.getTime()) && realDeparture > new Date());
+
+  if (useRealFlight && realTicket && realDeparture) {
+    const durationOut = realTicket.durationOutMinutes ?? baseDuration;
+    let returnDepartureTime: string | undefined;
+    let returnArrivalTime: string | undefined;
+    if (realTicket.returnAt) {
+      const retDep = new Date(realTicket.returnAt);
+      if (!isNaN(retDep.getTime())) {
+        returnDepartureTime = retDep.toISOString();
+        if (realTicket.durationBackMinutes) returnArrivalTime = addMinutes(retDep, realTicket.durationBackMinutes);
+      }
+    }
+    flights.push({
+      id: `real-${dest.airportCode}-${Date.now()}`,
+      originCity: origin.city,
+      originAirport: origin.code,
+      destinationCity: dest.city,
+      destinationAirport: dest.airportCode,
+      airline: realTicket.airline ?? AIRLINES[0],
+      departureTime: realDeparture.toISOString(),
+      arrivalTime: addMinutes(realDeparture, durationOut),
+      returnDepartureTime,
+      returnArrivalTime,
+      price: realTicket.price,
+      currency: request.currency || "EUR",
+      durationMinutes: durationOut,
+      stops: realTicket.stops ?? 0,
+      score: 0,
+      badges: [],
+      recommendationReason: "",
+    });
+  }
+
+  const remaining = useRealFlight ? count - 1 : count;
+
+  for (let i = 0; i < remaining; i++) {
     const departureDate = generateDepartureDate(request);
     // Vary duration slightly
     const durationVariance = Math.floor(Math.random() * 20 - 10);
     const rawDuration = baseDuration + durationVariance;
 
     // Direct or 1 stop
+    const isFirstSlot = !useRealFlight && i === 0;
     const isLongHaul = rawDuration > 360;
-    const stopChance = isLongHaul ? 0.7 : i === 0 ? 0.2 : 0.5;
+    const stopChance = isLongHaul ? 0.7 : isFirstSlot ? 0.2 : 0.5;
     const stops = Math.random() < stopChance ? 1 : 0;
     const durationMinutes = stops > 0 ? rawDuration + 85 + Math.floor(Math.random() * 50) : rawDuration;
 
-    // Si hay un precio real reciente (Travelpayouts) para esta ruta se usa ese en vez
-    // de la fórmula, para que coincida con lo que se ve al pinchar "Ver vuelos disponibles".
+    // Estas son variaciones estimadas alrededor del precio real (o de la fórmula si
+    // no hay dato real). Si ya se ha añadido el vuelo real arriba, ninguna de estas
+    // iguala su precio exacto — así queda claro que esa es la opción verificada.
     const anchorPrice = realAnchorPrice ?? roundPrice(basePrice);
-    const price = i === 0 ? anchorPrice : Math.round(anchorPrice * (1.05 + Math.random() * 0.35));
+    const price = isFirstSlot ? anchorPrice : Math.round(anchorPrice * (1.05 + Math.random() * 0.35));
 
     const arrivalDate = addMinutes(departureDate, durationMinutes);
     const airline = AIRLINES[Math.floor(Math.random() * AIRLINES.length)];
@@ -1553,10 +1602,10 @@ export const mockFlightProvider: FlightProvider = {
       ? 2 + Math.floor(Math.random() * 2)
       : 4 + Math.floor(Math.random() * 3);
 
-    const realPrices = await getRealAnchorPrices(origin.code, targets.map((t) => t.airportCode));
+    const realTickets = await getRealTickets(origin.code, targets.map((t) => t.airportCode));
 
     for (const dest of targets) {
-      const generated = generateFlightsForDestination(dest, origin, request, flightsPerDest, realPrices.get(dest.airportCode) ?? null);
+      const generated = generateFlightsForDestination(dest, origin, request, flightsPerDest, realTickets.get(dest.airportCode) ?? null);
       flights.push(...generated);
     }
 

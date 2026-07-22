@@ -48,6 +48,9 @@ export async function GET(request: NextRequest) {
             airline: t.airline,
             departure_at: t.departureAt,
             return_at: t.returnAt,
+            stops: t.stops,
+            duration_out: t.durationOutMinutes,
+            duration_back: t.durationBackMinutes,
             source: "travelpayouts",
             detected_at: new Date().toISOString(),
           };

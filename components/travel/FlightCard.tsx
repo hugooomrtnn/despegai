@@ -1,6 +1,6 @@
 "use client";
 
-import { Plane, Clock, ArrowRight, Zap, TrendingDown, Award, Star, AlertCircle } from "lucide-react";
+import { Plane, Clock, ArrowRight, Zap, TrendingDown, Award, Star, AlertCircle, BadgeCheck } from "lucide-react";
 import type { FlightResult, FlightBadge } from "@/types/travel";
 import { formatPrice, formatDuration, formatTime, formatDate } from "@/lib/utils";
 
@@ -113,6 +113,7 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
   const displayBadges = flight.badges.filter((b) => priorityBadges.includes(b)).slice(0, 3);
   const isTopPick  = rank === 0;
   const isMock     = flight.id.startsWith("mock-");
+  const isVerified = flight.id.startsWith("real-");
   const urls       = buildBookingUrls(flight);
 
   return (
@@ -252,8 +253,15 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
           ))}
         </div>
 
-        {/* Disclaimer for mock data */}
-        {isMock && (
+        {/* Precio verificado (real, detectado recientemente) vs orientativo (simulado) */}
+        {isVerified ? (
+          <div className="mt-3 flex items-start gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2.5">
+            <BadgeCheck className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-emerald-700 leading-relaxed">
+              <strong>Precio verificado</strong> — detectado recientemente para esta ruta. Puede variar ligeramente si ya no queda disponible al reservar, como en cualquier buscador de vuelos.
+            </p>
+          </div>
+        ) : isMock && (
           <div className="mt-3 flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
             <AlertCircle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700 leading-relaxed">

@@ -10,6 +10,9 @@ export type CheapTicket = {
   departureAt: string | null;
   returnAt: string | null;
   airline: string | null;
+  stops: number;
+  durationOutMinutes: number | null;
+  durationBackMinutes: number | null;
 };
 
 type CheapPricesRaw = {
@@ -21,6 +24,8 @@ type CheapPricesRaw = {
     departure_at?: string;
     return_at?: string;
     expires_at?: string;
+    duration_to?: number;
+    duration_back?: number;
   }>>;
   error?: string;
 };
@@ -30,7 +35,10 @@ export function isTravelpayoutsConfigured(): boolean {
 }
 
 // "Cheap tickets" — precios más baratos encontrados recientemente desde un origen,
-// agrupados por destino. Una sola llamada cubre decenas de destinos a la vez.
+// agrupados por destino (y, dentro de cada destino, por número de escalas). Una
+// sola llamada cubre decenas de destinos a la vez. Nos quedamos con la opción más
+// barata de cada destino (entre sus variantes de escalas) y descartamos las que ya
+// tengan la fecha de salida en el pasado.
 export async function fetchCheapestFromOrigin(
   originCode: string,
   currency = "eur"
@@ -53,20 +61,32 @@ export async function fetchCheapestFromOrigin(
     throw new Error(`Travelpayouts error: ${json.error ?? "respuesta sin success"}`);
   }
 
-  const tickets: CheapTicket[] = [];
+  const now = Date.now();
+  const cheapestByDestination = new Map<string, CheapTicket>();
+
   for (const [destinationCode, byStops] of Object.entries(json.data ?? {})) {
-    for (const entry of Object.values(byStops)) {
+    for (const [stopsKey, entry] of Object.entries(byStops)) {
       if (typeof entry?.price !== "number") continue;
-      tickets.push({
+      if (entry.departure_at && new Date(entry.departure_at).getTime() < now) continue;
+
+      const candidate: CheapTicket = {
         destinationCode,
         price: entry.price,
         currency: currency.toUpperCase(),
         departureAt: entry.departure_at ?? null,
         returnAt: entry.return_at ?? null,
         airline: entry.airline ?? null,
-      });
+        stops: Number(stopsKey) || 0,
+        durationOutMinutes: entry.duration_to ?? null,
+        durationBackMinutes: entry.duration_back ?? null,
+      };
+
+      const existing = cheapestByDestination.get(destinationCode);
+      if (!existing || candidate.price < existing.price) {
+        cheapestByDestination.set(destinationCode, candidate);
+      }
     }
   }
 
-  return tickets;
+  return Array.from(cheapestByDestination.values());
 }
