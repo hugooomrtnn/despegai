@@ -1,7 +1,7 @@
 import type { FlightResult, ParsedTravelRequest, DestinationRecommendation } from "@/types/travel";
 import type { FlightProvider } from "./types";
 import { buildRecommendationReason } from "./scoreFlight";
-import { roundPrice } from "@/lib/data/destinationMeta";
+import { roundPrice, getContinent, randomTripDays } from "@/lib/data/destinationMeta";
 
 const AIRLINES = [
   "Vueling", "Ryanair", "Iberia Express", "EasyJet", "Wizz Air",
@@ -1415,6 +1415,7 @@ function generateFlightsForDestination(
   const flights: FlightResult[] = [];
   const baseDuration = FLIGHT_DURATIONS[dest.airportCode] ?? 120;
   const basePrice = getFlightBasePrice(dest.airportCode, dest.estimatedPriceLevel);
+  const continent = getContinent(dest.country || "España");
 
   for (let i = 0; i < count; i++) {
     const departureDate = generateDepartureDate(request);
@@ -1435,8 +1436,9 @@ function generateFlightsForDestination(
     const arrivalDate = addMinutes(departureDate, durationMinutes);
     const airline = AIRLINES[Math.floor(Math.random() * AIRLINES.length)];
 
-    // Siempre incluimos vuelta (viaje redondo por defecto de 5 días si no se especifica)
-    const tripDays = request.durationDays ?? 5;
+    // Siempre incluimos vuelta. Si no se especifica duración, se sortea dentro de un
+    // rango realista según el continente (nadie va a Asia/Oceanía/América 5 días).
+    const tripDays = request.durationDays ?? randomTripDays(continent);
     const returnBase = new Date(departureDate.getTime() + tripDays * 24 * 60 * 60 * 1000);
     returnBase.setHours(randomHour(8, 20), Math.floor(Math.random() * 60), 0, 0);
     const returnDepartureTime = returnBase.toISOString();

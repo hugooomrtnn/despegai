@@ -192,28 +192,66 @@ export const FAMOUS_CITY_CODES: Set<string> = new Set([
   "LHR", // Londres
   "AMS", // Ámsterdam
   "VCE", // Venecia
+  "PRG", // Praga
+  "VIE", // Viena
+  "JTR", // Santorini
+  "BUD", // Budapest
+  "ATH", // Atenas
   // África
   "CAI", // El Cairo
   "CPT", // Ciudad del Cabo
   "RAK", // Marrakech
   "ZNZ", // Zanzíbar
+  "NBO", // Nairobi
+  "CMN", // Casablanca
+  "LXR", // Luxor
   // Oriente Medio
   "DXB", // Dubái
   "IST", // Estambul
   "DOH", // Doha
+  "TLV", // Tel Aviv
+  "AMM", // Amán (Petra)
   // Asia
   "NRT", // Tokio
   "BKK", // Bangkok
   "DPS", // Bali
   "SIN", // Singapur
   "HKG", // Hong Kong
+  "ICN", // Seúl
+  "PEK", // Pekín
+  "KTM", // Katmandú
+  "DEL", // Delhi (Taj Mahal)
   // América
   "JFK", // Nueva York
   "GIG", // Río de Janeiro
   "CUN", // Cancún
   "EZE", // Buenos Aires
   "LAX", // Los Ángeles
+  "MIA", // Miami
+  "MEX", // Ciudad de México
+  "HAV", // La Habana
+  "LIM", // Lima (Machu Picchu)
   // Oceanía
   "SYD", // Sídney
   "AKL", // Auckland
+  "MEL", // Melbourne
+  "NAN", // Fiyi
 ]);
+
+// ─── Duración de viaje habitual por continente (ida y vuelta, en días) ───────
+// Nadie se va a Asia/Oceanía/América 5 días — cuanto más lejos, más se suele
+// alargar el viaje. Se usa para generar vuelos con vueltas realistas cuando
+// el usuario no especifica cuántos días quiere estar.
+export const TRIP_DURATION_BY_CONTINENT: Record<Continent, [number, number]> = {
+  "Europa": [3, 7],
+  "Oriente Medio": [5, 15],
+  "África": [5, 15],
+  "Asia": [7, 21],
+  "América": [7, 21],
+  "Oceanía": [7, 21],
+};
+
+export function randomTripDays(continent: Continent): number {
+  const [min, max] = TRIP_DURATION_BY_CONTINENT[continent];
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
