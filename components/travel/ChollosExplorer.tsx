@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Bell, BadgeCheck, Info, Loader2, Trash2, TrendingDown } from "lucide-react";
+import { Bell, BadgeCheck, Info, Loader2, Sparkles, Trash2, TrendingDown } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { TAG_COLORS, TAG_LABELS } from "@/lib/data/destinationMeta";
+import { TAG_COLORS, TAG_LABELS, FAMOUS_CITY_CODES } from "@/lib/data/destinationMeta";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
 
 function DealCard({ dest }: { dest: DestinationCard }) {
+  const isFamous = FAMOUS_CITY_CODES.has(dest.code);
   return (
     <Link
       href={`/?q=${encodeURIComponent(`Vuelos baratos a ${dest.city}`)}`}
@@ -27,6 +28,12 @@ function DealCard({ dest }: { dest: DestinationCard }) {
         </div>
       </div>
       <div className="flex gap-1.5 flex-wrap">
+        {isFamous && (
+          <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">
+            <Sparkles className="h-2.5 w-2.5" />
+            Icónico
+          </span>
+        )}
         {dest.tags.map((tag) => (
           <span key={tag} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${TAG_COLORS[tag] ?? "bg-slate-100 text-slate-500"}`}>
             {TAG_LABELS[tag] ?? tag}

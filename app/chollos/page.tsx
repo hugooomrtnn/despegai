@@ -1,7 +1,7 @@
 import { Flame } from "lucide-react";
 import type { Metadata } from "next";
 import { DESTINATIONS_CATALOG, getFlightBasePrice } from "@/lib/flights/mockFlightProvider";
-import { getContinent, getFlag, roundPrice, CONTINENTS } from "@/lib/data/destinationMeta";
+import { getContinent, getFlag, roundPrice, CONTINENTS, FAMOUS_CITY_CODES } from "@/lib/data/destinationMeta";
 import { ChollosExplorer } from "@/components/travel/ChollosExplorer";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
@@ -15,14 +15,17 @@ const PER_CONTINENT = 8;
 
 // Los vuelos más baratos son casi siempre de corta distancia (Europa). Para que
 // también aparezcan chollos fuera de Europa, se coge lo más barato POR CONTINENTE
-// en vez de ordenar todo el catálogo/tabla por precio global.
+// en vez de ordenar todo el catálogo/tabla por precio global. Además, los destinos
+// icónicos (FAMOUS_CITY_CODES) se añaden siempre que haya datos para ellos, aunque
+// no estén entre los más baratos de su continente ese día.
 function pickTopPerContinent(items: DestinationCard[], perContinent = PER_CONTINENT): DestinationCard[] {
-  return CONTINENTS.flatMap((continent) =>
-    items
-      .filter((d) => d.continent === continent)
-      .sort((a, b) => a.price - b.price)
-      .slice(0, perContinent)
-  );
+  return CONTINENTS.flatMap((continent) => {
+    const continentItems = items.filter((d) => d.continent === continent);
+    const cheapest = [...continentItems].sort((a, b) => a.price - b.price).slice(0, perContinent);
+    const cheapestCodes = new Set(cheapest.map((d) => d.code));
+    const famous = continentItems.filter((d) => FAMOUS_CITY_CODES.has(d.code) && !cheapestCodes.has(d.code));
+    return [...cheapest, ...famous].sort((a, b) => a.price - b.price);
+  });
 }
 
 function buildSimulatedDeals(): DestinationCard[] {

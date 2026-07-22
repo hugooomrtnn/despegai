@@ -180,3 +180,40 @@ export function getFlag(country: string): string {
 export function roundPrice(price: number): number {
   return Math.max(15, Math.round(price / 5) * 5);
 }
+
+// ─── Destinos icónicos por continente (código de aeropuerto) ────────────────
+// Se muestran siempre en /chollos aunque no sean el precio más bajo de su
+// continente ese día, para que los grandes clásicos (Tokio, Nueva York, El
+// Cairo...) nunca falten aunque otro destino salga más barato.
+export const FAMOUS_CITY_CODES: Set<string> = new Set([
+  // Europa
+  "CDG", // París
+  "FCO", // Roma
+  "LHR", // Londres
+  "AMS", // Ámsterdam
+  "VCE", // Venecia
+  // África
+  "CAI", // El Cairo
+  "CPT", // Ciudad del Cabo
+  "RAK", // Marrakech
+  "ZNZ", // Zanzíbar
+  // Oriente Medio
+  "DXB", // Dubái
+  "IST", // Estambul
+  "DOH", // Doha
+  // Asia
+  "NRT", // Tokio
+  "BKK", // Bangkok
+  "DPS", // Bali
+  "SIN", // Singapur
+  "HKG", // Hong Kong
+  // América
+  "JFK", // Nueva York
+  "GIG", // Río de Janeiro
+  "CUN", // Cancún
+  "EZE", // Buenos Aires
+  "LAX", // Los Ángeles
+  // Oceanía
+  "SYD", // Sídney
+  "AKL", // Auckland
+]);
