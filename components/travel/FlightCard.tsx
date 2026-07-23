@@ -2,7 +2,7 @@
 
 import { Plane, Clock, ArrowRight, Zap, TrendingDown, Award, Star, AlertCircle, BadgeCheck } from "lucide-react";
 import type { FlightResult, FlightBadge } from "@/types/travel";
-import { formatPrice, formatDuration, formatTime, formatDate } from "@/lib/utils";
+import { formatPrice, formatDuration, formatTime, formatDate, resolveAirlineName } from "@/lib/utils";
 
 const BADGE_CONFIG: Record<FlightBadge, { label: string; bg: string; text: string }> = {
   cheapest:       { label: "Más barato",    bg: "bg-emerald-50",  text: "text-emerald-700" },
@@ -114,6 +114,7 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
   const isTopPick  = rank === 0;
   const isMock     = flight.id.startsWith("mock-");
   const isVerified = flight.id.startsWith("real-");
+  const airlineName = resolveAirlineName(flight.airline);
   const urls       = buildBookingUrls(flight);
 
   return (
@@ -217,9 +218,9 @@ export function FlightCard({ flight, rank }: FlightCardProps) {
 
         {/* Bottom row: airline + date */}
         <div className="mt-4 pt-4 border-t border-slate-50 flex items-center gap-2 min-w-0">
-          <AirlineBadge airline={flight.airline} />
+          <AirlineBadge airline={airlineName} />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-slate-700 truncate">{flight.airline}</p>
+            <p className="text-sm font-semibold text-slate-700 truncate">{airlineName}</p>
             <p className="text-xs text-slate-400">{formatDate(flight.departureTime)}</p>
           </div>
         </div>
