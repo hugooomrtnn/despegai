@@ -7,8 +7,12 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { TAG_COLORS, TAG_LABELS, FAMOUS_CITY_CODES } from "@/lib/data/destinationMeta";
 import type { DestinationCard } from "@/components/travel/DestinationsExplorer";
 
-function DealCard({ dest }: { dest: DestinationCard }) {
+function DealCard({ dest, pageIsReal }: { dest: DestinationCard; pageIsReal: boolean }) {
   const isFamous = FAMOUS_CITY_CODES.has(dest.code);
+  // Solo se marca "Estimado" cuando el resto de la página va con precios reales —
+  // si toda la página es una estimación ya lo dice el aviso de arriba, no hace
+  // falta repetirlo en cada tarjeta.
+  const showEstimatedTag = pageIsReal && dest.isReal === false;
   return (
     <Link
       href={`/?q=${encodeURIComponent(`Vuelos baratos a ${dest.city}`)}`}
@@ -32,6 +36,11 @@ function DealCard({ dest }: { dest: DestinationCard }) {
           <span className="flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">
             <Sparkles className="h-2.5 w-2.5" />
             Icónico
+          </span>
+        )}
+        {showEstimatedTag && (
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">
+            Estimado
           </span>
         )}
         {dest.tags.map((tag) => (
@@ -164,7 +173,7 @@ export function ChollosExplorer({ deals, isReal, lastUpdated }: ChollosExplorerP
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {group.deals.map((dest) => (
-                <DealCard key={dest.code} dest={dest} />
+                <DealCard key={dest.code} dest={dest} pageIsReal={isReal} />
               ))}
             </div>
           </div>

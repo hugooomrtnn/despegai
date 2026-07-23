@@ -13,6 +13,9 @@ export type DestinationCard = {
   price: number;
   tags: string[];
   continent: Continent;
+  // Solo relevante en /chollos: si el precio viene de Travelpayouts (real) o es una
+  // estimación de respaldo (p. ej. un destino icónico sin dato reciente ese día).
+  isReal?: boolean;
 };
 
 export function DestinationsExplorer({ destinations }: { destinations: DestinationCard[] }) {

@@ -213,6 +213,7 @@ export const FAMOUS_CITY_CODES: Set<string> = new Set([
   "AMM", // Amán (Petra)
   // Asia
   "NRT", // Tokio
+  "KIX", // Osaka
   "BKK", // Bangkok
   "DPS", // Bali
   "SIN", // Singapur

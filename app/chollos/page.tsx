@@ -28,18 +28,25 @@ function pickTopPerContinent(items: DestinationCard[], perContinent = PER_CONTIN
   });
 }
 
+function buildCatalogCard(code: string, isReal: boolean): DestinationCard | null {
+  const d = DESTINATIONS_CATALOG.find((c) => c.airportCode === code);
+  if (!d) return null;
+  return {
+    city: d.city,
+    country: d.country,
+    code: d.airportCode,
+    flag: getFlag(d.country),
+    price: roundPrice(getFlightBasePrice(d.airportCode, d.estimatedPriceLevel)),
+    tags: d.tags.slice(0, 3),
+    continent: getContinent(d.country),
+    isReal,
+  };
+}
+
 function buildSimulatedDeals(): DestinationCard[] {
   const all: DestinationCard[] = DESTINATIONS_CATALOG
     .filter((d) => d.country !== "España")
-    .map((d) => ({
-      city: d.city,
-      country: d.country,
-      code: d.airportCode,
-      flag: getFlag(d.country),
-      price: roundPrice(getFlightBasePrice(d.airportCode, d.estimatedPriceLevel)),
-      tags: d.tags.slice(0, 3),
-      continent: getContinent(d.country),
-    }));
+    .map((d) => buildCatalogCard(d.airportCode, false)!);
   return pickTopPerContinent(all);
 }
 
@@ -76,8 +83,18 @@ async function getRealDeals(): Promise<RealDealsResult> {
           price: Math.round(row.price),
           tags: catalogEntry?.tags.slice(0, 3) ?? [],
           continent: getContinent(country),
+          isReal: true,
         };
       });
+
+    // Destinos icónicos sin precio real ese día: se añaden con una estimación,
+    // marcada individualmente como tal (nunca se presenta como real lo que no lo es).
+    const coveredCodes = new Set(deals.map((d) => d.code));
+    Array.from(FAMOUS_CITY_CODES).forEach((code) => {
+      if (coveredCodes.has(code)) return;
+      const card = buildCatalogCard(code, false);
+      if (card && card.country !== "España") deals.push(card);
+    });
 
     const lastUpdated = data.reduce((max, r) => (r.detected_at > max ? r.detected_at : max), data[0].detected_at);
     return { deals: pickTopPerContinent(deals), lastUpdated };
