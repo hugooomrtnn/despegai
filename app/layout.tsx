@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { CookieConsent } from "@/components/legal/CookieConsent";
 
 const font = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -58,24 +59,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* Google AdSense */}
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1669085762524524"
-          crossOrigin="anonymous"
-        />
-        {/* Travelpayouts Drive — debe estar en el HTML inicial para ser detectado */}
-        {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var s=document.createElement('script');s.async=1;s.src='https://emrldtp.com/NTM2Mzkx.js?t=536391';document.head.appendChild(s);})();`,
-          }}
-        />
+        {/* Google AdSense y Travelpayouts Drive ya no se cargan aquí sin permiso —
+            <CookieConsent> los inyecta solo si el usuario da su consentimiento. */}
       </head>
       <body className="min-h-screen antialiased font-[var(--font-sans)]">
         <AuthProvider>
           <Header />
           {children}
+          <CookieConsent />
         </AuthProvider>
       </body>
     </html>

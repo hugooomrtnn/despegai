@@ -22,7 +22,7 @@ export default function PrivacyPage() {
 
       <div className="max-w-3xl mx-auto px-6 py-14">
         <h1 className="text-3xl font-black text-slate-900 mb-2">Política de Privacidad</h1>
-        <p className="text-sm text-slate-400 mb-10">Última actualización: junio de 2026</p>
+        <p className="text-sm text-slate-400 mb-10">Última actualización: julio de 2026</p>
 
         <div className="prose prose-slate max-w-none space-y-8 text-slate-700 leading-relaxed">
 
@@ -38,11 +38,13 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-3">2. Datos que recopilamos</h2>
             <p>Despegai recopila únicamente los datos mínimos necesarios para prestar el servicio:</p>
             <ul className="list-disc pl-6 mt-3 space-y-2">
-              <li><strong>Consultas de búsqueda:</strong> el texto que introduces en el buscador para procesar tu solicitud de viaje mediante inteligencia artificial.</li>
-              <li><strong>Datos de navegación:</strong> dirección IP, tipo de navegador, páginas visitadas y tiempo de permanencia, recogidos de forma anónima mediante cookies técnicas y de análisis.</li>
-              <li><strong>Cookies de afiliación:</strong> identificadores de sesión gestionados por Travelpayouts para el seguimiento de reservas realizadas a través de enlaces de afiliado.</li>
+              <li><strong>Consultas de búsqueda:</strong> el texto que introduces en el buscador. Se guarda junto con la interpretación que hace la IA de tu petición (destino, fechas, presupuesto) para poder mostrarte resultados y mejorar el servicio.</li>
+              <li><strong>Cuenta de usuario (si te registras):</strong> email y, en su caso, nombre, para poder identificarte, guardar tu historial de búsquedas y tus alertas de precio.</li>
+              <li><strong>Alertas de precio:</strong> destino y precio máximo que configures, para avisarte cuando corresponda.</li>
+              <li><strong>Cookies de afiliación:</strong> identificadores gestionados por Travelpayouts para el seguimiento de reservas realizadas a través de enlaces de afiliado (requieren tu consentimiento, ver sección 5).</li>
+              <li><strong>Datos de navegación:</strong> dirección IP y páginas visitadas, tratados por Vercel (alojamiento) como parte del funcionamiento técnico del sitio.</li>
             </ul>
-            <p className="mt-3">No recopilamos nombres, apellidos, DNI, tarjetas de crédito ni ningún otro dato personal sensible.</p>
+            <p className="mt-3">No recopilamos DNI, tarjetas de crédito ni ningún otro dato personal sensible. No procesamos pagos: las reservas de vuelos se completan siempre en la web de la aerolínea o agencia correspondiente.</p>
           </section>
 
           <section>
@@ -68,42 +70,49 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">5. Cookies</h2>
-            <p>Despegai utiliza los siguientes tipos de cookies:</p>
+            <p>
+              Al entrar por primera vez a Despegai verás un aviso donde puedes <strong>aceptar, rechazar o personalizar</strong> las cookies no esenciales. Las cookies de afiliación y publicidad solo se activan si das tu consentimiento expreso; hasta entonces no se cargan.
+            </p>
             <div className="overflow-x-auto mt-3">
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-slate-50">
                     <th className="text-left p-3 border border-slate-200 font-semibold">Cookie</th>
                     <th className="text-left p-3 border border-slate-200 font-semibold">Proveedor</th>
+                    <th className="text-left p-3 border border-slate-200 font-semibold">Tipo</th>
                     <th className="text-left p-3 border border-slate-200 font-semibold">Finalidad</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="p-3 border border-slate-200">Cookies técnicas</td>
-                    <td className="p-3 border border-slate-200">Despegai / Vercel</td>
-                    <td className="p-3 border border-slate-200">Funcionamiento básico del sitio</td>
+                    <td className="p-3 border border-slate-200">Sesión / autenticación</td>
+                    <td className="p-3 border border-slate-200">Despegai / Supabase / Vercel</td>
+                    <td className="p-3 border border-slate-200">Necesaria</td>
+                    <td className="p-3 border border-slate-200">Funcionamiento básico del sitio y, si te registras, mantener tu sesión iniciada</td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td className="p-3 border border-slate-200">_tp_marker</td>
-                    <td className="p-3 border border-slate-200">Travelpayouts</td>
-                    <td className="p-3 border border-slate-200">Seguimiento de reservas de afiliado</td>
+                    <td className="p-3 border border-slate-200">despegai_cookie_consent</td>
+                    <td className="p-3 border border-slate-200">Despegai</td>
+                    <td className="p-3 border border-slate-200">Necesaria</td>
+                    <td className="p-3 border border-slate-200">Recordar tu elección sobre cookies para no volver a preguntarte</td>
                   </tr>
                   <tr>
-                    <td className="p-3 border border-slate-200">_ga, _gid</td>
-                    <td className="p-3 border border-slate-200">Google Analytics</td>
-                    <td className="p-3 border border-slate-200">Análisis de uso anónimo</td>
+                    <td className="p-3 border border-slate-200">_tp_marker</td>
+                    <td className="p-3 border border-slate-200">Travelpayouts</td>
+                    <td className="p-3 border border-slate-200">Opcional (afiliación)</td>
+                    <td className="p-3 border border-slate-200">Seguimiento de reservas realizadas a través de enlaces de afiliado</td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td className="p-3 border border-slate-200">IDE, DSID</td>
+                    <td className="p-3 border border-slate-200">IDE, DSID y similares</td>
                     <td className="p-3 border border-slate-200">Google AdSense</td>
+                    <td className="p-3 border border-slate-200">Opcional (publicidad)</td>
                     <td className="p-3 border border-slate-200">Publicidad personalizada</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <p className="mt-3">
-              Puedes gestionar o rechazar las cookies desde la configuración de tu navegador. Para más información sobre cómo Google utiliza los datos: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">policies.google.com/privacy</a>.
+              Puedes cambiar tu elección en cualquier momento borrando las cookies del sitio desde la configuración de tu navegador, lo que hará que el aviso vuelva a aparecer. Para más información sobre cómo Google utiliza los datos: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">policies.google.com/privacy</a>.
             </p>
           </section>
 
@@ -111,17 +120,18 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-3">6. Terceros y transferencias internacionales</h2>
             <p>Despegai utiliza los siguientes servicios de terceros que pueden tratar datos personales:</p>
             <ul className="list-disc pl-6 mt-3 space-y-2">
+              <li><strong>Supabase (UE, Irlanda):</strong> base de datos donde se guardan tu cuenta, tus búsquedas y tus alertas de precio si te registras. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
               <li><strong>Anthropic (EE.UU.):</strong> procesamiento de consultas mediante inteligencia artificial. <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
-              <li><strong>Travelpayouts (internacional):</strong> programa de afiliados y seguimiento de reservas. <a href="https://www.travelpayouts.com/en/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
+              <li><strong>Travelpayouts (internacional):</strong> programa de afiliados y seguimiento de reservas, solo si aceptas las cookies de afiliación. <a href="https://www.travelpayouts.com/en/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
               <li><strong>Vercel (EE.UU.):</strong> alojamiento del sitio web. <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
-              <li><strong>Google AdSense (EE.UU.):</strong> publicidad. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
+              <li><strong>Google AdSense (EE.UU.):</strong> publicidad, solo si aceptas las cookies de publicidad. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:underline">Política de privacidad</a></li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">7. Conservación de datos</h2>
             <p>
-              Los datos de las consultas de búsqueda no se almacenan de forma permanente en nuestros servidores. Los datos de navegación anónimos se conservan durante un máximo de 26 meses. Las cookies de afiliado tienen una duración de 30 días.
+              Las consultas de búsqueda se guardan para poder mostrarte tu historial (si tienes cuenta) y mejorar el servicio. Puedes solicitar la eliminación de tu cuenta y de todos los datos asociados (historial, alertas de precio) escribiendo al email de contacto de la sección 8. Las cookies de afiliado (Travelpayouts) tienen una duración de 30 días.
             </p>
           </section>
 
