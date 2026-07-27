@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plane, Hotel, ExternalLink, MapPin, Calendar, ChevronDown, ShieldCheck } from "lucide-react";
 import type { ParsedTravelRequest, DestinationRecommendation, FlightResult } from "@/types/travel";
 import { FlightResultsList } from "./FlightResultsList";
@@ -180,6 +180,20 @@ interface Props {
 export function RealSearchPanel({ parsed, recommendations, flights }: Props) {
   const [expandedDest, setExpandedDest] = useState<string | null>(null);
 
+  // Al pinchar una tarjeta de "Destinos recomendados por IA" (arriba en la página),
+  // el enlace usa #dest-CODIGO — esto abre automáticamente esa fila al llegar.
+  useEffect(() => {
+    function openFromHash() {
+      const hash = window.location.hash.replace("#dest-", "");
+      if (hash && recommendations.some((r) => r.airportCode === hash)) {
+        setExpandedDest(hash);
+      }
+    }
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [recommendations]);
+
   const origin     = parsed.originAirportCode ?? "MAD";
   const originCity = parsed.origin ?? "Madrid";
   const adults     = parsed.passengers ?? 1;
@@ -305,7 +319,7 @@ export function RealSearchPanel({ parsed, recommendations, flights }: Props) {
             const isOpen   = expandedDest === rec.airportCode;
 
             return (
-              <div key={rec.airportCode}>
+              <div key={rec.airportCode} id={`dest-${rec.airportCode}`} className="scroll-mt-20">
                 <button
                   onClick={() => setExpandedDest(isOpen ? null : rec.airportCode)}
                   className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-slate-100 hover:border-sky-200 hover:bg-sky-50/50 transition-all group"

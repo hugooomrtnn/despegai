@@ -36,9 +36,10 @@ export function DestinationRecommendations({ destinations }: DestinationRecommen
           const emoji = DESTINATION_EMOJIS[dest.city] || "🌍";
 
           return (
-            <div
+            <a
               key={dest.airportCode}
-              className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md hover:border-violet-200 transition-all group"
+              href={`#dest-${dest.airportCode}`}
+              className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md hover:border-violet-200 transition-all group block cursor-pointer"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -79,7 +80,7 @@ export function DestinationRecommendations({ destinations }: DestinationRecommen
                   <span className="text-xs font-semibold text-violet-600">{dest.matchScore}%</span>
                 </div>
               </div>
-            </div>
+            </a>
           );
         })}
       </div>

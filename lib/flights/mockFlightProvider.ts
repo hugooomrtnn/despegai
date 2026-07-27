@@ -1385,10 +1385,10 @@ function generateDepartureDate(request: ParsedTravelRequest): Date {
     }
   }
 
-  // Fecha flexible o sin fecha: reparte los vuelos a lo largo de todo el año que
-  // viene (14-364 días), no solo de las próximas semanas — un chollo puede ser
-  // para dentro de meses.
-  base.setDate(base.getDate() + 14 + Math.floor(Math.random() * 350));
+  // Fecha flexible o sin fecha: reparte los vuelos desde mañana hasta 6 meses
+  // vista (1-180 días desde hoy), nunca anclado a "el finde que viene" ni al
+  // "día 1 del mes" — la IA debe comparar todo ese rango para dar el más barato.
+  base.setDate(base.getDate() + 1 + Math.floor(Math.random() * 179));
   base.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
   return base;
 }
@@ -1430,7 +1430,12 @@ function generateFlightsForDestination(
   // detectó Travelpayouts) se muestra tal cual, sin inventar nada — es la opción
   // que de verdad coincide con lo que se ve al pinchar "Ver vuelos disponibles".
   const realDeparture = realTicket?.departureAt ? new Date(realTicket.departureAt) : null;
-  const useRealFlight = !!(realTicket && realDeparture && !isNaN(realDeparture.getTime()) && realDeparture > new Date());
+  const now = new Date();
+  const sixMonthsOut = new Date(now.getTime() + 180 * 24 * 60 * 60 * 1000);
+  const useRealFlight = !!(
+    realTicket && realDeparture && !isNaN(realDeparture.getTime()) &&
+    realDeparture > now && realDeparture <= sixMonthsOut
+  );
 
   if (useRealFlight && realTicket && realDeparture) {
     const durationOut = realTicket.durationOutMinutes ?? baseDuration;
