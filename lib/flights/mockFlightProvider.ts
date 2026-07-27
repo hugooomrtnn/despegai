@@ -1366,28 +1366,37 @@ function randomHour(min = 6, max = 21): number {
 
 function generateDepartureDate(request: ParsedTravelRequest): Date {
   const now = new Date();
-  const base = new Date(now);
 
-  // Solo se respeta una fecha concreta cuando el usuario NO ha pedido fechas
-  // flexibles. Si flexibleDates es true (lo habitual al buscar "lo más barato"),
-  // se ignora cualquier mes/fecha que el parser haya podido suponer y se reparte
-  // por todo el año — así se compara de verdad contra los 365 días, no solo
-  // contra un mes concreto.
-  if (request.departureDate && !request.flexibleDates) {
+  // Si el usuario ha mencionado un mes o fecha concreta (p. ej. "para mayo" o
+  // "el 15 de agosto"), SIEMPRE se respeta esa fecha, esté a 6 meses o a un año
+  // vista — el límite genérico de abajo solo es para cuando no se pidió nada.
+  if (request.departureDate) {
     const parsed = new Date(request.departureDate);
     if (!isNaN(parsed.getTime()) && parsed > now) {
-      // Scatter around the target month (±7 days)
-      parsed.setDate(parsed.getDate() + Math.floor(Math.random() * 14 - 7));
-      if (parsed > now) {
-        parsed.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
-        return parsed;
+      if (request.flexibleDates) {
+        // Mes flexible ("cualquier día de mayo"): repartir dentro de ese mes
+        // completo (día 1 a 28, válido para cualquier mes) en vez de anclar al
+        // día 1 exacto que puso el parser.
+        const scattered = new Date(parsed);
+        scattered.setDate(1 + Math.floor(Math.random() * 28));
+        if (scattered > now) {
+          scattered.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
+          return scattered;
+        }
+      } else {
+        // Fecha exacta: pequeño margen de ±7 días alrededor de ella.
+        parsed.setDate(parsed.getDate() + Math.floor(Math.random() * 14 - 7));
+        if (parsed > now) {
+          parsed.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
+          return parsed;
+        }
       }
     }
   }
 
-  // Fecha flexible o sin fecha: reparte los vuelos desde mañana hasta 6 meses
-  // vista (1-180 días desde hoy), nunca anclado a "el finde que viene" ni al
-  // "día 1 del mes" — la IA debe comparar todo ese rango para dar el más barato.
+  // Sin ningún mes ni fecha mencionados: reparte desde mañana hasta 6 meses
+  // vista (1-180 días desde hoy) para encontrar el más barato en ese rango.
+  const base = new Date(now);
   base.setDate(base.getDate() + 1 + Math.floor(Math.random() * 179));
   base.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
   return base;
@@ -1431,10 +1440,14 @@ function generateFlightsForDestination(
   // que de verdad coincide con lo que se ve al pinchar "Ver vuelos disponibles".
   const realDeparture = realTicket?.departureAt ? new Date(realTicket.departureAt) : null;
   const now = new Date();
+  // El límite de 6 meses solo aplica cuando no se pidió ningún mes/fecha concreta
+  // (búsqueda genérica de "lo más barato"). Si el usuario especificó un mes
+  // (aunque caiga más lejos), no se descarta el vuelo real por estar fuera de ese rango.
   const sixMonthsOut = new Date(now.getTime() + 180 * 24 * 60 * 60 * 1000);
+  const withinDefaultWindow = request.departureDate ? true : realDeparture !== null && realDeparture <= sixMonthsOut;
   const useRealFlight = !!(
     realTicket && realDeparture && !isNaN(realDeparture.getTime()) &&
-    realDeparture > now && realDeparture <= sixMonthsOut
+    realDeparture > now && withinDefaultWindow
   );
 
   if (useRealFlight && realTicket && realDeparture) {
