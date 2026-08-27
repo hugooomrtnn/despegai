@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Responsable del tratamiento</h2>
             <p>
-              El responsable del tratamiento de los datos personales recogidos a través de <strong>despegai.vercel.app</strong> (en adelante, &ldquo;Despegai&rdquo;) es el titular del sitio web, con domicilio en España.
+              El responsable del tratamiento de los datos personales recogidos a través de <strong>despegai.net</strong> (en adelante, &ldquo;Despegai&rdquo;) es el titular del sitio web, con domicilio en España.
               Para cualquier consulta relacionada con la privacidad, puede contactar en: <a href="mailto:hugo.moya.martin@gmail.com" className="text-orange-500 hover:underline">hugo.moya.martin@gmail.com</a>
             </p>
           </section>
@@ -43,6 +43,7 @@ export default function PrivacyPage() {
               <li><strong>Alertas de precio:</strong> destino y precio máximo que configures, para avisarte cuando corresponda.</li>
               <li><strong>Cookies de afiliación:</strong> identificadores gestionados por Travelpayouts para el seguimiento de reservas realizadas a través de enlaces de afiliado (requieren tu consentimiento, ver sección 5).</li>
               <li><strong>Datos de navegación:</strong> dirección IP y páginas visitadas, tratados por Vercel (alojamiento) como parte del funcionamiento técnico del sitio.</li>
+              <li><strong>Estadísticas de uso anónimas:</strong> mediante Vercel Analytics, que no usa cookies ni identifica a usuarios individuales — solo agrega datos como páginas más visitadas o país aproximado.</li>
             </ul>
             <p className="mt-3">No recopilamos DNI, tarjetas de crédito ni ningún otro dato personal sensible. No procesamos pagos: las reservas de vuelos se completan siempre en la web de la aerolínea o agencia correspondiente.</p>
           </section>

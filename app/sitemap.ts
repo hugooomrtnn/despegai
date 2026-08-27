@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { STATIC_GUIDES } from "@/lib/data/staticGuides";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://despegai.vercel.app";
+  const base = "https://www.despegai.net";
   const now  = new Date();
 
   const guiaUrls: MetadataRoute.Sitemap = STATIC_GUIDES.map((g) => ({

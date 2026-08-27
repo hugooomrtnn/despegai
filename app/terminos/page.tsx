@@ -28,7 +28,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. Aceptación de los términos</h2>
             <p>
-              Al acceder y utilizar <strong>Despegai</strong> (despegai.vercel.app), aceptas estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguna parte, te pedimos que no utilices el servicio.
+              Al acceder y utilizar <strong>Despegai</strong> (despegai.net), aceptas estos términos y condiciones en su totalidad. Si no estás de acuerdo con alguna parte, te pedimos que no utilices el servicio.
             </p>
           </section>
 

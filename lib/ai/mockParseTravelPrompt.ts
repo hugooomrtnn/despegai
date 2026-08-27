@@ -650,15 +650,31 @@ function extractDuration(text: string): number | null {
   return null;
 }
 
+// ─── Fecha local en formato YYYY-MM-DD sin pasar por toISOString() ───────────
+// (toISOString() convierte a UTC, lo que desplaza un día en zonas horarias
+// adelantadas a UTC como España — construir el string directo lo evita).
+function toLocalISODate(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+type ParsedDate = { date: string; exact: boolean };
+
 // ─── Extraer fecha de salida ─────────────────────────────────────────────────
-function extractDepartureDate(text: string): string | null {
+// exact=true  → un día concreto pedido explícitamente ("mañana", "el 15 de
+//               agosto"): se respeta con solo un pequeño margen.
+// exact=false → una ventana (un mes entero, una temporada...): hay que repartir
+//               vuelos por todo ese rango en vez de anclarse a un solo día.
+function extractDepartureDate(text: string): ParsedDate | null {
   const lower = text.toLowerCase();
 
   // "mañana"
   if (/\bma[ñn]ana\b/.test(lower)) {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split("T")[0];
+    return { date: toLocalISODate(d), exact: true };
   }
 
   // "este fin de semana", "este finde", "este weekend"
@@ -666,7 +682,7 @@ function extractDepartureDate(text: string): string | null {
     const d = new Date();
     const daysToSat = (6 - d.getDay() + 7) % 7 || 7;
     d.setDate(d.getDate() + daysToSat);
-    return d.toISOString().split("T")[0];
+    return { date: toLocalISODate(d), exact: true };
   }
 
   // "la semana que viene", "la próxima semana", "la semana próxima"
@@ -674,51 +690,89 @@ function extractDepartureDate(text: string): string | null {
     const d = new Date();
     const daysToMon = (8 - d.getDay()) % 7 || 7;
     d.setDate(d.getDate() + daysToMon);
-    return d.toISOString().split("T")[0];
+    return { date: toLocalISODate(d), exact: true };
   }
 
-  // "el mes que viene", "el próximo mes", "el mes próximo"
+  // Día concreto dentro de un mes: "el 15 de agosto", "15 de agosto", "agosto 15", "15/08"
+  const monthNamesPattern = Object.keys(MONTH_MAP).join("|");
+  const dayThenMonth = lower.match(new RegExp(`\\b(\\d{1,2})\\s*(?:de\\s+)?(${monthNamesPattern})\\b`, "i"));
+  const monthThenDay = !dayThenMonth ? lower.match(new RegExp(`\\b(${monthNamesPattern})\\s+(\\d{1,2})\\b`, "i")) : null;
+  const dayMonthMatch = dayThenMonth ?? monthThenDay;
+  if (dayMonthMatch) {
+    const [, a, b] = dayMonthMatch;
+    const day = /^\d+$/.test(a) ? parseInt(a) : parseInt(b);
+    const monthName = /^\d+$/.test(a) ? b : a;
+    const monthNum = MONTH_MAP[monthName];
+    if (monthNum && day >= 1 && day <= 31) {
+      const now = new Date();
+      let targetYear = now.getFullYear();
+      if (new Date(targetYear, monthNum - 1, day) < now) targetYear += 1;
+      const mm = String(monthNum).padStart(2, "0");
+      const dd = String(day).padStart(2, "0");
+      return { date: `${targetYear}-${mm}-${dd}`, exact: true };
+    }
+  }
+
+  // Fecha numérica: "15/08", "15-08", "15/08/2026"
+  const numericMatch = lower.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+  if (numericMatch) {
+    const day = parseInt(numericMatch[1]);
+    const month = parseInt(numericMatch[2]);
+    if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
+      const now = new Date();
+      let year = numericMatch[3] ? parseInt(numericMatch[3]) : now.getFullYear();
+      if (year < 100) year += 2000;
+      if (!numericMatch[3] && new Date(year, month - 1, day) < now) year += 1;
+      const mm = String(month).padStart(2, "0");
+      const dd = String(day).padStart(2, "0");
+      return { date: `${year}-${mm}-${dd}`, exact: true };
+    }
+  }
+
+  // "el mes que viene", "el próximo mes", "el mes próximo" — mes completo, flexible
   if (/(?:el\s+)?(?:pr[oó]ximo\s+mes|mes\s+que\s+viene|mes\s+pr[oó]ximo)/.test(lower)) {
     const d = new Date();
     d.setMonth(d.getMonth() + 1);
     d.setDate(1);
-    return d.toISOString().split("T")[0];
+    return { date: toLocalISODate(d), exact: false };
   }
 
-  // Mes por nombre ("en agosto", "para julio", "en el mes de octubre"…)
+  // Mes por nombre sin día ("en agosto", "para julio", "en el mes de octubre"…)
+  // — flexible dentro de todo ese mes, no solo el día 1.
   for (const [monthName, monthNum] of Object.entries(MONTH_MAP)) {
     if (lower.includes(monthName)) {
       const now = new Date();
       const targetMonth = monthNum - 1;
       const targetYear = targetMonth < now.getMonth() ? now.getFullYear() + 1 : now.getFullYear();
-      return new Date(targetYear, targetMonth, 1).toISOString().split("T")[0];
+      const mm = String(monthNum).padStart(2, "0");
+      return { date: `${targetYear}-${mm}-01`, exact: false };
     }
   }
 
-  // "próximas X semanas"
+  // "próximas X semanas" — ventana, flexible
   const weeksMatch = lower.match(/pr[oó]ximas?\s+(\d+)\s+semanas?/i);
   if (weeksMatch) {
     const d = new Date();
     d.setDate(d.getDate() + parseInt(weeksMatch[1]) * 7);
-    return d.toISOString().split("T")[0];
+    return { date: toLocalISODate(d), exact: false };
   }
 
-  // "próximos X meses"
+  // "próximos X meses" — ventana, flexible
   const monthsMatch = lower.match(/pr[oó]ximos?\s+(\d+)\s+meses?/i);
   if (monthsMatch) {
     const d = new Date();
     d.setMonth(d.getMonth() + parseInt(monthsMatch[1]));
-    return d.toISOString().split("T")[0];
+    return { date: toLocalISODate(d), exact: false };
   }
 
   if (/(?:este|el)\s+verano/.test(lower)) {
-    return new Date(new Date().getFullYear(), 6, 1).toISOString().split("T")[0];
+    return { date: toLocalISODate(new Date(new Date().getFullYear(), 6, 1)), exact: false };
   }
   if (/navidad|navidades/.test(lower)) {
-    return new Date(new Date().getFullYear(), 11, 22).toISOString().split("T")[0];
+    return { date: toLocalISODate(new Date(new Date().getFullYear(), 11, 22)), exact: false };
   }
   if (/semana\s+santa/.test(lower)) {
-    return new Date(new Date().getFullYear(), 3, 10).toISOString().split("T")[0];
+    return { date: toLocalISODate(new Date(new Date().getFullYear(), 3, 10)), exact: false };
   }
 
   return null;
@@ -799,7 +853,7 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
   const destination = extractDestination(text, origin?.name ?? null);
   const budget = extractBudget(text);
   const durationDays = extractDuration(text);
-  const departureDate = extractDepartureDate(text);
+  const parsedDate = extractDepartureDate(text);
   const tripType = detectTripType(text);
   const preferences = extractPreferences(text);
 
@@ -807,12 +861,14 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
     !destination ||
     FLEXIBLE_DESTINATION_KEYWORDS.some((k) => norm.includes(normalize(k)));
 
-  // "cualquier día/fecha", "flexible con las fechas", "cuando sea", etc.
+  // Flexible si no se dio fecha, si lo que se dio es una ventana (mes, temporada...)
+  // en vez de un día concreto, o si se usaron palabras explícitas de flexibilidad.
   const isFlexibleDates =
-    !departureDate ||
+    !parsedDate ||
+    !parsedDate.exact ||
     /flexible|cualquier|cuando sea|cuando quiera|no importa la fecha|cualquier momento/.test(norm);
 
-  const dep = departureDate ?? null;
+  const dep = parsedDate?.date ?? null;
   const dur = durationDays ?? null;
   const returnDate = dep && dur
     ? (() => { const d = new Date(dep); d.setDate(d.getDate() + dur); return d.toISOString().split("T")[0]; })()

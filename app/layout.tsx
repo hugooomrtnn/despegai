@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { CookieConsent } from "@/components/legal/CookieConsent";
+import { Analytics } from "@vercel/analytics/react";
 
 const font = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -16,13 +17,13 @@ export const metadata: Metadata = {
   description:
     "Escribe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan para ti en segundos. Sin formularios, sin complicaciones.",
   keywords: ["vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos", "buscar vuelos IA", "despegai", "vuelos baratos españa", "buscador vuelos ia"],
-  metadataBase: new URL("https://despegai.vercel.app"),
+  metadataBase: new URL("https://www.despegai.net"),
   alternates: { canonical: "/" },
   openGraph: {
     title: "Despegai — Busca vuelos con inteligencia artificial",
     description: "Escribe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan de viaje en segundos. Sin formularios.",
     type: "website",
-    url: "https://despegai.vercel.app",
+    url: "https://www.despegai.net",
     siteName: "Despegai",
     locale: "es_ES",
   },
@@ -41,7 +42,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Despegai",
-  url: "https://despegai.vercel.app",
+  url: "https://www.despegai.net",
   description: "Buscador de vuelos con inteligencia artificial en español. Escribe tu viaje y la IA encuentra vuelos, hoteles y plan de viaje en segundos.",
   applicationCategory: "TravelApplication",
   operatingSystem: "Web",
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <CookieConsent />
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
