@@ -1366,6 +1366,9 @@ function randomHour(min = 6, max = 21): number {
 
 function generateDepartureDate(request: ParsedTravelRequest): Date {
   const now = new Date();
+  // Si se pidió "de jueves a domingo" (o similar), la ida SIEMPRE tiene que caer
+  // en ese día de la semana — no vale cualquier día del mes/rango.
+  const weekday = request.departureWeekday ?? null;
 
   // Si el usuario ha mencionado un mes o fecha concreta (p. ej. "para mayo" o
   // "el 15 de agosto"), SIEMPRE se respeta esa fecha, esté a 6 meses o a un año
@@ -1381,15 +1384,26 @@ function generateDepartureDate(request: ParsedTravelRequest): Date {
         const isCurrentMonth = parsed.getFullYear() === now.getFullYear() && parsed.getMonth() === now.getMonth();
         const daysInMonth = new Date(parsed.getFullYear(), parsed.getMonth() + 1, 0).getDate();
         const minDay = isCurrentMonth ? now.getDate() + 1 : 1;
-        const maxDay = Math.min(28, daysInMonth);
-        if (minDay <= maxDay) {
-          const scattered = new Date(parsed);
-          scattered.setDate(minDay + Math.floor(Math.random() * (maxDay - minDay + 1)));
+        // Sin día de la semana pedido, se acota a los primeros 28 días (evita
+        // sesgar siempre a fin de mes); con día de la semana, hace falta el mes
+        // entero para poder encontrar todas las ocurrencias de ese día.
+        const maxDay = weekday === null ? Math.min(28, daysInMonth) : daysInMonth;
+
+        const candidateDays: number[] = [];
+        for (let d = minDay; d <= maxDay; d++) {
+          if (weekday === null || new Date(parsed.getFullYear(), parsed.getMonth(), d).getDay() === weekday) {
+            candidateDays.push(d);
+          }
+        }
+
+        if (candidateDays.length > 0) {
+          const day = candidateDays[Math.floor(Math.random() * candidateDays.length)];
+          const scattered = new Date(parsed.getFullYear(), parsed.getMonth(), day);
           scattered.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
           return scattered;
         }
         // Si no queda ningún día válido en ese mes (pedido casi al final del mes
-        // en curso), cae al reparto genérico de abajo.
+        // en curso, o ese día de la semana no cabe ya), cae al reparto genérico.
       } else if (parsed > now) {
         // Fecha exacta: pequeño margen de ±7 días alrededor de ella.
         parsed.setDate(parsed.getDate() + Math.floor(Math.random() * 14 - 7));
@@ -1402,7 +1416,21 @@ function generateDepartureDate(request: ParsedTravelRequest): Date {
   }
 
   // Sin ningún mes ni fecha mencionados: reparte desde mañana hasta 6 meses
-  // vista (1-180 días desde hoy) para encontrar el más barato en ese rango.
+  // vista (1-180 días desde hoy), respetando el día de la semana si se pidió.
+  if (weekday !== null) {
+    const candidates: Date[] = [];
+    for (let offset = 1; offset <= 179; offset++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() + offset);
+      if (d.getDay() === weekday) candidates.push(d);
+    }
+    if (candidates.length > 0) {
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      picked.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);
+      return picked;
+    }
+  }
+
   const base = new Date(now);
   base.setDate(base.getDate() + 1 + Math.floor(Math.random() * 179));
   base.setHours(randomHour(), Math.floor(Math.random() * 60), 0, 0);

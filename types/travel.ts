@@ -18,6 +18,10 @@ export type ParsedTravelRequest = {
   returnDate?: string | null;
   flexibleDates: boolean;
   durationDays?: number | null;
+  // Día de la semana exacto pedido para la ida (0=domingo…6=sábado), si el
+  // usuario dijo algo como "de jueves a domingo" — los vuelos generados deben
+  // caer justo en ese día, no en cualquiera dentro del mes/rango.
+  departureWeekday?: number | null;
   budget?: number | null;
   currency: string;
   passengers: number;

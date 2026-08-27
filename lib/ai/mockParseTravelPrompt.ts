@@ -625,9 +625,30 @@ function extractBudget(text: string): number | null {
   return null;
 }
 
+// ─── Días de la semana ("de jueves a domingo", "viernes a domingo"…) ─────────
+const WEEKDAY_MAP: Record<string, number> = {
+  domingo: 0, lunes: 1, martes: 2, miercoles: 3, jueves: 4, viernes: 5, sabado: 6,
+};
+
+// Devuelve el día de la semana de ida (0=domingo…6=sábado) y cuántos días dura
+// el viaje hasta el día de vuelta mencionado. "jueves a domingo" → sale jueves,
+// 3 días hasta el domingo (jue, vie, sáb, domingo = vuelta).
+function extractWeekdayRange(normText: string): { weekday: number; days: number } | null {
+  const names = Object.keys(WEEKDAY_MAP).join("|");
+  const m = normText.match(new RegExp(`(?:de\\s+)?(${names})\\s+a\\s+(${names})`, "i"));
+  if (!m) return null;
+  const start = WEEKDAY_MAP[m[1]];
+  const end = WEEKDAY_MAP[m[2]];
+  const days = ((end - start + 7) % 7) || 7;
+  return { weekday: start, days };
+}
+
 // ─── Extraer duración ────────────────────────────────────────────────────────
-function extractDuration(text: string): number | null {
+function extractDuration(text: string, norm: string): number | null {
   const lower = text.toLowerCase();
+
+  const weekdayRange = extractWeekdayRange(norm);
+  if (weekdayRange) return weekdayRange.days;
 
   if (/fin\s+de\s+semana|finde(?:\s+semana)?|weekend/.test(lower)) return 3;
 
@@ -852,7 +873,8 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
   const origin = extractOrigin(text);
   const destination = extractDestination(text, origin?.name ?? null);
   const budget = extractBudget(text);
-  const durationDays = extractDuration(text);
+  const durationDays = extractDuration(text, norm);
+  const weekdayRange = extractWeekdayRange(norm);
   const parsedDate = extractDepartureDate(text);
   const tripType = detectTripType(text);
   const preferences = extractPreferences(text);
@@ -871,7 +893,7 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
   const dep = parsedDate?.date ?? null;
   const dur = durationDays ?? null;
   const returnDate = dep && dur
-    ? (() => { const d = new Date(dep); d.setDate(d.getDate() + dur); return d.toISOString().split("T")[0]; })()
+    ? (() => { const d = new Date(dep); d.setDate(d.getDate() + dur); return toLocalISODate(d); })()
     : null;
 
   return {
@@ -884,6 +906,7 @@ export function mockParseTravelPrompt(rawPrompt: string): ParsedTravelRequest {
     returnDate,
     flexibleDates: isFlexibleDates,
     durationDays: dur,
+    departureWeekday: weekdayRange?.weekday ?? null,
     budget,
     currency: "EUR",
     passengers: extractPassengers(text),
