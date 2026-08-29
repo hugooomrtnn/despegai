@@ -13,15 +13,15 @@ const font = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Despegai — Busca vuelos con inteligencia artificial",
+  title: "Despegai — Vuelos baratos con inteligencia artificial",
   description:
-    "Escribe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan para ti en segundos. Sin formularios, sin complicaciones.",
-  keywords: ["vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos", "buscar vuelos IA", "despegai", "vuelos baratos españa", "buscador vuelos ia"],
+    "Busca vuelos baratos con IA: escribe tu viaje en español y encuentra los mejores precios en vuelos, hoteles y plan de viaje en segundos. Sin formularios.",
+  keywords: ["vuelos baratos", "vuelos baratos con ia", "búsqueda de vuelos baratos", "inteligencia artificial", "viajes", "comparador vuelos", "buscar vuelos IA", "despegai", "vuelos baratos españa", "buscador vuelos ia"],
   metadataBase: new URL("https://www.despegai.net"),
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Despegai — Busca vuelos con inteligencia artificial",
-    description: "Escribe tu viaje en español y la IA encuentra los mejores vuelos, hoteles y plan de viaje en segundos. Sin formularios.",
+    title: "Despegai — Vuelos baratos con inteligencia artificial",
+    description: "Busca vuelos baratos con IA: escribe tu viaje en español y encuentra los mejores precios en vuelos, hoteles y plan de viaje en segundos.",
     type: "website",
     url: "https://www.despegai.net",
     siteName: "Despegai",
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Despegai — Busca vuelos con IA",
-    description: "Describe tu viaje en español. La IA lo encuentra todo en segundos.",
+    title: "Despegai — Vuelos baratos con IA",
+    description: "Busca vuelos baratos con inteligencia artificial. Describe tu viaje en español y la IA lo encuentra todo en segundos.",
   },
   robots: { index: true, follow: true },
   other: {
@@ -43,7 +43,7 @@ const jsonLd = {
   "@type": "WebApplication",
   name: "Despegai",
   url: "https://www.despegai.net",
-  description: "Buscador de vuelos con inteligencia artificial en español. Escribe tu viaje y la IA encuentra vuelos, hoteles y plan de viaje en segundos.",
+  description: "Buscador de vuelos baratos con inteligencia artificial en español. Escribe tu viaje y la IA encuentra vuelos, hoteles y plan de viaje en segundos.",
   applicationCategory: "TravelApplication",
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },

@@ -8,7 +8,7 @@ import { DestinationsExplorer, type DestinationCard } from "@/components/travel/
 
 export const metadata: Metadata = {
   title: "Destinos populares desde España — Despegai",
-  description: "Más de 180 destinos desde España: Europa, América, Asia, África y Oceanía. Encuentra los vuelos más baratos con inteligencia artificial.",
+  description: "Más de 226 destinos desde España: Europa, América, Asia, África y Oceanía. Encuentra los vuelos más baratos con inteligencia artificial.",
 };
 
 export default async function DestinosPage() {
